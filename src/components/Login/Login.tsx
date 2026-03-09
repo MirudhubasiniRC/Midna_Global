@@ -30,6 +30,8 @@ export default function Login() {
         justifyContent: 'center',
         padding: spacing[8],
         fontFamily: typography.fonts.sans.family,
+        fontSize: typography.sizes.base.fontSize,
+        lineHeight: typography.sizes.base.lineHeight,
         color: theme['text-primary'],
       }}
     >
@@ -50,12 +52,14 @@ export default function Login() {
             boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)',
           }}
         >
-        {/* Logo - full width of card, slight left offset */}
+        {/* Logo - no background, transparent only */}
         <div
           style={{
             width: '100%',
-            padding: `${spacing[5]} 0 0`,
-            marginLeft: -1,
+            height: 120,
+            paddingTop: spacing[4],
+            marginLeft: -10,
+            background: 'transparent',
           }}
         >
           <img
@@ -63,10 +67,11 @@ export default function Login() {
             alt="Midna Global"
             style={{
               width: '100%',
-              height: 'auto',
-              maxHeight: 56,
+              height: '100%',
               objectFit: 'contain',
+              objectPosition: 'center center',
               display: 'block',
+              background: 'transparent',
             }}
           />
         </div>
@@ -92,6 +97,7 @@ export default function Login() {
             letterSpacing: typography.fonts.heading.letterSpacing,
             margin: `0 0 ${spacing[6]} 0`,
             color: theme['text-primary'],
+            textAlign: 'center',
           }}
         >
           Sign In
@@ -104,6 +110,8 @@ export default function Login() {
             style={{
               display: 'block',
               fontSize: typography.sizes.base.fontSize,
+              lineHeight: typography.sizes.base.lineHeight,
+              fontFamily: typography.fonts.sans.family,
               marginBottom: spacing[2],
               color: theme['text-primary'],
             }}
@@ -119,11 +127,13 @@ export default function Login() {
               height: inputTokens.height.md,
               padding: inputTokens.padding,
               fontSize: typography.sizes.base.fontSize,
+              lineHeight: typography.sizes.base.lineHeight,
               fontFamily: typography.fonts.sans.family,
               border: `1px solid ${theme.border}`,
               borderRadius: radius.sm,
               color: theme['text-primary'],
               boxSizing: 'border-box',
+              outlineColor: theme['focus-ring'],
             }}
           />
         </div>
@@ -142,6 +152,8 @@ export default function Login() {
               htmlFor="password"
               style={{
                 fontSize: typography.sizes.base.fontSize,
+                lineHeight: typography.sizes.base.lineHeight,
+                fontFamily: typography.fonts.sans.family,
                 color: theme['text-primary'],
               }}
             >
@@ -151,6 +163,8 @@ export default function Login() {
               href="#"
               style={{
                 fontSize: typography.sizes.sm.fontSize,
+                lineHeight: typography.sizes.sm.lineHeight,
+                fontFamily: typography.fonts.sans.family,
                 color: theme.primary,
                 textDecoration: 'none',
               }}
@@ -167,11 +181,13 @@ export default function Login() {
               height: inputTokens.height.md,
               padding: inputTokens.padding,
               fontSize: typography.sizes.base.fontSize,
+              lineHeight: typography.sizes.base.lineHeight,
               fontFamily: typography.fonts.sans.family,
               border: `1px solid ${theme.border}`,
               borderRadius: radius.sm,
               color: theme['text-primary'],
               boxSizing: 'border-box',
+              outlineColor: theme['focus-ring'],
             }}
           />
         </div>
@@ -183,6 +199,8 @@ export default function Login() {
             style={{
               display: 'block',
               fontSize: typography.sizes.base.fontSize,
+              lineHeight: typography.sizes.base.lineHeight,
+              fontFamily: typography.fonts.sans.family,
               marginBottom: spacing[2],
               color: theme['text-primary'],
             }}
@@ -199,11 +217,13 @@ export default function Login() {
                 height: inputTokens.height.md,
                 padding: inputTokens.padding,
                 fontSize: typography.sizes.base.fontSize,
+                lineHeight: typography.sizes.base.lineHeight,
                 fontFamily: typography.fonts.sans.family,
                 border: `1px solid ${theme.border}`,
                 borderRadius: radius.sm,
                 color: theme['text-primary'],
                 boxSizing: 'border-box',
+                outlineColor: theme['focus-ring'],
               }}
             />
             <div
@@ -223,8 +243,9 @@ export default function Login() {
                   fontFamily: typography.fonts.mono.family,
                   fontWeight: typography.fonts.mono.fontWeight,
                   fontSize: typography.sizes.lg.fontSize,
+                  lineHeight: typography.sizes.lg.lineHeight,
+                  letterSpacing: typography.fonts.mono.letterSpacing,
                   color: theme['text-primary'],
-                  letterSpacing: '2px',
                 }}
               >
                 {captcha}
@@ -266,7 +287,8 @@ export default function Login() {
             background: theme['btn-primary-bg'],
             color: theme['btn-primary-text'],
             fontSize: typography.sizes.base.fontSize,
-            fontWeight: 600,
+            lineHeight: typography.sizes.base.lineHeight,
+            fontWeight: typography.fonts.heading.fontWeight,
             fontFamily: typography.fonts.sans.family,
             border: 'none',
             borderRadius: radius.md,
@@ -280,7 +302,7 @@ export default function Login() {
             e.currentTarget.style.background = theme['btn-primary-bg'];
           }}
         >
-          Secure Login
+          Sign In
         </button>
 
         {/* Security disclaimer */}
@@ -306,8 +328,9 @@ export default function Login() {
           </svg>
           <span
             style={{
-              fontSize: typography.sizes.xs.fontSize,
-              lineHeight: typography.sizes.xs.lineHeight,
+              fontSize: typography.sizes['2xs'].fontSize,
+              lineHeight: typography.sizes['2xs'].lineHeight,
+              fontFamily: typography.fonts.sans.family,
               color: theme['text-muted'],
             }}
           >
