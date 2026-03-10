@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import Login from './components/Login/Login'
 import { getThemeCssVars } from './styles/theme'
 import './App.css'
+import Sign from './components/Login/Sign'
 
 function App() {
   useEffect(() => {
