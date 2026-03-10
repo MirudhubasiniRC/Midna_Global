@@ -271,7 +271,7 @@ export default function PentLogin() {
               >
                 Sign In
               </h1>
-              <div style={{ marginTop: (spacing[6] ?? 24) + 18, marginBottom: spacing[2] }}>
+              <div style={{ marginTop: (spacing[6] ?? 24) + 42, marginBottom: spacing[2] }}>
                 <label htmlFor="pent-user-id" style={{ display: 'block', fontSize: typography.sizes.sm.fontSize, marginBottom: 4, marginLeft: 8, color: theme['text-primary'] }}>
                   User ID
                 </label>
@@ -293,21 +293,22 @@ export default function PentLogin() {
                 />
               </div>
               <div style={{ marginBottom: spacing[2] }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4, marginLeft: -25 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4, marginLeft: -25, marginRight: -25 }}>
                   <label htmlFor="pent-password" style={{ fontSize: typography.sizes.sm.fontSize, color: theme['text-primary'] }}>
                     Password
                   </label>
-                  <a href="#" style={{ fontSize: typography.sizes.xs.fontSize, color: primary, marginRight: -22, textDecoration: 'none' }}>
+                  <a href="#" style={{ fontSize: typography.sizes.xs.fontSize, color: primary, textDecoration: 'none' }}>
                     Forgot Password?
                   </a>
                 </div>
-                <input
-                  id="pent-password"
-                  type="password"
-                  placeholder="Enter your password"
-                  style={{
-                    width: '100%',
-                    height: inputTokens.height.sm,
+                <div style={{ marginLeft: -35, marginRight: -35 }}>
+                  <input
+                    id="pent-password"
+                    type="password"
+                    placeholder="Enter your password"
+                    style={{
+                      width: '100%',
+                      height: inputTokens.height.sm,
                     padding: '8px 12px',
                     fontSize: typography.sizes.sm.fontSize,
                     fontFamily: typography.fonts.sans.family,
@@ -316,31 +317,31 @@ export default function PentLogin() {
                     color: theme['text-primary'],
                     boxSizing: 'border-box',
                   }}
-                />
+                  />
+                </div>
               </div>
               <div style={{ marginBottom: spacing[3] }}>
                 <label htmlFor="pent-captcha" style={{ display: 'block', fontSize: typography.sizes.sm.fontSize, marginBottom: 4, marginLeft: -10, color: theme['text-primary'] }}>
                   Captcha
                 </label>
-                <input
-                  id="pent-captcha"
-                  type="text"
-                  placeholder="Enter captcha"
-                  style={{
-                    width: '100%',
-                    maxWidth: 140,
-                    height: inputTokens.height.sm,
-                    padding: '8px 12px',
-                    fontSize: typography.sizes.sm.fontSize,
-                    fontFamily: typography.fonts.sans.family,
-                    border: `1px solid ${theme.border}`,
-                    borderRadius: radius.sm,
-                    color: theme['text-primary'],
-                    boxSizing: 'border-box',
-                    marginBottom: spacing[2],
-                  }}
-                />
                 <div style={{ display: 'flex', gap: spacing[2], alignItems: 'center' }}>
+                  <input
+                    id="pent-captcha"
+                    type="text"
+                    placeholder="Enter captcha"
+                    style={{
+                      width: 100,
+                      maxWidth: 100,
+                      height: inputTokens.height.sm,
+                      padding: '8px 12px',
+                      fontSize: typography.sizes.sm.fontSize,
+                      fontFamily: typography.fonts.sans.family,
+                      border: `1px solid ${theme.border}`,
+                      borderRadius: radius.sm,
+                      color: theme['text-primary'],
+                      boxSizing: 'border-box',
+                    }}
+                  />
                   <div
                     style={{
                       height: inputTokens.height.sm,
@@ -374,9 +375,11 @@ export default function PentLogin() {
                 type="button"
                 style={{
                   alignSelf: 'center',
+                  marginTop: spacing[6],
                   minWidth: 60,
-                  padding: '0 10px',
+                  padding: '0 20px',
                   height: 48,
+                  minHeight: 30,
                   background: theme['btn-primary-bg'],
                   color: theme['btn-primary-text'],
                   fontSize: typography.sizes.sm.fontSize,
