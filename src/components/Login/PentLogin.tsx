@@ -1,8 +1,11 @@
+import { useState, useCallback } from 'react';
 import {
   colors,
   spacing,
   radius,
   typography,
+  buttonTokens,
+  inputTokens,
 } from '../../styles/theme';
 
 import fullLogo from '../../assets/Full.png';
@@ -16,8 +19,8 @@ const theme = colors.light;
 const primary = theme.primary;
 const accent = theme.accent;
 
-const LOGO_SIZE = 90;
-const STAR_SIZE = 480;
+const LOGO_SIZE = 98;
+const STAR_SIZE = 500;
 
 const logos = [
   { src: academicsLogo, alt: 'Academics', position: 'topLeft' as const },
@@ -26,15 +29,20 @@ const logos = [
   { src: partneringLogo, alt: 'Partnering', position: 'bottomRight' as const },
 ];
 
+const generateCaptcha = () => Math.random().toString(36).slice(2, 6);
+
 export default function PentLogin() {
-  // Centered in each of the 4 small triangles (scaled for STAR_SIZE 480)
+  const [captcha, setCaptcha] = useState(generateCaptcha);
+  const refreshCaptcha = useCallback(() => setCaptcha(generateCaptcha), []);
+
+  // Centered in each of the 4 small triangles (scaled for STAR_SIZE 500)
   const getLogoPosition = (pos: 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight') => {
     const h = LOGO_SIZE / 2;
     switch (pos) {
-      case 'topLeft':   return { top: 128 - h, left: 102 - h };
-      case 'topRight':  return { top: 128 - h, left: 378 - h };
-      case 'bottomLeft': return { top: 378 - h, left: 102 - h };
-      case 'bottomRight': return { top: 378 - h, left: 378 - h };
+      case 'topLeft':   return { top: 133 - h, left: 106 - h };
+      case 'topRight':  return { top: 133 - h, left: 394 - h };
+      case 'bottomLeft': return { top: 367 - h, left: 106 - h };
+      case 'bottomRight': return { top: 367 - h, left: 394 - h };
     }
   };
 
@@ -53,10 +61,10 @@ export default function PentLogin() {
         color: theme['text-primary'],
       }}
     >
-      {/* Header card - shrunk, star stays same size */}
+      {/* Header card */}
       <div
         style={{
-          width: 520,
+          width: 540,
           maxWidth: '100%',
           background: theme['bg-surface'],
           borderRadius: radius.lg,
@@ -72,9 +80,10 @@ export default function PentLogin() {
             justifyContent: 'space-between',
             width: '100%',
             paddingTop: spacing[4],
+            paddingBottom: spacing[2],
             paddingLeft: spacing[4],
             paddingRight: spacing[4],
-            minHeight: 120,
+            minHeight: 100,
             gap: 0,
           }}
         >
@@ -135,10 +144,13 @@ export default function PentLogin() {
           }}
         />
 
-        {/* Star section - reduced padding, star size unchanged */}
+        {/* Star section */}
         <div
           style={{
-            padding: spacing[4],
+            paddingTop: 0,
+            paddingBottom: spacing[3],
+            paddingLeft: spacing[3],
+            paddingRight: spacing[4],
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -164,26 +176,26 @@ export default function PentLogin() {
                 overflow: 'visible',
               }}
             >
-              {/* Triangle 1 (primary) */}
+              {/* Triangle 1 (primary) - scaled for 500 */}
               <polygon
-                points="200,57 280,57 478,446 2,446"
+                points="208,60 292,60 498,465 2,465"
                 fill="none"
                 stroke={primary}
                 strokeWidth="2.5"
               />
               {/* Triangle 2 (accent) */}
               <polygon
-                points="2,57 478,57 280,446 200,446"
+                points="2,60 498,60 292,465 208,465"
                 fill="none"
                 stroke={accent}
                 strokeWidth="2.5"
               />
-              {/* Middle bottom segment - indigo overlay (teal hidden beneath) */}
+              {/* Middle bottom segment - indigo overlay */}
               <line
-                x1="200"
-                y1="446"
-                x2="280"
-                y2="446"
+                x1="208"
+                y1="465"
+                x2="292"
+                y2="465"
                 stroke={primary}
                 strokeWidth="2.5"
               />
@@ -230,7 +242,176 @@ export default function PentLogin() {
               </div>
             ))}
 
-            {/* Center hexagon space - ready for sign-in card later */}
+            {/* Login fields - narrow width, inside pentagon */}
+            <div
+              style={{
+                position: 'absolute',
+                top: 170,
+                left: 145,
+                right: 145,
+                bottom: 90,
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'stretch',
+                padding: spacing[3],
+                background: 'transparent',
+                zIndex: 2,
+              }}
+            >
+              <h1
+                style={{
+                  fontSize: typography.sizes.xl.fontSize,
+                  fontWeight: typography.fonts.heading.fontWeight,
+                  fontFamily: typography.fonts.heading.family,
+                  margin: `0 0 ${spacing[3]} 0`,
+                  color: theme['text-primary'],
+                  textAlign: 'center',
+                }}
+              >
+                Sign In
+              </h1>
+              <div style={{ marginBottom: spacing[2] }}>
+                <label htmlFor="pent-user-id" style={{ display: 'block', fontSize: typography.sizes.sm.fontSize, marginBottom: 4, color: theme['text-primary'] }}>
+                  User ID
+                </label>
+                <input
+                  id="pent-user-id"
+                  type="text"
+                  placeholder="Enter your user ID"
+                  style={{
+                    width: '100%',
+                    height: inputTokens.height.sm,
+                    padding: '8px 12px',
+                    fontSize: typography.sizes.sm.fontSize,
+                    fontFamily: typography.fonts.sans.family,
+                    border: `1px solid ${theme.border}`,
+                    borderRadius: radius.sm,
+                    color: theme['text-primary'],
+                    boxSizing: 'border-box',
+                  }}
+                />
+              </div>
+              <div style={{ marginBottom: spacing[2] }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                  <label htmlFor="pent-password" style={{ fontSize: typography.sizes.sm.fontSize, color: theme['text-primary'] }}>
+                    Password
+                  </label>
+                  <a href="#" style={{ fontSize: typography.sizes.xs.fontSize, color: primary, textDecoration: 'none' }}>
+                    Forgot Password?
+                  </a>
+                </div>
+                <input
+                  id="pent-password"
+                  type="password"
+                  placeholder="Enter your password"
+                  style={{
+                    width: '100%',
+                    height: inputTokens.height.sm,
+                    padding: '8px 12px',
+                    fontSize: typography.sizes.sm.fontSize,
+                    fontFamily: typography.fonts.sans.family,
+                    border: `1px solid ${theme.border}`,
+                    borderRadius: radius.sm,
+                    color: theme['text-primary'],
+                    boxSizing: 'border-box',
+                  }}
+                />
+              </div>
+              <div style={{ marginBottom: spacing[3] }}>
+                <label htmlFor="pent-captcha" style={{ display: 'block', fontSize: typography.sizes.sm.fontSize, marginBottom: 4, color: theme['text-primary'] }}>
+                  Captcha
+                </label>
+                <input
+                  id="pent-captcha"
+                  type="text"
+                  placeholder="Enter captcha"
+                  style={{
+                    width: '100%',
+                    maxWidth: 140,
+                    height: inputTokens.height.sm,
+                    padding: '8px 12px',
+                    fontSize: typography.sizes.sm.fontSize,
+                    fontFamily: typography.fonts.sans.family,
+                    border: `1px solid ${theme.border}`,
+                    borderRadius: radius.sm,
+                    color: theme['text-primary'],
+                    boxSizing: 'border-box',
+                    marginBottom: spacing[2],
+                  }}
+                />
+                <div style={{ display: 'flex', gap: spacing[2], alignItems: 'center' }}>
+                  <div
+                    style={{
+                      height: inputTokens.height.sm,
+                      minWidth: 52,
+                      padding: '0 10px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      background: theme['bg-muted'],
+                      borderRadius: radius.sm,
+                      border: `1px solid ${theme.border}`,
+                      fontFamily: typography.fonts.mono.family,
+                      fontSize: typography.sizes.sm.fontSize,
+                    }}
+                  >
+                    {captcha}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={refreshCaptcha}
+                    aria-label="Refresh captcha"
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: theme['text-secondary'] }}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M21 2v6h-6M3 22v-6h6M21 8A9 9 0 0 0 6 19.5M3 16a9 9 0 0 1 15-6.5" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <button
+                type="button"
+                style={{
+                  alignSelf: 'center',
+                  minWidth: 60,
+                  padding: '0 10px',
+                  height: 100,
+                  background: theme['btn-primary-bg'],
+                  color: theme['btn-primary-text'],
+                  fontSize: typography.sizes.sm.fontSize,
+                  fontWeight: typography.fonts.heading.fontWeight,
+                  fontFamily: typography.fonts.sans.family,
+                  border: 'none',
+                  borderRadius: radius.sm,
+                  cursor: 'pointer',
+                }}
+                onMouseOver={(e) => { e.currentTarget.style.background = theme['btn-primary-hover']; }}
+                onMouseOut={(e) => { e.currentTarget.style.background = theme['btn-primary-bg']; }}
+              >
+                Sign In
+              </button>
+            </div>
+          </div>
+          {/* Biometric text - below star, minimal spacing */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: spacing[1],
+              marginTop: -24,
+              paddingTop: 0,
+              paddingBottom: spacing[1],
+            }}
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ flexShrink: 0, color: theme['text-muted'] }}>
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+            </svg>
+            <span style={{ fontSize: typography.sizes['2xs'].fontSize, color: theme['text-muted'] }}>
+              Your biometric data is encrypted and securely processed.
+            </span>
           </div>
         </div>
       </div>
