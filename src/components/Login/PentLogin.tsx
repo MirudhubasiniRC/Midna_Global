@@ -169,14 +169,23 @@ export default function PentLogin() {
                 points="200,57 280,57 478,446 2,446"
                 fill="none"
                 stroke={primary}
-                strokeWidth="4"
+                strokeWidth="2.5"
               />
               {/* Triangle 2 (accent) */}
               <polygon
                 points="2,57 478,57 280,446 200,446"
                 fill="none"
                 stroke={accent}
-                strokeWidth="4"
+                strokeWidth="2.5"
+              />
+              {/* Middle bottom segment - indigo overlay (teal hidden beneath) */}
+              <line
+                x1="200"
+                y1="446"
+                x2="280"
+                y2="446"
+                stroke={primary}
+                strokeWidth="2.5"
               />
             </svg>
 
