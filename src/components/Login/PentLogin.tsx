@@ -15,8 +15,10 @@ import careerLogo from '../../assets/career.png';
 import partneringLogo from '../../assets/Partnering.png';
 
 const theme = colors.light;
-const primary = theme.primary;
-const accent = theme.accent;
+// Sign.tsx colors: primary magenta, secondary yellow (MYDNA logo)
+const primary = '#93207A';
+const primaryHover = '#7A1A65';
+const secondary = '#FDD00F';
 
 const LOGO_SIZE = 98;
 const STAR_SIZE = 500;
@@ -139,7 +141,7 @@ export default function PentLogin() {
           style={{
             width: '100%',
             height: 3,
-            background: `linear-gradient(90deg, ${primary}, ${accent})`,
+            background: `linear-gradient(90deg, ${primary}, ${secondary})`,
           }}
         />
 
@@ -180,14 +182,14 @@ export default function PentLogin() {
                 points="208,60 292,60 498,465 2,465"
                 fill="none"
                 stroke={primary}
-                strokeWidth="2.5"
+                strokeWidth="3"
               />
-              {/* Triangle 2 (accent) */}
+              {/* Triangle 2 (secondary) */}
               <polygon
                 points="2,60 498,60 292,465 208,465"
                 fill="none"
-                stroke={accent}
-                strokeWidth="2.5"
+                stroke={secondary}
+                strokeWidth="3"
               />
               {/* Middle bottom segment - indigo overlay */}
               <line
@@ -380,8 +382,8 @@ export default function PentLogin() {
                   padding: '0 20px',
                   height: 48,
                   minHeight: 30,
-                  background: theme['btn-primary-bg'],
-                  color: theme['btn-primary-text'],
+                  background: primary,
+                  color: '#FFFFFF',
                   fontSize: typography.sizes.sm.fontSize,
                   fontWeight: typography.fonts.heading.fontWeight,
                   fontFamily: typography.fonts.sans.family,
@@ -389,8 +391,8 @@ export default function PentLogin() {
                   borderRadius: radius.sm,
                   cursor: 'pointer',
                 }}
-                onMouseOver={(e) => { e.currentTarget.style.background = theme['btn-primary-hover']; }}
-                onMouseOut={(e) => { e.currentTarget.style.background = theme['btn-primary-bg']; }}
+                onMouseOver={(e) => { e.currentTarget.style.background = primaryHover; }}
+                onMouseOut={(e) => { e.currentTarget.style.background = primary; }}
               >
                 Sign In
               </button>
