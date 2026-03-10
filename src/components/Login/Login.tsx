@@ -9,6 +9,7 @@ import {
 } from '../../styles/theme';
 
 import fullLogo from '../../assets/Full.png';
+import bulletsLogo from '../../assets/Bullets.PNG';
 
 const theme = colors.light;
 
@@ -52,28 +53,69 @@ export default function Login() {
             boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)',
           }}
         >
-        {/* Logo - no background, transparent only */}
+        {/* Logo header - Full.png left, Bullets.PNG right, slight edge overlap */}
         <div
           style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
             width: '100%',
-            height: 120,
             paddingTop: spacing[4],
-            marginLeft: -10,
+            paddingLeft: spacing[2],
+            paddingRight: spacing[2],
+            minHeight: 120,
+            gap: 0,
             background: 'transparent',
           }}
         >
-          <img
-            src={fullLogo}
-            alt="Midna Global"
+          <div
             style={{
-              width: '100%',
-              height: '100%',
-              objectFit: 'contain',
-              objectPosition: 'center center',
-              display: 'block',
-              background: 'transparent',
+              flex: '1 1 65%',
+              minWidth: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'flex-start',
             }}
-          />
+          >
+            <img
+              src={fullLogo}
+              alt="Midna Global"
+              style={{
+                width: '100%',
+                height: 'auto',
+                maxHeight: 120,
+                objectFit: 'contain',
+                objectPosition: 'left center',
+                display: 'block',
+                background: 'transparent',
+              }}
+            />
+          </div>
+          <div
+            style={{
+              flex: '1 1 35%',
+              minWidth: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'flex-end',
+              marginLeft: -20,
+              zIndex: 1,
+            }}
+          >
+            <img
+              src={bulletsLogo}
+              alt="Smart Life Coaching"
+              style={{
+                width: '100%',
+                height: 'auto',
+                maxHeight: 120,
+                objectFit: 'contain',
+                objectPosition: 'right center',
+                display: 'block',
+                background: 'transparent',
+              }}
+            />
+          </div>
         </div>
 
         {/* Small gradient dash - full width like card */}
