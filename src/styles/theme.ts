@@ -3,7 +3,7 @@
  * Typography, spacing, colors, and component tokens
  */
 
-export type ThemeMode = 'light' | 'dark';
+export type ThemeMode = 'light';
 
 // ─── Typography ───────────────────────────────────────────────────────────────
 
@@ -74,113 +74,61 @@ export const tableTokens = {
   rowHeight: '48px',
 } as const;
 
-// ─── Colors (Light & Dark) ────────────────────────────────────────────────────
+// ─── Colors (Light) ───────────────────────────────────────────────────────────
 
 export const colors = {
   light: {
     // Background
-    'bg-base': '#F8FAFC',
+    'bg-base': '#F5F6F7',
     'bg-surface': '#FFFFFF',
-    'bg-muted': '#F1F5F9',
-    'bg-hover': '#EEF2FF',
+    'bg-muted': '#FFF8E1',
+    'bg-hover': '#F7E6F2',
 
     // Text
-    'text-primary': '#0F172A',
-    'text-secondary': '#475569',
-    'text-muted': '#64748B',
+    'text-primary': '#333333',
+    'text-secondary': '#6B7280',
+    'text-muted': '#9CA3AF',
     'text-inverse': '#FFFFFF',
 
     // Brand
-    primary: '#312E81',
-    'primary-hover': '#4338CA',
-    accent: '#0D9488',
-    'accent-soft': '#CCFBF1',
+    primary: '#93207A',
+    'primary-hover': '#A52A8A',
+    'primary-soft': '#F7E6F2',
+    secondary: '#E9C75A',
+    'secondary-hover': '#DDB94F',
+    accent: '#E9C75A',
 
     // Buttons
-    'btn-primary-bg': '#312E81',
+    'btn-primary-bg': '#93207A',
     'btn-primary-text': '#FFFFFF',
-    'btn-primary-hover': '#4338CA',
-    'btn-secondary-bg': '#E0E7FF',
-    'btn-secondary-text': '#312E81',
-    'btn-disabled-bg': '#E2E8F0',
-    'btn-disabled-text': '#94A3B8',
+    'btn-primary-hover': '#A52A8A',
+
+    'btn-secondary-bg': '#E9C75A',
+    'btn-secondary-text': '#333333',
+    'btn-secondary-hover': '#DDB94F',
+
+    'btn-disabled-bg': '#E5E7EB',
+    'btn-disabled-text': '#9CA3AF',
 
     // Tables
-    'table-header-bg': '#EEF2FF',
-    'table-row-hover': '#F9FAFB',
-    'table-border': '#E2E8F0',
-
-    // Status
-    success: '#16A34A',
-    'success-bg': '#DCFCE7',
-    error: '#DC2626',
-    'error-bg': '#FEE2E2',
-    warning: '#D97706',
-    'warning-bg': '#FEF3C7',
-    info: '#0EA5E9',
-    'info-bg': '#E0F2FE',
-
-    // Security
-    'secure-badge-bg': '#E0E7FF',
-    'secure-badge-text': '#312E81',
-    'focus-ring': '#6366F1',
-
-    // Borders
-    border: '#E5E7EB',
-    divider: '#E2E8F0',
-  } as const,
-
-  dark: {
-    // Background
-    'bg-base': '#0B1220',
-    'bg-surface': '#111827',
-    'bg-muted': '#1F2937',
-    'bg-hover': '#1E293B',
-
-    // Text
-    'text-primary': '#F8FAFC',
-    'text-secondary': '#CBD5E1',
-    'text-muted': '#94A3B8',
-    'text-inverse': '#0F172A',
-
-    // Brand
-    primary: '#6366F1',
-    'primary-hover': '#818CF8',
-    accent: '#14B8A6',
-    'accent-soft': '#134E4A',
-
-    // Buttons
-    'btn-primary-bg': '#6366F1',
-    'btn-primary-text': '#0B1220',
-    'btn-primary-hover': '#818CF8',
-    'btn-secondary-bg': '#1E293B',
-    'btn-secondary-text': '#E0E7FF',
-    'btn-disabled-bg': '#334155',
-    'btn-disabled-text': '#64748B',
-
-    // Tables
-    'table-header-bg': '#1E293B',
-    'table-row-hover': '#1F2937',
-    'table-border': '#334155',
+    'table-header-bg': '#F7E6F2',
+    'table-row-hover': '#FFF8E1',
+    'table-border': '#E5E7EB',
 
     // Status
     success: '#22C55E',
-    'success-bg': '#14532D',
-    error: '#EF4444',
-    'error-bg': '#7F1D1D',
+    'success-bg': '#DCFCE7',
+    error: '#DC2626',
+    'error-bg': '#FEE2E2',
     warning: '#F59E0B',
-    'warning-bg': '#78350F',
-    info: '#38BDF8',
-    'info-bg': '#0C4A6E',
-
-    // Security
-    'secure-badge-bg': '#312E81',
-    'secure-badge-text': '#E0E7FF',
-    'focus-ring': '#818CF8',
+    'warning-bg': '#FEF3C7',
+    info: '#0284C7',
+    'info-bg': '#E0F2FE',
 
     // Borders
-    border: '#334155',
-    divider: '#1F2937',
+    border: '#E5E7EB',
+    divider: '#E5E7EB',
+    'focus-ring': '#93207A',
   } as const,
 };
 

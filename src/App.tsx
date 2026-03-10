@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import PentLogin from './components/Login/PentLogin'
+import Login from './components/Login/Login'
 import { getThemeCssVars } from './styles/theme'
 import './App.css'
 
@@ -11,7 +11,7 @@ function App() {
     })
   }, [])
 
-  return <PentLogin />
+  return <Login />
 }
 
 export default App
