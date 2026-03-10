@@ -297,7 +297,7 @@ export default function PentLogin() {
                   <label htmlFor="pent-password" style={{ fontSize: typography.sizes.sm.fontSize, color: theme['text-primary'] }}>
                     Password
                   </label>
-                  <a href="#" style={{ fontSize: typography.sizes.xs.fontSize, color: primary, textDecoration: 'none' }}>
+                  <a href="#" style={{ fontSize: typography.sizes.xs.fontSize, color: primary, marginRight: -22, textDecoration: 'none' }}>
                     Forgot Password?
                   </a>
                 </div>
