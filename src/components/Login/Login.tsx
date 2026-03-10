@@ -83,7 +83,7 @@ export default function Login() {
               style={{
                 width: '100%',
                 height: 'auto',
-                maxHeight: 120,
+                maxHeight: 140,
                 objectFit: 'contain',
                 objectPosition: 'left center',
                 display: 'block',
