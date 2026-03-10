@@ -4,7 +4,6 @@ import {
   spacing,
   radius,
   typography,
-  buttonTokens,
   inputTokens,
 } from '../../styles/theme';
 
@@ -39,10 +38,10 @@ export default function PentLogin() {
   const getLogoPosition = (pos: 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight') => {
     const h = LOGO_SIZE / 2;
     switch (pos) {
-      case 'topLeft':   return { top: 133 - h, left: 106 - h };
-      case 'topRight':  return { top: 133 - h, left: 394 - h };
-      case 'bottomLeft': return { top: 367 - h, left: 106 - h };
-      case 'bottomRight': return { top: 367 - h, left: 394 - h };
+      case 'topLeft':   return { top: 133 - h, left: 104 - h };
+      case 'topRight':  return { top: 133 - h, left: 396 - h };
+      case 'bottomLeft': return { top: 390 - h, left: 104 - h };
+      case 'bottomRight': return { top: 390 - h, left: 396 - h };
     }
   };
 
@@ -265,14 +264,15 @@ export default function PentLogin() {
                   fontWeight: typography.fonts.heading.fontWeight,
                   fontFamily: typography.fonts.heading.family,
                   margin: `0 0 ${spacing[3]} 0`,
+                  marginTop: -50,
                   color: theme['text-primary'],
                   textAlign: 'center',
                 }}
               >
                 Sign In
               </h1>
-              <div style={{ marginBottom: spacing[2] }}>
-                <label htmlFor="pent-user-id" style={{ display: 'block', fontSize: typography.sizes.sm.fontSize, marginBottom: 4, color: theme['text-primary'] }}>
+              <div style={{ marginTop: (spacing[6] ?? 24) + 18, marginBottom: spacing[2] }}>
+                <label htmlFor="pent-user-id" style={{ display: 'block', fontSize: typography.sizes.sm.fontSize, marginBottom: 4, marginLeft: 8, color: theme['text-primary'] }}>
                   User ID
                 </label>
                 <input
@@ -293,7 +293,7 @@ export default function PentLogin() {
                 />
               </div>
               <div style={{ marginBottom: spacing[2] }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4, marginLeft: -25 }}>
                   <label htmlFor="pent-password" style={{ fontSize: typography.sizes.sm.fontSize, color: theme['text-primary'] }}>
                     Password
                   </label>
@@ -319,7 +319,7 @@ export default function PentLogin() {
                 />
               </div>
               <div style={{ marginBottom: spacing[3] }}>
-                <label htmlFor="pent-captcha" style={{ display: 'block', fontSize: typography.sizes.sm.fontSize, marginBottom: 4, color: theme['text-primary'] }}>
+                <label htmlFor="pent-captcha" style={{ display: 'block', fontSize: typography.sizes.sm.fontSize, marginBottom: 4, marginLeft: -10, color: theme['text-primary'] }}>
                   Captcha
                 </label>
                 <input
@@ -376,7 +376,7 @@ export default function PentLogin() {
                   alignSelf: 'center',
                   minWidth: 60,
                   padding: '0 10px',
-                  height: 100,
+                  height: 48,
                   background: theme['btn-primary-bg'],
                   color: theme['btn-primary-text'],
                   fontSize: typography.sizes.sm.fontSize,
