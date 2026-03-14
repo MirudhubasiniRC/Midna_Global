@@ -10,15 +10,6 @@ const quickLinks = [
   'My Profile',
 ];
 
-const stats = [
-  { label: 'CLOSING BALANCE', value: '-100318' },
-  { label: 'LAST SCAN', value: '+0 DAYS AGO' },
-  { label: 'CURRENT YEAR SCAN', value: '0' },
-  { label: 'LAST 365 DAYS SCAN', value: '23' },
-  { label: 'LAST 90 DAYS SCAN', value: '1' },
-];
-const nasExpiry = '31/03/2027';
-
 export default function QuickLinks() {
   return (
     <div
@@ -78,26 +69,6 @@ export default function QuickLinks() {
             {label}
           </button>
         ))}
-      </div>
-      <div
-        style={{
-          marginTop: spacing[6],
-          display: 'flex',
-          flexDirection: 'column',
-          gap: spacing[1],
-          color: theme['text-primary'],
-          fontSize: typography.sizes.sm.fontSize,
-          fontFamily: typography.fonts.sans.family,
-        }}
-      >
-        {stats.map(({ label, value }) => (
-          <div key={label}>
-            {label} : {value}
-          </div>
-        ))}
-        <div style={{ marginTop: spacing[3] }}>
-          NAS EXPIRY DATE : {nasExpiry}
-        </div>
       </div>
     </div>
   );

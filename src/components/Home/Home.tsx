@@ -4,6 +4,7 @@ import NoticeBoard from './NoticeBoard';
 import QuickLinks from './QuickLinks';
 import ScansCard from './ScansCard';
 import NestPerformance from './NestPerformance';
+import AccountStats from './AccountStats';
 
 const theme = colors.light;
 
@@ -84,23 +85,26 @@ export default function Home() {
           ))}
         </div>
 
-        {/* Layout: Row1: Scan Summary | Quick Links | Notice Board; Row2: Table | Notice Board */}
+        {/* Layout: Row1: AccountStats | Notice Board; Row2: Scan Summary | Quick Links | Notice Board; Row3: Table | Notice Board */}
         <div
           style={{
             display: 'grid',
             gridTemplateColumns: '1fr 1fr 320px',
-            gridTemplateRows: 'auto 1fr',
+            gridTemplateRows: 'auto auto 1fr',
             gap: spacing[6],
             alignItems: 'start',
           }}
         >
+          <div style={{ gridColumn: '1 / 3' }}>
+            <AccountStats />
+          </div>
           <div style={{ gridColumn: 1 }}>
             <ScansCard />
           </div>
           <div style={{ gridColumn: 2 }}>
             <QuickLinks />
           </div>
-          <div style={{ gridColumn: 3, gridRow: '1 / -1', alignSelf: 'stretch', minHeight: 0, display: 'flex' }}>
+          <div style={{ gridColumn: 3, gridRow: '1 / -1', alignSelf: 'stretch', minHeight: 0, display: 'flex', flexDirection: 'column' }}>
             <NoticeBoard />
           </div>
           <div style={{ gridColumn: '1 / 3' }}>
