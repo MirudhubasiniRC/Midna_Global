@@ -112,7 +112,10 @@ export const colors = {
 
     // Tables
     'table-header-bg': '#F7E6F2',
-    'table-row-hover': '#FFF8E1',
+    'table-header-gray': '#F3F4F6',
+    'table-header-muted-secondary': '#FDF8E7',
+    'table-row-hover': 'rgba(147, 32, 122, 0.05)',
+    'table-zebra': '#F9FAFB',
     'table-border': '#E5E7EB',
 
     // Status

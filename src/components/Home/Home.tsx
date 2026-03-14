@@ -1,5 +1,9 @@
 import { colors, spacing, radius, typography } from '../../styles/theme';
 import TopBar from '../Layout/TopBar';
+import NoticeBoard from './NoticeBoard';
+import QuickLinks from './QuickLinks';
+import ScansCard from './ScansCard';
+import NestPerformance from './NestPerformance';
 
 const theme = colors.light;
 
@@ -35,11 +39,14 @@ export default function Home() {
         >
           My Home
         </h1>
+
+        {/* KPI Cards */}
         <div
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
             gap: spacing[4],
+            marginBottom: spacing[6],
           }}
         >
           {kpiCards.map((card) => (
@@ -75,6 +82,30 @@ export default function Home() {
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Layout: Row1: Scan Summary | Quick Links | Notice Board; Row2: Table | Notice Board */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr 320px',
+            gridTemplateRows: 'auto 1fr',
+            gap: spacing[6],
+            alignItems: 'start',
+          }}
+        >
+          <div style={{ gridColumn: 1 }}>
+            <ScansCard />
+          </div>
+          <div style={{ gridColumn: 2 }}>
+            <QuickLinks />
+          </div>
+          <div style={{ gridColumn: 3, gridRow: '1 / -1', alignSelf: 'stretch', minHeight: 0, display: 'flex' }}>
+            <NoticeBoard />
+          </div>
+          <div style={{ gridColumn: '1 / 3' }}>
+            <NestPerformance />
+          </div>
         </div>
       </main>
     </div>
