@@ -1,6 +1,6 @@
 import { House, Users, ChartColumn, BookMarked, FolderCode, BookOpenCheck, BookUser, UserStar, ChevronDown, User } from 'lucide-react';
 import { colors, spacing, typography } from '../../styles/theme';
-import fullLogo from '../../assets/Full.png';
+import logo from '../../assets/Name_only.png';
 
 const theme = colors.light;
 
@@ -32,7 +32,7 @@ export default function TopBar() {
     >
       <div style={{ flexShrink: 0 }}>
         <img
-          src={fullLogo}
+          src={logo}
           alt="Midna Global"
           style={{
             height: 52,
@@ -78,7 +78,7 @@ export default function TopBar() {
                 cursor: 'pointer',
                 padding: `${spacing[2]} ${spacing[2]}`,
                 fontFamily: typography.fonts.sans.family,
-                fontSize: typography.sizes.base.fontSize,
+                fontSize: typography.sizes.sm.fontSize,
                 color: theme['text-primary'],
                 whiteSpace: 'nowrap',
               }}
