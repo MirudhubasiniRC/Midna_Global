@@ -1,4 +1,5 @@
-import { House, Users, ChartColumn, BookMarked, FolderCode, BookOpenCheck, BookUser, UserStar, ChevronDown, User } from 'lucide-react';
+import { NavLink, useLocation } from 'react-router-dom';
+import { House, Users, ChartColumn, BookMarked, FolderCode, BookOpenCheck, BookUser, UserStar, User } from 'lucide-react';
 import { colors, spacing, typography } from '../../styles/theme';
 import logo from '../../assets/Name_only.png';
 
@@ -7,17 +8,19 @@ const theme = colors.light;
 const ICON_SIZE = 18;
 
 const navItems = [
-  { label: 'My Home', Icon: House, hasDropdown: false },
-  { label: 'MLA', Icon: Users, hasDropdown: false },
-  { label: 'Process', Icon: ChartColumn, hasDropdown: false },
-  { label: 'Resources', Icon: BookMarked, hasDropdown: false },
-  { label: 'Softwares', Icon: FolderCode, hasDropdown: false },
-  { label: 'Live Coach', Icon: BookOpenCheck, hasDropdown: false },
-  { label: 'Mentor', Icon: BookUser, hasDropdown: false },
-  { label: 'Expert', Icon: UserStar, hasDropdown: false },
+  { label: 'My Home', Icon: House, path: '/home' },
+  { label: 'MLA', Icon: Users, path: '/mla' },
+  { label: 'Process', Icon: ChartColumn, path: '/home' },
+  { label: 'Resources', Icon: BookMarked, path: '/home' },
+  { label: 'Softwares', Icon: FolderCode, path: '/home' },
+  { label: 'Live Coach', Icon: BookOpenCheck, path: '/home' },
+  { label: 'Mentor', Icon: BookUser, path: '/home' },
+  { label: 'Expert', Icon: UserStar, path: '/home' },
 ];
 
 export default function TopBar() {
+  const location = useLocation();
+
   return (
     <header
       style={{
@@ -54,41 +57,57 @@ export default function TopBar() {
       >
         {navItems.map((item) => {
           const Icon = item.Icon;
+          const isActive =
+            item.path === '/home'
+              ? location.pathname === '/home'
+              : location.pathname.startsWith(item.path);
           return (
-            <button
+            <NavLink
               key={item.label}
-              type="button"
+              to={item.path}
+              end={item.path === '/home'}
               onMouseEnter={(e) => {
                 e.currentTarget.style.color = theme.primary;
                 const iconSpan = e.currentTarget.querySelector('span:first-of-type');
                 if (iconSpan) (iconSpan as HTMLElement).style.color = theme.primary;
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.color = theme['text-primary'];
+                const active =
+                  item.path === '/home'
+                    ? location.pathname === '/home'
+                    : location.pathname.startsWith(item.path);
+                e.currentTarget.style.color = active ? theme.primary : theme['text-primary'];
                 const iconSpan = e.currentTarget.querySelector('span:first-of-type');
-                if (iconSpan) (iconSpan as HTMLElement).style.color = theme['text-secondary'];
+                if (iconSpan)
+                  (iconSpan as HTMLElement).style.color = active
+                    ? theme.primary
+                    : theme['text-secondary'];
               }}
               style={{
                 display: 'flex',
                 alignItems: 'center',
                 flexShrink: 0,
                 gap: spacing[1],
-                background: 'none',
-                border: 'none',
+                textDecoration: 'none',
                 cursor: 'pointer',
                 padding: `${spacing[2]} ${spacing[2]}`,
                 fontFamily: typography.fonts.sans.family,
                 fontSize: typography.sizes.sm.fontSize,
-                color: theme['text-primary'],
+                color: isActive ? theme.primary : theme['text-primary'],
                 whiteSpace: 'nowrap',
               }}
             >
-              <span style={{ display: 'flex', alignItems: 'center', color: theme['text-secondary'] }}>
+              <span
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  color: isActive ? theme.primary : theme['text-secondary'],
+                }}
+              >
                 <Icon size={ICON_SIZE} strokeWidth={2} />
               </span>
               <span>{item.label}</span>
-              {item.hasDropdown && <ChevronDown size={12} strokeWidth={2} />}
-            </button>
+            </NavLink>
           );
         })}
       </nav>
