@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   colors,
   spacing,
@@ -13,12 +14,35 @@ import bulletsLogo from '../../assets/Bullets.PNG';
 
 const theme = colors.light;
 
+// Dummy credentials for now - replace with real auth later
+const DUMMY_USER_ID = 'admin';
+const DUMMY_PASSWORD = 'password123';
+
 const generateCaptcha = () =>
   Math.random().toString(36).slice(2, 6);
 
 export default function Login() {
+  const navigate = useNavigate();
+  const [userId, setUserId] = useState('');
+  const [password, setPassword] = useState('');
   const [captcha, setCaptcha] = useState(generateCaptcha);
+  const [captchaInput, setCaptchaInput] = useState('');
+  const [error, setError] = useState('');
   const refreshCaptcha = useCallback(() => setCaptcha(generateCaptcha), []);
+
+  const handleSignIn = () => {
+    setError('');
+    const validUser = userId.trim().toLowerCase() === DUMMY_USER_ID.toLowerCase();
+    const validPass = password === DUMMY_PASSWORD;
+    const validCaptcha = captchaInput.trim().toLowerCase() === captcha.toLowerCase();
+    if (validUser && validPass && validCaptcha) {
+      navigate('/home');
+    } else {
+      setError('Invalid User ID, Password, or Captcha. Try admin / password123');
+      setCaptcha(generateCaptcha());
+      setCaptchaInput('');
+    }
+  };
 
   return (
     <div
@@ -164,6 +188,8 @@ export default function Login() {
             id="user-id"
             type="text"
             placeholder="Enter your user ID"
+            value={userId}
+            onChange={(e) => setUserId(e.target.value)}
             style={{
               width: '100%',
               height: inputTokens.height.md,
@@ -218,6 +244,8 @@ export default function Login() {
             id="password"
             type="password"
             placeholder="Enter your password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             style={{
               width: '100%',
               height: inputTokens.height.md,
@@ -254,6 +282,8 @@ export default function Login() {
               id="captcha"
               type="text"
               placeholder="Enter captcha"
+              value={captchaInput}
+              onChange={(e) => setCaptchaInput(e.target.value)}
               style={{
                 flex: 1,
                 height: inputTokens.height.md,
@@ -319,9 +349,25 @@ export default function Login() {
           </div>
         </div>
 
+        {error && (
+          <div
+            style={{
+              marginBottom: spacing[4],
+              padding: spacing[2],
+              background: theme['error-bg'],
+              color: theme.error,
+              fontSize: typography.sizes.sm.fontSize,
+              borderRadius: radius.sm,
+            }}
+          >
+            {error}
+          </div>
+        )}
+
         {/* Secure Login button */}
         <button
           type="button"
+          onClick={handleSignIn}
           style={{
             width: '100%',
             height: buttonTokens.height.lg,
