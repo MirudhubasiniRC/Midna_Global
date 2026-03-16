@@ -3,10 +3,10 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import Login from './components/Login/Login'
 import Home from './components/Home/Home'
 import MLAPage from './components/MLA/MLAPage'
-import MLAIndex from './components/MLA/MLAIndex'
 import MLASection from './components/MLA/MLASection'
 import ScanPage from './components/MLA/ScanPage'
 import ReportsPage from './components/MLA/ReportsPage'
+import LedgerPage from './components/MLA/LedgerPage'
 import { getThemeCssVars } from './styles/theme'
 import './App.css'
 
@@ -26,6 +26,7 @@ function App() {
         <Route index element={<Navigate to="/mla/scan" replace />} />
         <Route path="scan" element={<ScanPage />} />
         <Route path="reports" element={<ReportsPage />} />
+        <Route path="ledger" element={<LedgerPage />} />
         <Route path=":section" element={<MLASection />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
