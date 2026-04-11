@@ -18,11 +18,26 @@ export default function NoticeBoard() {
           0%, 100% { opacity: 1; }
           50% { opacity: 0.3; }
         }
+        @keyframes noticeBorderBlink {
+          0%, 100% {
+            border-color: ${theme.border};
+            box-shadow: 0 0 0 0 ${theme['error-bg']};
+          }
+          50% {
+            border-color: ${theme.error};
+            box-shadow: 0 0 0 3px ${theme['error-bg']};
+          }
+        }
         .notice-alert-icon {
           animation: noticeBlink 1.2s ease-in-out infinite;
         }
+        .notice-board-frame {
+          border: 1px solid ${theme.border};
+          animation: noticeBorderBlink 1.2s ease-in-out infinite;
+        }
       `}</style>
       <div
+        className="notice-board-frame"
         style={{
           flex: 1,
           minHeight: 0,
@@ -32,7 +47,6 @@ export default function NoticeBoard() {
           borderRadius: radius.lg,
           padding: spacing[5],
           overflow: 'hidden',
-          border: `1px solid ${theme.border}`,
         }}
       >
         <div style={{ marginBottom: spacing[5], flexShrink: 0 }}>

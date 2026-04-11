@@ -18,6 +18,15 @@ const navItems = [
   { label: 'Expert', Icon: UserStar, path: '/home' },
 ];
 
+/** Only one nav item should read as “active” per route (many links still point to /home as placeholders). */
+function isNavActive(item: { label: string; path: string }, pathname: string): boolean {
+  if (item.label === 'My Home') return pathname === '/home';
+  if (item.path === '/mla') return pathname.startsWith('/mla');
+  return false;
+}
+
+const inactiveColor = theme['text-secondary'];
+
 export default function TopBar() {
   const location = useLocation();
 
@@ -57,31 +66,23 @@ export default function TopBar() {
       >
         {navItems.map((item) => {
           const Icon = item.Icon;
-          const isActive =
-            item.path === '/home'
-              ? location.pathname === '/home'
-              : location.pathname.startsWith(item.path);
+          const isActive = isNavActive(item, location.pathname);
           return (
             <NavLink
               key={item.label}
               to={item.path}
-              end={item.path === '/home'}
+              end={item.label === 'My Home'}
               onMouseEnter={(e) => {
                 e.currentTarget.style.color = theme.primary;
                 const iconSpan = e.currentTarget.querySelector('span:first-of-type');
                 if (iconSpan) (iconSpan as HTMLElement).style.color = theme.primary;
               }}
               onMouseLeave={(e) => {
-                const active =
-                  item.path === '/home'
-                    ? location.pathname === '/home'
-                    : location.pathname.startsWith(item.path);
-                e.currentTarget.style.color = active ? theme.primary : theme['text-primary'];
+                const active = isNavActive(item, location.pathname);
+                e.currentTarget.style.color = active ? theme.primary : inactiveColor;
                 const iconSpan = e.currentTarget.querySelector('span:first-of-type');
                 if (iconSpan)
-                  (iconSpan as HTMLElement).style.color = active
-                    ? theme.primary
-                    : theme['text-secondary'];
+                  (iconSpan as HTMLElement).style.color = active ? theme.primary : inactiveColor;
               }}
               style={{
                 display: 'flex',
@@ -93,7 +94,7 @@ export default function TopBar() {
                 padding: `${spacing[2]} ${spacing[2]}`,
                 fontFamily: typography.fonts.sans.family,
                 fontSize: typography.sizes.sm.fontSize,
-                color: isActive ? theme.primary : theme['text-primary'],
+                color: isActive ? theme.primary : inactiveColor,
                 whiteSpace: 'nowrap',
               }}
             >
@@ -101,7 +102,7 @@ export default function TopBar() {
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  color: isActive ? theme.primary : theme['text-secondary'],
+                  color: isActive ? theme.primary : inactiveColor,
                 }}
               >
                 <Icon size={ICON_SIZE} strokeWidth={2} />

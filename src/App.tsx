@@ -7,6 +7,7 @@ import MLASection from './components/MLA/MLASection'
 import ScanPage from './components/MLA/ScanPage'
 import ReportsPage from './components/MLA/ReportsPage'
 import LedgerPage from './components/MLA/LedgerPage'
+import ProfilePage from './components/MLA/ProfilePage'
 import { getThemeCssVars } from './styles/theme'
 import './App.css'
 
@@ -27,6 +28,7 @@ function App() {
         <Route path="scan" element={<ScanPage />} />
         <Route path="reports" element={<ReportsPage />} />
         <Route path="ledger" element={<LedgerPage />} />
+        <Route path="profile" element={<ProfilePage />} />
         <Route path=":section" element={<MLASection />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
