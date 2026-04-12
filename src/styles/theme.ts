@@ -46,6 +46,8 @@ export const radius = {
   sm: '6px',
   md: '10px',
   lg: '14px',
+  /** Full pill — inline table actions, chips */
+  pill: '9999px',
 } as const;
 
 export const buttonTokens = {

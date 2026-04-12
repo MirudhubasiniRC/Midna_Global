@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { colors, spacing, radius, typography } from '../../styles/theme';
 
@@ -32,7 +33,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
   const isFirstPage = currentPage <= 1;
   const isLastPage = currentPage >= totalPages;
 
-  const baseButtonStyle: React.CSSProperties = {
+  const baseButtonStyle: CSSProperties = {
     display: 'flex',
     alignItems: 'center',
     gap: spacing[1],
@@ -46,25 +47,29 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
     cursor: 'pointer',
   };
 
-  const disabledStyle: React.CSSProperties = {
+  const disabledStyle: CSSProperties = {
     ...baseButtonStyle,
     color: theme['text-muted'],
     cursor: 'not-allowed',
   };
 
-  const pageButtonStyle = (active: boolean): React.CSSProperties => ({
+  const pageButtonStyle = (active: boolean): CSSProperties => ({
     ...baseButtonStyle,
     padding: `${spacing[1]} ${spacing[3]}`,
+    minWidth: 36,
+    justifyContent: 'center',
+    borderRadius: radius.sm,
     ...(active
       ? {
-          border: `2px solid ${theme.primary}`,
-          background: 'transparent',
-          color: theme.primary,
+          border: `1px solid ${theme['btn-primary-bg']}`,
+          background: theme['btn-primary-bg'],
+          color: theme['btn-primary-text'],
           fontWeight: 600,
         }
       : {
-          border: 'none',
-          background: 'transparent',
+          border: `1px solid ${theme.border}`,
+          background: theme['bg-surface'],
+          color: theme['text-primary'],
         }),
   });
 

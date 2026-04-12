@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { colors, spacing, radius, typography, tableTokens } from '../../styles/theme';
 import Pagination from '../ui/Pagination';
+import TablePaginationFooter from '../ui/TablePaginationFooter';
 
 const theme = colors.light;
 
@@ -241,23 +242,16 @@ export default function NestPerformance() {
           </tbody>
         </table>
       </div>
-      <div
-        style={{
-          padding: spacing[2],
-          color: theme['text-secondary'],
-          fontSize: typography.sizes.xs.fontSize,
-          fontFamily: typography.fonts.sans.family,
-        }}
-      >
-        Showing {from} to {to} of {TOTAL_ENTRIES} entries
-      </div>
-      <div style={{ padding: spacing[2] }}>
-        <Pagination
-          currentPage={currentPage}
-          totalPages={TOTAL_PAGES}
-          onPageChange={setCurrentPage}
-        />
-      </div>
+      <TablePaginationFooter
+        summary={`Showing ${from} to ${to} of ${TOTAL_ENTRIES} entries`}
+        pagination={
+          <Pagination
+            currentPage={currentPage}
+            totalPages={TOTAL_PAGES}
+            onPageChange={setCurrentPage}
+          />
+        }
+      />
     </div>
   );
 }

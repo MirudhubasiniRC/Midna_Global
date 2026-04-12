@@ -6,6 +6,7 @@ import {
   typography,
 } from '../../styles/theme';
 import Pagination from '../ui/Pagination';
+import TablePaginationFooter from '../ui/TablePaginationFooter';
 
 const theme = colors.light;
 
@@ -102,7 +103,46 @@ export default function ReportsPage() {
           marginBottom: spacing[4],
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: spacing[2] }}>
+        <label
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: spacing[2],
+            fontSize: typography.sizes.sm.fontSize,
+            fontFamily: typography.fonts.sans.family,
+            color: theme['text-secondary'],
+            flex: '1 1 200px',
+            minWidth: 0,
+          }}
+        >
+          Search:
+          <input
+            type="search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search..."
+            style={{
+              flex: 1,
+              maxWidth: 360,
+              padding: `${spacing[2]} ${spacing[3]}`,
+              borderRadius: radius.sm,
+              border: `1px solid ${theme.border}`,
+              fontSize: typography.sizes.sm.fontSize,
+              fontFamily: typography.fonts.sans.family,
+              color: theme['text-primary'],
+              minWidth: 160,
+            }}
+          />
+        </label>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: spacing[2],
+            flexShrink: 0,
+            marginLeft: 'auto',
+          }}
+        >
           <span
             style={{
               fontSize: typography.sizes.sm.fontSize,
@@ -139,32 +179,6 @@ export default function ReportsPage() {
             records per page
           </span>
         </div>
-        <label
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: spacing[2],
-            fontSize: typography.sizes.sm.fontSize,
-            fontFamily: typography.fonts.sans.family,
-            color: theme['text-secondary'],
-          }}
-        >
-          Search:
-          <input
-            type="search"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search..."
-            style={{
-              padding: `${spacing[2]} ${spacing[3]}`,
-              borderRadius: radius.sm,
-              border: `1px solid ${theme.border}`,
-              fontSize: typography.sizes.sm.fontSize,
-              fontFamily: typography.fonts.sans.family,
-              color: theme['text-primary'],
-            }}
-          />
-        </label>
       </div>
 
       <style>{`
@@ -211,7 +225,7 @@ export default function ReportsPage() {
                       padding: `${spacing[1]} ${spacing[3]}`,
                       background: theme['primary-soft'],
                       color: theme.primary,
-                      borderRadius: 9999,
+                      borderRadius: radius.pill,
                       fontSize: typography.sizes.xs.fontSize,
                       fontFamily: typography.fonts.sans.family,
                       fontWeight: 500,
@@ -227,7 +241,7 @@ export default function ReportsPage() {
                       padding: `${spacing[1]} ${spacing[3]}`,
                       background: theme['warning-bg'],
                       color: theme.warning,
-                      borderRadius: 9999,
+                      borderRadius: radius.pill,
                       fontSize: typography.sizes.xs.fontSize,
                       fontFamily: typography.fonts.sans.family,
                       fontWeight: 500,
@@ -244,23 +258,16 @@ export default function ReportsPage() {
         </table>
       </div>
 
-      <div
-        style={{
-          padding: spacing[2],
-          color: theme['text-secondary'],
-          fontSize: typography.sizes.xs.fontSize,
-          fontFamily: typography.fonts.sans.family,
-        }}
-      >
-        Showing {from} to {to} of {TOTAL_ENTRIES} entries
-      </div>
-      <div style={{ padding: spacing[2] }}>
-        <Pagination
-          currentPage={currentPage}
-          totalPages={TOTAL_PAGES}
-          onPageChange={setCurrentPage}
-        />
-      </div>
+      <TablePaginationFooter
+        summary={`Showing ${from} to ${to} of ${TOTAL_ENTRIES} entries`}
+        pagination={
+          <Pagination
+            currentPage={currentPage}
+            totalPages={TOTAL_PAGES}
+            onPageChange={setCurrentPage}
+          />
+        }
+      />
     </div>
   );
 }

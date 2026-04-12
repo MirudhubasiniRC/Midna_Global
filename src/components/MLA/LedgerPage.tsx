@@ -7,6 +7,7 @@ import {
   inputTokens,
 } from '../../styles/theme';
 import Pagination from '../ui/Pagination';
+import TablePaginationFooter from '../ui/TablePaginationFooter';
 
 const theme = colors.light;
 
@@ -242,25 +243,16 @@ export default function LedgerPage() {
           </div>
 
           {!isEmpty && (
-            <>
-              <div
-                style={{
-                  padding: spacing[2],
-                  color: theme['text-secondary'],
-                  fontSize: typography.sizes.xs.fontSize,
-                  fontFamily: typography.fonts.sans.family,
-                }}
-              >
-                Showing {from + 1} to {to} of {totalEntries} entries
-              </div>
-              <div style={{ padding: spacing[2] }}>
+            <TablePaginationFooter
+              summary={`Showing ${from + 1} to ${to} of ${totalEntries} entries`}
+              pagination={
                 <Pagination
                   currentPage={currentPage}
                   totalPages={totalPages}
                   onPageChange={setCurrentPage}
                 />
-              </div>
-            </>
+              }
+            />
           )}
         </div>
     </div>

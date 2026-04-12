@@ -8,6 +8,12 @@ import ScanPage from './components/MLA/ScanPage'
 import ReportsPage from './components/MLA/ReportsPage'
 import LedgerPage from './components/MLA/LedgerPage'
 import ProfilePage from './components/MLA/ProfilePage'
+import SRAPage from './components/MLA/SRAPage'
+import TransactionsPage from './components/MLA/TransactionsPage'
+import TestimonialsPage from './components/MLA/TestimonialsPage'
+import FeedbackPage from './components/MLA/FeedbackPage'
+import GoogleReviewPage from './components/MLA/GoogleReviewPage'
+import ABCLedgerPage from './components/MLA/ABCLedgerPage'
 import { getThemeCssVars } from './styles/theme'
 import './App.css'
 
@@ -29,6 +35,12 @@ function App() {
         <Route path="reports" element={<ReportsPage />} />
         <Route path="ledger" element={<LedgerPage />} />
         <Route path="profile" element={<ProfilePage />} />
+        <Route path="sra" element={<SRAPage />} />
+        <Route path="transactions" element={<TransactionsPage />} />
+        <Route path="testimonials" element={<TestimonialsPage />} />
+        <Route path="feedbacks" element={<FeedbackPage />} />
+        <Route path="google-review" element={<GoogleReviewPage />} />
+        <Route path="abc-ledger" element={<ABCLedgerPage />} />
         <Route path=":section" element={<MLASection />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
