@@ -91,7 +91,7 @@ export default function LedgerPage() {
           color: theme['text-primary'],
         }}
       >
-        Accounts detail
+        Accounts Detail
       </h2>
 
       {/* KPI cards */}

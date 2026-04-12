@@ -195,7 +195,7 @@ export default function TestimonialsPage() {
               color: theme['text-primary'],
             }}
           >
-            My testimonials
+            My Testimonials
           </h2>
           <p
             style={{

@@ -130,7 +130,7 @@ export default function ProfilePage() {
           color: theme['text-primary'],
         }}
       >
-        My profile
+        My Profile
       </h2>
 
       <div

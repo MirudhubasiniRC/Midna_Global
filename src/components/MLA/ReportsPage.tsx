@@ -77,7 +77,7 @@ export default function ReportsPage() {
             textAlign: 'left',
           }}
         >
-          My reports
+          My Reports
         </h2>
         <p
           style={{

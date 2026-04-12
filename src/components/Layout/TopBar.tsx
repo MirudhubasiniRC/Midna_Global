@@ -10,7 +10,7 @@ const ICON_SIZE = 18;
 const navItems = [
   { label: 'My Home', Icon: House, path: '/home' },
   { label: 'MLA', Icon: Users, path: '/mla' },
-  { label: 'Process', Icon: ChartColumn, path: '/home' },
+  { label: 'Process', Icon: ChartColumn, path: '/process' },
   { label: 'Resources', Icon: BookMarked, path: '/home' },
   { label: 'Softwares', Icon: FolderCode, path: '/home' },
   { label: 'Live Coach', Icon: BookOpenCheck, path: '/home' },
@@ -22,6 +22,7 @@ const navItems = [
 function isNavActive(item: { label: string; path: string }, pathname: string): boolean {
   if (item.label === 'My Home') return pathname === '/home';
   if (item.path === '/mla') return pathname.startsWith('/mla');
+  if (item.path === '/process') return pathname.startsWith('/process');
   return false;
 }
 

@@ -65,7 +65,7 @@ export default function ScanPage() {
               color: theme['text-primary'],
             }}
           >
-            Upload scan
+            Upload Scan
           </h2>
         </div>
         <div style={{ padding: spacing[5] }}>
