@@ -15,7 +15,8 @@ import FeedbackPage from './components/MLA/FeedbackPage'
 import GoogleReviewPage from './components/MLA/GoogleReviewPage'
 import ABCLedgerPage from './components/MLA/ABCLedgerPage'
 import ProcessPage from './components/Process/ProcessPage'
-import ProcessPlaceholder from './components/Process/ProcessPlaceholder'
+import DataReviewPage from './components/Process/DataReviewPage'
+import UploadReportPage from './components/Process/UploadReportPage'
 import { getThemeCssVars } from './styles/theme'
 import './App.css'
 
@@ -46,10 +47,10 @@ function App() {
         <Route path=":section" element={<MLASection />} />
       </Route>
       <Route path="/process" element={<ProcessPage />}>
-        <Route index element={<ProcessPlaceholder title="Process" />} />
-        <Route path="data-review" element={<ProcessPlaceholder title="Data Review" />} />
-        <Route path="data-process" element={<ProcessPlaceholder title="Data Process" />} />
-        <Route path="upload-report" element={<ProcessPlaceholder title="Upload Report" />} />
+        <Route index element={null} />
+        <Route path="data-review" element={<DataReviewPage />} />
+        <Route path="data-process" element={<div>Data Process content coming soon.</div>} />
+        <Route path="upload-report" element={<UploadReportPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
