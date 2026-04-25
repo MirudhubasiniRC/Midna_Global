@@ -159,10 +159,12 @@ function ProcessListView() {
                   style={{
                     display: 'inline-block',
                     padding: `${spacing[1]} ${spacing[3]}`,
+                    border: `1px solid ${theme.info}`,
                     background: theme['info-bg'],
                     color: theme.info,
                     borderRadius: radius.pill,
                     fontSize: typography.sizes.xs.fontSize,
+                    fontFamily: typography.fonts.sans.family,
                     fontWeight: 500,
                   }}
                 >
@@ -174,18 +176,18 @@ function ProcessListView() {
               <td style={{ padding: `${spacing[1]} ${spacing[2]}`, fontSize: typography.sizes.xs.fontSize }}>Bhuvana Pasupathi</td>
               <td style={{ padding: `${spacing[1]} ${spacing[2]}`, textAlign: 'right', fontSize: typography.sizes.xs.fontSize }}>2000.00</td>
               <td style={{ padding: `${spacing[1]} ${spacing[2]}`, textAlign: 'center' }}>
-                <span style={{ display: 'inline-block', padding: `${spacing[1]} ${spacing[3]}`, background: theme['info-bg'], color: theme.info, borderRadius: radius.pill, fontSize: typography.sizes.xs.fontSize, fontWeight: 500 }}>View</span>
+                <span style={{ display: 'inline-block', padding: `${spacing[1]} ${spacing[3]}`, border: `1px solid ${theme.info}`, background: theme['info-bg'], color: theme.info, borderRadius: radius.pill, fontSize: typography.sizes.xs.fontSize, fontFamily: typography.fonts.sans.family, fontWeight: 500 }}>View</span>
               </td>
               <td style={{ padding: `${spacing[1]} ${spacing[2]}`, textAlign: 'center' }}>
-                <span style={{ display: 'inline-block', padding: `${spacing[1]} ${spacing[3]}`, background: theme['primary-soft'], color: theme.primary, borderRadius: radius.pill, fontSize: typography.sizes.xs.fontSize, fontWeight: 500 }}>Edit</span>
+                <span style={{ display: 'inline-block', padding: `${spacing[1]} ${spacing[3]}`, border: `1px solid ${theme.primary}`, background: theme['primary-soft'], color: theme.primary, borderRadius: radius.pill, fontSize: typography.sizes.xs.fontSize, fontFamily: typography.fonts.sans.family, fontWeight: 500 }}>Edit</span>
               </td>
               <td style={{ padding: `${spacing[1]} ${spacing[2]}`, textAlign: 'center' }}>
-                <span style={{ display: 'inline-block', padding: `${spacing[1]} ${spacing[3]}`, background: theme['success-bg'], color: theme.success, borderRadius: radius.pill, fontSize: typography.sizes.xs.fontSize, fontWeight: 500 }}>Process</span>
+                <span style={{ display: 'inline-block', padding: `${spacing[1]} ${spacing[3]}`, border: `1px solid ${theme.success}`, background: theme['success-bg'], color: theme.success, borderRadius: radius.pill, fontSize: typography.sizes.xs.fontSize, fontFamily: typography.fonts.sans.family, fontWeight: 500 }}>Process</span>
               </td>
               <td style={{ padding: `${spacing[1]} ${spacing[2]}`, fontSize: typography.sizes.xs.fontSize }}>976544899</td>
               <td style={{ padding: `${spacing[1]} ${spacing[2]}`, fontSize: typography.sizes.xs.fontSize }}>Not Processed</td>
               <td style={{ padding: `${spacing[1]} ${spacing[2]}`, textAlign: 'center' }}>
-                <span style={{ display: 'inline-block', padding: `${spacing[1]} ${spacing[3]}`, background: theme['warning-bg'], color: theme.warning, borderRadius: radius.pill, fontSize: typography.sizes.xs.fontSize, fontWeight: 500 }}>Assign</span>
+                <span style={{ display: 'inline-block', padding: `${spacing[1]} ${spacing[3]}`, border: `1px solid ${theme.warning}`, background: theme['warning-bg'], color: theme.warning, borderRadius: radius.pill, fontSize: typography.sizes.xs.fontSize, fontFamily: typography.fonts.sans.family, fontWeight: 500 }}>Assign</span>
               </td>
             </tr>
           </tbody>

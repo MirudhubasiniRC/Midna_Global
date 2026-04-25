@@ -76,6 +76,17 @@ export const tableTokens = {
   rowHeight: '48px',
 } as const;
 
+export const sidebarTokens = {
+  width: {
+    expanded: 220,
+    collapsed: 72,
+    sectionExpanded: 280,
+  } as const,
+  iconSize: 20,
+  collapseIconSize: 22,
+  navItemFontSize: '14px',
+} as const;
+
 // ─── Colors (Light) ───────────────────────────────────────────────────────────
 
 export const colors = {

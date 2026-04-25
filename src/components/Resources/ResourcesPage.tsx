@@ -81,17 +81,18 @@ const RESOURCES: ResourceRow[] = [
 
 const actionPill = (label: string) => (
   <button
+    className="resources-action-pill"
     type="button"
     style={{
       display: 'inline-block',
       padding: `${spacing[1]} ${spacing[3]}`,
+      border: `1px solid ${theme.info}`,
       background: theme['info-bg'],
       color: theme.info,
       borderRadius: radius.pill,
       fontSize: typography.sizes.xs.fontSize,
       fontFamily: typography.fonts.sans.family,
       fontWeight: 500,
-      border: 'none',
       cursor: 'pointer',
     }}
   >
@@ -157,7 +158,7 @@ export default function ResourcesPage() {
               marginBottom: spacing[2],
             }}
           >
-            Gbp resources
+            GBP resources
           </h1>
           <p
             style={{
@@ -185,6 +186,7 @@ export default function ResourcesPage() {
               const isOn = chip.id === 'all' ? categoryFilter === 'all' : categoryFilter === chip.id;
               return (
                 <button
+                  className="resources-filter-chip"
                   key={chip.id}
                   type="button"
                   onClick={() => {
@@ -254,6 +256,7 @@ export default function ResourcesPage() {
                   fontFamily: typography.fonts.sans.family,
                   color: theme['text-primary'],
                   background: theme['bg-surface'],
+                  outlineColor: theme['focus-ring'],
                 }}
               />
             </label>
@@ -288,6 +291,7 @@ export default function ResourcesPage() {
                   fontFamily: typography.fonts.sans.family,
                   color: theme['text-primary'],
                   background: theme['bg-surface'],
+                  outlineColor: theme['focus-ring'],
                 }}
               >
                 <option value={10}>10</option>
@@ -303,6 +307,11 @@ export default function ResourcesPage() {
           <style>{`
             .resources-table-body tr:nth-child(even) { background: ${theme['table-zebra']}; }
             .resources-table-body tr:hover { background: ${theme['table-row-hover']}; }
+            .resources-filter-chip:focus-visible,
+            .resources-action-pill:focus-visible {
+              outline: 2px solid ${theme['focus-ring']};
+              outline-offset: 2px;
+            }
           `}</style>
           <div style={{ overflowX: 'auto', borderRadius: radius.sm, border: `1px solid ${theme.border}` }}>
             <table

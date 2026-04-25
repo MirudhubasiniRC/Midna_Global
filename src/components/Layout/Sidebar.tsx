@@ -14,13 +14,13 @@ import {
   PanelLeft,
 } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
-import { colors, spacing, radius, typography } from '../../styles/theme';
+import { colors, spacing, radius, typography, sidebarTokens } from '../../styles/theme';
 
 const theme = colors.light;
 
-const ICON_SIZE = 20;
-const SIDEBAR_EXPANDED = 220;
-const SIDEBAR_COLLAPSED = 72;
+const ICON_SIZE = sidebarTokens.iconSize;
+const SIDEBAR_EXPANDED = sidebarTokens.width.expanded;
+const SIDEBAR_COLLAPSED = sidebarTokens.width.collapsed;
 
 const mlaMenuItems = [
   { label: 'My Scan', Icon: ScanLine, path: '/mla/scan' },
@@ -75,10 +75,10 @@ export default function Sidebar() {
         aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
       >
         {collapsed ? (
-          <PanelLeft size={22} strokeWidth={2} />
+          <PanelLeft size={sidebarTokens.collapseIconSize} strokeWidth={2} />
         ) : (
           <>
-            <PanelLeftClose size={22} strokeWidth={2} />
+            <PanelLeftClose size={sidebarTokens.collapseIconSize} strokeWidth={2} />
             <span
               style={{
                 fontSize: typography.sizes.xs.fontSize,
@@ -117,7 +117,7 @@ export default function Sidebar() {
               padding: collapsed ? spacing[3] : `${spacing[3]} ${spacing[4]}`,
               borderRadius: radius.sm,
               fontFamily: typography.fonts.sans.family,
-              fontSize: typography.sizes.sm.fontSize,
+              fontSize: sidebarTokens.navItemFontSize,
               color: isActive ? theme.primary : theme['text-primary'],
               textDecoration: 'none',
               background: isActive ? theme['primary-soft'] : 'transparent',

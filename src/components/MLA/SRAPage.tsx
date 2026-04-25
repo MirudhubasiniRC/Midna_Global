@@ -488,13 +488,13 @@ export default function SRAPage() {
                     style={{
                       display: 'inline-block',
                       padding: `${spacing[1]} ${spacing[3]}`,
+                      border: `1px solid ${theme.info}`,
                       background: theme['info-bg'],
                       color: theme.info,
                       borderRadius: radius.pill,
                       fontSize: typography.sizes.xs.fontSize,
                       fontFamily: typography.fonts.sans.family,
                       fontWeight: 500,
-                      border: 'none',
                       cursor: 'pointer',
                     }}
                   >

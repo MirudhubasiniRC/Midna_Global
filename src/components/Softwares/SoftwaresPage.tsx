@@ -35,17 +35,18 @@ const SOFTWARE: { sno: number; name: string }[] = [
 
 const downloadPill = (
   <button
+    className="softwares-action-pill"
     type="button"
     style={{
       display: 'inline-block',
       padding: `${spacing[1]} ${spacing[3]}`,
+      border: `1px solid ${theme.primary}`,
       background: theme['primary-soft'],
       color: theme.primary,
       borderRadius: radius.pill,
       fontSize: typography.sizes.xs.fontSize,
       fontFamily: typography.fonts.sans.family,
       fontWeight: 500,
-      border: 'none',
       cursor: 'pointer',
     }}
   >
@@ -157,6 +158,7 @@ export default function SoftwaresPage() {
                   fontFamily: typography.fonts.sans.family,
                   color: theme['text-primary'],
                   background: theme['bg-surface'],
+                  outlineColor: theme['focus-ring'],
                 }}
               />
             </label>
@@ -186,6 +188,7 @@ export default function SoftwaresPage() {
                   fontFamily: typography.fonts.sans.family,
                   color: theme['text-primary'],
                   background: theme['bg-surface'],
+                  outlineColor: theme['focus-ring'],
                 }}
               >
                 <option value={10}>10</option>
@@ -201,6 +204,10 @@ export default function SoftwaresPage() {
           <style>{`
             .softwares-table-body tr:nth-child(even) { background: ${theme['table-zebra']}; }
             .softwares-table-body tr:hover { background: ${theme['table-row-hover']}; }
+            .softwares-action-pill:focus-visible {
+              outline: 2px solid ${theme['focus-ring']};
+              outline-offset: 2px;
+            }
           `}</style>
           <div style={{ overflowX: 'auto', borderRadius: radius.sm, border: `1px solid ${theme.border}` }}>
             <table

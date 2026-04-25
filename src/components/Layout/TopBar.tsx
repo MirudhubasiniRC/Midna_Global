@@ -1,5 +1,17 @@
 import { NavLink, useLocation } from 'react-router-dom';
-import { House, Users, ChartColumn, BookMarked, FolderCode, BookOpenCheck, BookUser, UserStar, User } from 'lucide-react';
+import {
+  House,
+  Users,
+  ChartColumn,
+  BookMarked,
+  FolderCode,
+  BookOpenCheck,
+  BookUser,
+  UserStar,
+  User,
+  ShieldCheck,
+  Laptop,
+} from 'lucide-react';
 import { colors, spacing, typography } from '../../styles/theme';
 import logo from '../../assets/Name_only.png';
 
@@ -14,7 +26,9 @@ const navItems = [
   { label: 'Resources', Icon: BookMarked, path: '/resources' },
   { label: 'Softwares', Icon: FolderCode, path: '/softwares' },
   { label: 'Live Coach', Icon: BookOpenCheck, path: '/home' },
-  { label: 'Mentor', Icon: BookUser, path: '/home' },
+  { label: 'Mentor', Icon: BookUser, path: '/mentor' },
+  { label: 'Admin', Icon: ShieldCheck, path: '/admin' },
+  { label: 'Master', Icon: Laptop, path: '/master' },
   { label: 'Expert', Icon: UserStar, path: '/home' },
 ];
 
@@ -25,6 +39,9 @@ function isNavActive(item: { label: string; path: string }, pathname: string): b
   if (item.path === '/process') return pathname.startsWith('/process');
   if (item.path === '/resources') return pathname === '/resources';
   if (item.path === '/softwares') return pathname === '/softwares';
+  if (item.path === '/mentor') return pathname.startsWith('/mentor');
+  if (item.path === '/admin') return pathname.startsWith('/admin');
+  if (item.path === '/master') return pathname.startsWith('/master');
   return false;
 }
 

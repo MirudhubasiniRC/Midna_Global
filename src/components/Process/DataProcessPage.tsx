@@ -193,7 +193,23 @@ export default function DataProcessPage() {
                 filtered.map((row, index) => (
                   <tr key={row.id} style={{ height: 40 }}>
                     <td style={{ ...tdStyle, textAlign: 'center' }}>{index + 1}</td>
-                    <td style={tdStyle}>{row.scanId}</td>
+                    <td style={tdStyle}>
+                      <span
+                        style={{
+                          display: 'inline-block',
+                          padding: `${spacing[1]} ${spacing[3]}`,
+                          border: `1px solid ${theme.info}`,
+                          background: theme['info-bg'],
+                          color: theme.info,
+                          borderRadius: radius.pill,
+                          fontSize: typography.sizes.xs.fontSize,
+                          fontFamily: typography.fonts.sans.family,
+                          fontWeight: 500,
+                        }}
+                      >
+                        {row.scanId}
+                      </span>
+                    </td>
                     <td style={tdStyle}>{row.name}</td>
                     <td style={tdStyle}>{row.storedOn}</td>
                     <td style={tdStyle}>{row.processedBy}</td>
@@ -203,7 +219,9 @@ export default function DataProcessPage() {
                           display: 'inline-block',
                           padding: `${spacing[1]} ${spacing[3]}`,
                           borderRadius: radius.pill,
+                          border: `1px solid ${row.flagged ? theme.warning : theme.success}`,
                           fontSize: typography.sizes.xs.fontSize,
+                          fontFamily: typography.fonts.sans.family,
                           fontWeight: 500,
                           background: row.flagged ? theme['warning-bg'] : theme['success-bg'],
                           color: row.flagged ? theme.warning : theme.success,
@@ -221,8 +239,9 @@ export default function DataProcessPage() {
                           display: 'inline-block',
                           padding: `${spacing[1]} ${spacing[3]}`,
                           borderRadius: radius.pill,
-                          border: 'none',
+                          border: `1px solid ${row.flagged ? theme['btn-disabled-text'] : theme.warning}`,
                           fontSize: typography.sizes.xs.fontSize,
+                          fontFamily: typography.fonts.sans.family,
                           fontWeight: 500,
                           background: row.flagged ? theme['btn-disabled-bg'] : theme['warning-bg'],
                           color: row.flagged ? theme['btn-disabled-text'] : theme.warning,
