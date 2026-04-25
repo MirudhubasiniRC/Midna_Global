@@ -329,6 +329,7 @@ export default function ProfilePage() {
 
 function EditProfileModal({ onClose }: { onClose: () => void }) {
   const [form, setForm] = useState(editFormDefaults);
+  const [emailError, setEmailError] = useState('');
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -346,8 +347,18 @@ function EditProfileModal({ onClose }: { onClose: () => void }) {
     setForm((f) => ({ ...f, [key]: value }));
   };
 
+  const keepDigitsOnly = (value: string, maxLength?: number) => {
+    const digits = value.replace(/\D/g, '');
+    return typeof maxLength === 'number' ? digits.slice(0, maxLength) : digits;
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.mailId);
+    if (!validEmail) {
+      setEmailError('Enter a valid email address.');
+      return;
+    }
     onClose();
   };
 
@@ -456,7 +467,10 @@ function EditProfileModal({ onClose }: { onClose: () => void }) {
                 id="ep-mob-acc"
                 type="tel"
                 value={form.mobileAccounts}
-                onChange={(e) => setField('mobileAccounts', e.target.value)}
+                onChange={(e) => setField('mobileAccounts', keepDigitsOnly(e.target.value, 10))}
+                inputMode="numeric"
+                pattern="[0-9]*"
+                maxLength={10}
                 style={inputBase}
               />
             </Field>
@@ -465,7 +479,10 @@ function EditProfileModal({ onClose }: { onClose: () => void }) {
                 id="ep-mob-couns"
                 type="tel"
                 value={form.mobileCounselling}
-                onChange={(e) => setField('mobileCounselling', e.target.value)}
+                onChange={(e) => setField('mobileCounselling', keepDigitsOnly(e.target.value, 10))}
+                inputMode="numeric"
+                pattern="[0-9]*"
+                maxLength={10}
                 style={inputBase}
               />
             </Field>
@@ -500,7 +517,10 @@ function EditProfileModal({ onClose }: { onClose: () => void }) {
                 id="ep-pin"
                 type="text"
                 value={form.pincode}
-                onChange={(e) => setField('pincode', e.target.value)}
+                onChange={(e) => setField('pincode', keepDigitsOnly(e.target.value, 6))}
+                inputMode="numeric"
+                pattern="[0-9]*"
+                maxLength={6}
                 style={inputBase}
               />
             </Field>
@@ -518,10 +538,29 @@ function EditProfileModal({ onClose }: { onClose: () => void }) {
                 id="ep-mail"
                 type="email"
                 value={form.mailId}
-                onChange={(e) => setField('mailId', e.target.value)}
-                style={inputBase}
+                onChange={(e) => {
+                  setField('mailId', e.target.value);
+                  setEmailError('');
+                }}
+                style={{
+                  ...inputBase,
+                  borderColor: emailError ? theme.error : theme.border,
+                }}
               />
             </Field>
+            {emailError ? (
+              <div
+                style={{
+                  gridColumn: '1 / -1',
+                  fontSize: typography.sizes.xs.fontSize,
+                  color: theme.error,
+                  fontFamily: typography.fonts.sans.family,
+                  marginTop: `-${spacing[2]}`,
+                }}
+              >
+                {emailError}
+              </div>
+            ) : null}
           </div>
 
           <div style={{ marginTop: spacing[4] }}>

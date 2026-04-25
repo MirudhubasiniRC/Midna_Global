@@ -66,7 +66,7 @@ const feedbackBtnPillBase: CSSProperties = {
   transition: 'background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease',
 };
 
-const feedbackPillPrimary: CSSProperties = {
+const feedbackPillHide: CSSProperties = {
   ...feedbackBtnPillBase,
   border: `1px solid ${theme.primary}`,
   background: theme['primary-soft'],
@@ -74,23 +74,38 @@ const feedbackPillPrimary: CSSProperties = {
   boxShadow: '0 1px 2px rgba(15, 23, 42, 0.06)',
 };
 
-const feedbackPillWarning: CSSProperties = {
+const feedbackPillShow: CSSProperties = {
   ...feedbackBtnPillBase,
-  border: `1px solid ${theme.warning}`,
-  background: theme['warning-bg'],
-  color: theme.warning,
+  border: `1px solid ${theme.success}`,
+  background: theme['success-bg'],
+  color: theme.success,
+  boxShadow: '0 1px 2px rgba(15, 23, 42, 0.06)',
+};
+
+const feedbackPillDelete: CSSProperties = {
+  ...feedbackBtnPillBase,
+  border: `1px solid ${theme.error}`,
+  background: theme['error-bg'],
+  color: theme.error,
   boxShadow: '0 1px 2px rgba(15, 23, 42, 0.06)',
 };
 
 export default function FeedbackPage() {
+  const [feedbackRows, setFeedbackRows] = useState(
+    FEEDBACK_DATA.map((row) => ({ ...row, hidden: false }))
+  );
   const [pageSize, setPageSize] = useState(20);
   const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState('');
+  const [pendingAction, setPendingAction] = useState<{
+    type: 'hide' | 'show' | 'delete';
+    row: FeedbackRow & { hidden: boolean };
+  } | null>(null);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    if (!q) return FEEDBACK_DATA;
-    return FEEDBACK_DATA.filter(
+    if (!q) return feedbackRows;
+    return feedbackRows.filter(
       (r) =>
         String(r.sno).includes(q) ||
         r.name.toLowerCase().includes(q) ||
@@ -98,7 +113,7 @@ export default function FeedbackPage() {
         r.counselorMobile.includes(q) ||
         r.feedback.toLowerCase().includes(q)
     );
-  }, [search]);
+  }, [feedbackRows, search]);
 
   const totalEntries = filtered.length;
   const totalPages =
@@ -130,30 +145,43 @@ export default function FeedbackPage() {
       }}
     >
       <style>{`
-        .feedback-status-btn--primary:hover {
+        .feedback-status-btn--hide:hover {
           background: color-mix(in srgb, ${theme.primary} 18%, ${theme['bg-surface']});
           border-color: ${theme['primary-hover']};
           box-shadow: 0 2px 6px rgba(147, 32, 122, 0.18);
         }
-        .feedback-status-btn--primary:active {
+        .feedback-status-btn--hide:active {
           transform: translateY(1px);
           box-shadow: 0 1px 2px rgba(147, 32, 122, 0.12);
         }
-        .feedback-status-btn--primary:focus-visible {
+        .feedback-status-btn--hide:focus-visible {
           outline: 2px solid ${theme['focus-ring']};
           outline-offset: 2px;
         }
-        .feedback-status-btn--warning:hover {
-          background: color-mix(in srgb, ${theme.warning} 22%, ${theme['bg-surface']});
-          border-color: color-mix(in srgb, ${theme.warning} 72%, black);
-          box-shadow: 0 2px 6px rgba(245, 158, 11, 0.22);
+        .feedback-status-btn--show:hover {
+          background: color-mix(in srgb, ${theme.success} 22%, ${theme['bg-surface']});
+          border-color: color-mix(in srgb, ${theme.success} 72%, black);
+          box-shadow: 0 2px 6px rgba(34, 197, 94, 0.22);
         }
-        .feedback-status-btn--warning:active {
+        .feedback-status-btn--show:active {
           transform: translateY(1px);
-          box-shadow: 0 1px 2px rgba(245, 158, 11, 0.14);
+          box-shadow: 0 1px 2px rgba(34, 197, 94, 0.14);
         }
-        .feedback-status-btn--warning:focus-visible {
-          outline: 2px solid ${theme.warning};
+        .feedback-status-btn--show:focus-visible {
+          outline: 2px solid ${theme.success};
+          outline-offset: 2px;
+        }
+        .feedback-status-btn--delete:hover {
+          background: color-mix(in srgb, ${theme.error} 22%, ${theme['bg-surface']});
+          border-color: color-mix(in srgb, ${theme.error} 72%, black);
+          box-shadow: 0 2px 6px rgba(220, 38, 38, 0.22);
+        }
+        .feedback-status-btn--delete:active {
+          transform: translateY(1px);
+          box-shadow: 0 1px 2px rgba(220, 38, 38, 0.14);
+        }
+        .feedback-status-btn--delete:focus-visible {
+          outline: 2px solid ${theme.error};
           outline-offset: 2px;
         }
       `}</style>
@@ -347,15 +375,19 @@ export default function FeedbackPage() {
                       >
                         <button
                           type="button"
-                          className="feedback-status-btn--primary"
-                          style={feedbackPillPrimary}
+                          className={row.hidden ? 'feedback-status-btn--show' : 'feedback-status-btn--hide'}
+                          onClick={() =>
+                            setPendingAction({ type: row.hidden ? 'show' : 'hide', row })
+                          }
+                          style={row.hidden ? feedbackPillShow : feedbackPillHide}
                         >
-                          Hide
+                          {row.hidden ? 'Show' : 'Hide'}
                         </button>
                         <button
                           type="button"
-                          className="feedback-status-btn--warning"
-                          style={feedbackPillWarning}
+                          className="feedback-status-btn--delete"
+                          onClick={() => setPendingAction({ type: 'delete', row })}
+                          style={feedbackPillDelete}
                         >
                           Delete
                         </button>
@@ -384,6 +416,146 @@ export default function FeedbackPage() {
           }
         />
       </div>
+
+      {pendingAction ? (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="confirm-feedback-action-title"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 1100,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: spacing[4],
+            background: 'rgba(17, 24, 39, 0.45)',
+          }}
+          onMouseDown={(e) => {
+            if (e.target === e.currentTarget) setPendingAction(null);
+          }}
+        >
+          <div
+            onMouseDown={(e) => e.stopPropagation()}
+            style={{
+              width: '100%',
+              maxWidth: 460,
+              background: theme['bg-surface'],
+              borderRadius: radius.lg,
+              border: `1px solid ${theme.border}`,
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+              padding: spacing[5],
+            }}
+          >
+            <h3
+              id="confirm-feedback-action-title"
+              style={{
+                margin: 0,
+                fontSize: typography.sizes.lg.fontSize,
+                fontWeight: typography.fonts.heading.fontWeight,
+                fontFamily: typography.fonts.heading.family,
+                color: theme['text-primary'],
+              }}
+            >
+              {pendingAction.type === 'hide' ? 'Hide feedback' : 'Delete feedback'}
+            </h3>
+            <p
+              style={{
+                margin: `${spacing[3]} 0 0`,
+                fontSize: typography.sizes.sm.fontSize,
+                lineHeight: 1.6,
+                fontFamily: typography.fonts.sans.family,
+                color: theme['text-secondary'],
+              }}
+            >
+              {pendingAction.type === 'hide'
+                ? 'Do you want to hide this feedback from the list? You can enable it again later from admin controls.'
+                : pendingAction.type === 'show'
+                  ? 'Do you want to show this feedback to other user types again?'
+                : 'Are you sure you want to delete this feedback permanently? This action cannot be undone.'}
+            </p>
+            <p
+              style={{
+                margin: `${spacing[2]} 0 0`,
+                fontSize: typography.sizes.sm.fontSize,
+                fontFamily: typography.fonts.sans.family,
+                color: theme['text-primary'],
+              }}
+            >
+              <strong>{pendingAction.row.name}</strong> ({pendingAction.row.counselorMobile})
+            </p>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                gap: spacing[3],
+                marginTop: spacing[5],
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => setPendingAction(null)}
+                style={{
+                  height: inputTokens.height.sm,
+                  padding: `${spacing[2]} ${spacing[4]}`,
+                  borderRadius: radius.sm,
+                  border: `1px solid ${theme.border}`,
+                  background: theme['bg-surface'],
+                  color: theme['text-primary'],
+                  fontSize: typography.sizes.sm.fontSize,
+                  fontWeight: 600,
+                  fontFamily: typography.fonts.sans.family,
+                  cursor: 'pointer',
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (!pendingAction) return;
+                  if (pendingAction.type === 'delete') {
+                    setFeedbackRows((prev) => prev.filter((r) => r.sno !== pendingAction.row.sno));
+                  } else if (pendingAction.type === 'hide') {
+                    setFeedbackRows((prev) =>
+                      prev.map((r) =>
+                        r.sno === pendingAction.row.sno ? { ...r, hidden: true } : r
+                      )
+                    );
+                  } else {
+                    setFeedbackRows((prev) =>
+                      prev.map((r) =>
+                        r.sno === pendingAction.row.sno ? { ...r, hidden: false } : r
+                      )
+                    );
+                  }
+                  setPendingAction(null);
+                }}
+                style={{
+                  height: inputTokens.height.sm,
+                  padding: `${spacing[2]} ${spacing[4]}`,
+                  borderRadius: radius.sm,
+                  border: 'none',
+                  background:
+                    pendingAction.type === 'delete' ? theme.error : theme['btn-primary-bg'],
+                  color: theme['text-inverse'],
+                  fontSize: typography.sizes.sm.fontSize,
+                  fontWeight: 600,
+                  fontFamily: typography.fonts.sans.family,
+                  cursor: 'pointer',
+                }}
+              >
+                {pendingAction.type === 'delete'
+                  ? 'Delete'
+                  : pendingAction.type === 'hide'
+                    ? 'Hide'
+                    : 'Show'}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

@@ -16,7 +16,10 @@ import GoogleReviewPage from './components/MLA/GoogleReviewPage'
 import ABCLedgerPage from './components/MLA/ABCLedgerPage'
 import ProcessPage from './components/Process/ProcessPage'
 import DataReviewPage from './components/Process/DataReviewPage'
+import DataProcessPage from './components/Process/DataProcessPage'
 import UploadReportPage from './components/Process/UploadReportPage'
+import ResourcesPage from './components/Resources/ResourcesPage'
+import SoftwaresPage from './components/Softwares/SoftwaresPage'
 import { getThemeCssVars } from './styles/theme'
 import './App.css'
 
@@ -49,9 +52,11 @@ function App() {
       <Route path="/process" element={<ProcessPage />}>
         <Route index element={null} />
         <Route path="data-review" element={<DataReviewPage />} />
-        <Route path="data-process" element={<div>Data Process content coming soon.</div>} />
+        <Route path="data-process" element={<DataProcessPage />} />
         <Route path="upload-report" element={<UploadReportPage />} />
       </Route>
+      <Route path="/resources" element={<ResourcesPage />} />
+      <Route path="/softwares" element={<SoftwaresPage />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )

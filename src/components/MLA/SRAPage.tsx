@@ -18,54 +18,17 @@ type NetworkTier =
   | 'IGNITE'
   | 'FREELANCER';
 
-/** Pastel fills + calmer borders; aligned with brand gold (#E9C75A) & primary (#93207A). */
-const TIER_STYLE: Record<NetworkTier, { bg: string; border: string; color: string }> = {
-  REGISTERED: {
-    bg: '#FFFAF3',
-    border: '#D4B87A',
-    color: '#5C4A2E',
-  },
-  SPARK_LITE: {
-    bg: '#F3F0FA',
-    border: '#9A8AB8',
-    color: '#4A3D63',
-  },
-  SPARK: {
-    bg: '#FFF5F0',
-    border: '#D4A090',
-    color: '#8B4A32',
-  },
-  IGNITE: {
-    bg: '#F9F0F6',
-    border: '#B5659A',
-    color: '#6B2058',
-  },
-  FREELANCER: {
-    bg: '#F2FAF6',
-    border: '#6FA894',
-    color: '#2D5C4A',
-  },
-};
-
 const NETWORK_FILTERS: {
-  id: NetworkTier;
+  id: NetworkTier | 'ALL';
   label: string;
-  bg: string;
-  color: string;
-  border: string;
-}[] = (
-  [
-    ['REGISTERED', 'Registered'],
-    ['SPARK_LITE', 'Spark lite'],
-    ['SPARK', 'Spark'],
-    ['IGNITE', 'Ignite'],
-    ['FREELANCER', 'Freelancer'],
-  ] as const
-).map(([id, label]) => ({
-  id,
-  label,
-  ...TIER_STYLE[id],
-}));
+}[] = [
+  { id: 'ALL', label: 'Show all' },
+  { id: 'REGISTERED', label: 'Registered' },
+  { id: 'SPARK_LITE', label: 'Spark lite' },
+  { id: 'SPARK', label: 'Spark' },
+  { id: 'IGNITE', label: 'Ignite' },
+  { id: 'FREELANCER', label: 'Freelancer' },
+];
 
 type TeacherRow = {
   tid: number;
@@ -190,6 +153,51 @@ const TEACHERS: TeacherRow[] = [
   },
 ];
 
+const STATE_OPTIONS = [
+  'Tamil Nadu',
+  'Andhra Pradesh',
+  'Karnataka',
+  'Kerala',
+  'Telangana',
+  'Maharashtra',
+  'Delhi',
+  'Goa',
+];
+
+const BILLING_OPTIONS = ['30%', '40%', '50%', '60%'];
+const SCANNER_OPTIONS = ['1', 'No', 'Yes'];
+const STATUS_OPTIONS = ['Registered', 'Spark Lite', 'Spark', 'Ignite', 'Freelancer'];
+const PEOPLE_OPTIONS = [
+  'Rathinaswamy A',
+  'AavishkarA (Anil B+)',
+  'Dhiya Kannan',
+  'Shreshta Minds (RB)',
+  'MIDNA (H.O)',
+  'Skill Masters Academy',
+  'Devi PL',
+  'Panchapakesan',
+  'Bhuvana Pasupathi',
+  'Sureshbabu L',
+  'Priya Chhabra',
+  'The Path Finder (SEEMA)',
+  'Manju Anand',
+  'Krutika Ramkumar',
+  'Rachana Mittal',
+  'Dr Ravi Perumal',
+  'Nithiyananthi S (PVM)',
+  'Tejvir Singh Sadana',
+  'Harish K Raju',
+  'Vanitha Venkatasubbu',
+  'Sindhu Dinesh',
+  'Jayashree Ganesan',
+  'Vijeyalakshme Shivakumar',
+  'Jeyalakshmi',
+  'Vinodhini J',
+  'Renuka Devi',
+  'Soumya R',
+  'Visukumar G',
+];
+
 /** Matches `LedgerPage` / accounts table styling */
 const thStyle = {
   padding: `${spacing[1]} ${spacing[2]}`,
@@ -231,6 +239,7 @@ export default function SRAPage() {
   const [pageSize, setPageSize] = useState(20);
   const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState('');
+  const [editingRow, setEditingRow] = useState<TeacherRow | null>(null);
 
   const filtered = useMemo(() => {
     let rows = TEACHERS;
@@ -263,12 +272,6 @@ export default function SRAPage() {
   const from = totalEntries === 0 ? 0 : (safePage - 1) * pageSize + 1;
   const to = Math.min(safePage * pageSize, totalEntries);
   const pageRows = filtered.slice((safePage - 1) * pageSize, safePage * pageSize);
-
-  const clearFilters = () => {
-    setActiveNetwork(null);
-    setSearch('');
-    setCurrentPage(1);
-  };
 
   return (
     <div
@@ -304,51 +307,33 @@ export default function SRAPage() {
           }}
         >
           {NETWORK_FILTERS.map((f) => {
-            const active = activeNetwork === f.id;
+            const active = f.id === 'ALL' ? activeNetwork === null : activeNetwork === f.id;
             return (
               <button
                 key={f.id}
                 type="button"
                 onClick={() => {
-                  setActiveNetwork(f.id);
+                  setActiveNetwork(f.id === 'ALL' ? null : f.id);
                   setCurrentPage(1);
                 }}
                 style={{
                   padding: `${spacing[2]} ${spacing[3]}`,
-                  borderRadius: radius.sm,
-                  border: active ? `2px solid ${theme.primary}` : `1px solid ${f.border}`,
-                  background: f.bg,
-                  color: f.color,
-                  fontSize: typography.sizes.xs.fontSize,
-                  fontWeight: 700,
+                  borderRadius: radius.pill,
+                  border: `1px solid ${active ? theme.primary : theme.border}`,
+                  background: active ? theme.primary : theme['bg-surface'],
+                  color: active ? theme['text-inverse'] : theme['text-secondary'],
+                  fontSize: typography.sizes.sm.fontSize,
+                  fontWeight: 500,
                   fontFamily: typography.fonts.sans.family,
                   cursor: 'pointer',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.04em',
-                  boxShadow: active ? `0 0 0 1px ${theme['primary-soft']}` : 'none',
+                  lineHeight: 1.2,
+                  transition: 'background 0.15s ease, color 0.15s ease, border-color 0.15s ease',
                 }}
               >
                 {f.label}
               </button>
             );
           })}
-          <button
-            type="button"
-            onClick={clearFilters}
-            style={{
-              padding: `${spacing[2]} ${spacing[3]}`,
-              borderRadius: radius.sm,
-              border: `1px solid ${theme.border}`,
-              background: theme['table-header-gray'],
-              color: theme['text-secondary'],
-              fontSize: typography.sizes.xs.fontSize,
-              fontWeight: 600,
-              fontFamily: typography.fonts.sans.family,
-              cursor: 'pointer',
-            }}
-          >
-            Clear
-          </button>
         </div>
       </div>
 
@@ -476,6 +461,7 @@ export default function SRAPage() {
               <Th align="right">L3M</Th>
               <Th align="right">LMS</Th>
               <Th>Last scan</Th>
+              <Th align="center">Action</Th>
             </tr>
           </thead>
           <tbody className="ledger-table-body">
@@ -495,6 +481,26 @@ export default function SRAPage() {
                 <td style={{ ...tdStyle, textAlign: 'right' }}>{row.l3m}</td>
                 <td style={{ ...tdStyle, textAlign: 'right' }}>{row.lms}</td>
                 <td style={tdStyle}>{row.lastScan}</td>
+                <td style={{ ...tdStyle, textAlign: 'center' }}>
+                  <button
+                    type="button"
+                    onClick={() => setEditingRow(row)}
+                    style={{
+                      display: 'inline-block',
+                      padding: `${spacing[1]} ${spacing[3]}`,
+                      background: theme['info-bg'],
+                      color: theme.info,
+                      borderRadius: radius.pill,
+                      fontSize: typography.sizes.xs.fontSize,
+                      fontFamily: typography.fonts.sans.family,
+                      fontWeight: 500,
+                      border: 'none',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    Edit
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -517,6 +523,488 @@ export default function SRAPage() {
           ) : undefined
         }
       />
+
+      {editingRow ? (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0, 0, 0, 0.45)',
+            zIndex: 1000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: spacing[5],
+          }}
+          onClick={() => setEditingRow(null)}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="SLC Training Data"
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              width: 'min(980px, 100%)',
+              maxHeight: '88vh',
+              overflowY: 'auto',
+              background: theme['bg-surface'],
+              borderRadius: radius.md,
+              border: `1px solid ${theme.border}`,
+              boxShadow: '0 12px 30px rgba(0, 0, 0, 0.18)',
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: spacing[4],
+                borderBottom: `1px solid ${theme.border}`,
+              }}
+            >
+              <h3
+                style={{
+                  margin: 0,
+                  fontSize: typography.sizes.xl.fontSize,
+                  fontFamily: typography.fonts.heading.family,
+                  fontWeight: typography.fonts.heading.fontWeight,
+                  color: theme['text-primary'],
+                }}
+              >
+                SLC Training Data
+              </h3>
+              <button
+                type="button"
+                onClick={() => setEditingRow(null)}
+                aria-label="Close edit modal"
+                style={{
+                  border: 'none',
+                  background: 'transparent',
+                  color: theme['text-muted'],
+                  fontSize: typography.sizes.lg.fontSize,
+                  cursor: 'pointer',
+                }}
+              >
+                X
+              </button>
+            </div>
+
+            <div style={{ padding: spacing[4] }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: spacing[3] }}>
+                <label
+                  style={{
+                    display: 'grid',
+                    gap: spacing[1],
+                    fontSize: typography.sizes.xs.fontSize,
+                    color: theme['text-secondary'],
+                  }}
+                >
+                  Name
+                  <input
+                    type="text"
+                    defaultValue={editingRow.name}
+                    style={{
+                      height: inputTokens.height.sm,
+                      padding: `${spacing[1]} ${spacing[2]}`,
+                      borderRadius: radius.sm,
+                      border: `1px solid ${theme.border}`,
+                      fontSize: typography.sizes.sm.fontSize,
+                      fontFamily: typography.fonts.sans.family,
+                      color: theme['text-primary'],
+                      background: theme['bg-surface'],
+                    }}
+                  />
+                </label>
+                <label
+                  style={{
+                    display: 'grid',
+                    gap: spacing[1],
+                    fontSize: typography.sizes.xs.fontSize,
+                    color: theme['text-secondary'],
+                  }}
+                >
+                  Date of Joining [T00505]
+                  <input
+                    type="date"
+                    defaultValue={editingRow.doj}
+                    style={{
+                      height: inputTokens.height.sm,
+                      padding: `${spacing[1]} ${spacing[2]}`,
+                      borderRadius: radius.sm,
+                      border: `1px solid ${theme.border}`,
+                      fontSize: typography.sizes.sm.fontSize,
+                      fontFamily: typography.fonts.sans.family,
+                      color: theme['text-primary'],
+                      background: theme['bg-surface'],
+                    }}
+                  />
+                </label>
+                <label
+                  style={{
+                    display: 'grid',
+                    gap: spacing[1],
+                    fontSize: typography.sizes.xs.fontSize,
+                    color: theme['text-secondary'],
+                  }}
+                >
+                  Contact 1
+                  <input
+                    type="tel"
+                    defaultValue={editingRow.mobile}
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    maxLength={10}
+                    onInput={(e) => {
+                      const target = e.currentTarget;
+                      target.value = target.value.replace(/\D/g, '').slice(0, 10);
+                    }}
+                    style={{
+                      height: inputTokens.height.sm,
+                      padding: `${spacing[1]} ${spacing[2]}`,
+                      borderRadius: radius.sm,
+                      border: `1px solid ${theme.border}`,
+                      fontSize: typography.sizes.sm.fontSize,
+                      fontFamily: typography.fonts.sans.family,
+                      color: theme['text-primary'],
+                      background: theme['bg-surface'],
+                    }}
+                  />
+                </label>
+                <label
+                  style={{
+                    display: 'grid',
+                    gap: spacing[1],
+                    fontSize: typography.sizes.xs.fontSize,
+                    color: theme['text-secondary'],
+                  }}
+                >
+                  Contact 2
+                  <input
+                    type="tel"
+                    defaultValue="9600227643"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    maxLength={10}
+                    onInput={(e) => {
+                      const target = e.currentTarget;
+                      target.value = target.value.replace(/\D/g, '').slice(0, 10);
+                    }}
+                    style={{
+                      height: inputTokens.height.sm,
+                      padding: `${spacing[1]} ${spacing[2]}`,
+                      borderRadius: radius.sm,
+                      border: `1px solid ${theme.border}`,
+                      fontSize: typography.sizes.sm.fontSize,
+                      fontFamily: typography.fonts.sans.family,
+                      color: theme['text-primary'],
+                      background: theme['bg-surface'],
+                    }}
+                  />
+                </label>
+                <label
+                  style={{
+                    display: 'grid',
+                    gap: spacing[1],
+                    fontSize: typography.sizes.xs.fontSize,
+                    color: theme['text-secondary'],
+                  }}
+                >
+                  Email
+                  <input
+                    type="email"
+                    defaultValue={`${editingRow.name.toLowerCase().replace(/\s+/g, '.')}@gmail.com`}
+                    style={{
+                      height: inputTokens.height.sm,
+                      padding: `${spacing[1]} ${spacing[2]}`,
+                      borderRadius: radius.sm,
+                      border: `1px solid ${theme.border}`,
+                      fontSize: typography.sizes.sm.fontSize,
+                      fontFamily: typography.fonts.sans.family,
+                      color: theme['text-primary'],
+                      background: theme['bg-surface'],
+                    }}
+                  />
+                </label>
+                <label
+                  style={{
+                    display: 'grid',
+                    gap: spacing[1],
+                    fontSize: typography.sizes.xs.fontSize,
+                    color: theme['text-secondary'],
+                  }}
+                >
+                  Qualification
+                  <input
+                    type="text"
+                    defaultValue="DCT, BSc Computer science, Dip in Nutrition"
+                    style={{
+                      height: inputTokens.height.sm,
+                      padding: `${spacing[1]} ${spacing[2]}`,
+                      borderRadius: radius.sm,
+                      border: `1px solid ${theme.border}`,
+                      fontSize: typography.sizes.sm.fontSize,
+                      fontFamily: typography.fonts.sans.family,
+                      color: theme['text-primary'],
+                      background: theme['bg-surface'],
+                    }}
+                  />
+                </label>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: spacing[3], marginTop: spacing[3] }}>
+                <label style={{ display: 'grid', gap: spacing[1], fontSize: typography.sizes.xs.fontSize, color: theme['text-secondary'] }}>
+                  BioData
+                  <textarea
+                    rows={4}
+                    defaultValue={`Ref By - ${editingRow.trainer}\nI am a Health coach and a Consultant Nutritionist`}
+                    style={{
+                      width: '100%',
+                      boxSizing: 'border-box',
+                      padding: spacing[2],
+                      borderRadius: radius.sm,
+                      border: `1px solid ${theme.border}`,
+                      fontSize: typography.sizes.sm.fontSize,
+                      fontFamily: typography.fonts.sans.family,
+                    }}
+                  />
+                </label>
+                <label style={{ display: 'grid', gap: spacing[1], fontSize: typography.sizes.xs.fontSize, color: theme['text-secondary'] }}>
+                  Postal address
+                  <textarea
+                    rows={4}
+                    defaultValue={'151 First Floor\nBhuvaneshwari Nagar 2nd Street\nDr Ambedkar Road'}
+                    style={{
+                      width: '100%',
+                      boxSizing: 'border-box',
+                      padding: spacing[2],
+                      borderRadius: radius.sm,
+                      border: `1px solid ${theme.border}`,
+                      fontSize: typography.sizes.sm.fontSize,
+                      fontFamily: typography.fonts.sans.family,
+                    }}
+                  />
+                </label>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: spacing[3], marginTop: spacing[3] }}>
+                <label style={{ display: 'grid', gap: spacing[1], fontSize: typography.sizes.xs.fontSize, color: theme['text-secondary'] }}>
+                  State
+                  <select
+                    defaultValue="Tamil Nadu"
+                    style={{
+                      height: inputTokens.height.sm,
+                      padding: `${spacing[1]} ${spacing[2]}`,
+                      borderRadius: radius.sm,
+                      border: `1px solid ${theme.border}`,
+                      fontSize: typography.sizes.sm.fontSize,
+                      fontFamily: typography.fonts.sans.family,
+                      color: theme['text-primary'],
+                      background: theme['bg-surface'],
+                    }}
+                  >
+                    {STATE_OPTIONS.map((state) => (
+                      <option key={state} value={state}>
+                        {state}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label style={{ display: 'grid', gap: spacing[1], fontSize: typography.sizes.xs.fontSize, color: theme['text-secondary'] }}>
+                  District
+                  <input
+                    type="text"
+                    defaultValue="Coimbatore"
+                    style={{
+                      height: inputTokens.height.sm,
+                      padding: `${spacing[1]} ${spacing[2]}`,
+                      borderRadius: radius.sm,
+                      border: `1px solid ${theme.border}`,
+                      fontSize: typography.sizes.sm.fontSize,
+                      fontFamily: typography.fonts.sans.family,
+                    }}
+                  />
+                </label>
+                <label style={{ display: 'grid', gap: spacing[1], fontSize: typography.sizes.xs.fontSize, color: theme['text-secondary'] }}>
+                  Pincode
+                  <input
+                    type="text"
+                    defaultValue="641025"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    maxLength={6}
+                    onInput={(e) => {
+                      const target = e.currentTarget;
+                      target.value = target.value.replace(/\D/g, '').slice(0, 6);
+                    }}
+                    style={{
+                      height: inputTokens.height.sm,
+                      padding: `${spacing[1]} ${spacing[2]}`,
+                      borderRadius: radius.sm,
+                      border: `1px solid ${theme.border}`,
+                      fontSize: typography.sizes.sm.fontSize,
+                      fontFamily: typography.fonts.sans.family,
+                    }}
+                  />
+                </label>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: spacing[3], marginTop: spacing[3] }}>
+                <label style={{ display: 'grid', gap: spacing[1], fontSize: typography.sizes.xs.fontSize, color: theme['text-secondary'] }}>
+                  NLA Billing
+                  <select
+                    defaultValue={editingRow.billing}
+                    style={{
+                      height: inputTokens.height.sm,
+                      padding: `${spacing[1]} ${spacing[2]}`,
+                      borderRadius: radius.sm,
+                      border: `1px solid ${theme.border}`,
+                      fontSize: typography.sizes.sm.fontSize,
+                      fontFamily: typography.fonts.sans.family,
+                      color: theme['text-primary'],
+                      background: theme['bg-surface'],
+                    }}
+                  >
+                    {BILLING_OPTIONS.map((opt) => (
+                      <option key={opt} value={opt}>
+                        {opt}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label style={{ display: 'grid', gap: spacing[1], fontSize: typography.sizes.xs.fontSize, color: theme['text-secondary'] }}>
+                  Scanner
+                  <select
+                    defaultValue="Yes"
+                    style={{
+                      height: inputTokens.height.sm,
+                      padding: `${spacing[1]} ${spacing[2]}`,
+                      borderRadius: radius.sm,
+                      border: `1px solid ${theme.border}`,
+                      fontSize: typography.sizes.sm.fontSize,
+                      fontFamily: typography.fonts.sans.family,
+                      color: theme['text-primary'],
+                      background: theme['bg-surface'],
+                    }}
+                  >
+                    {SCANNER_OPTIONS.map((opt) => (
+                      <option key={opt} value={opt}>
+                        {opt}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label style={{ display: 'grid', gap: spacing[1], fontSize: typography.sizes.xs.fontSize, color: theme['text-secondary'] }}>
+                  Expiry Date
+                  <input
+                    type="date"
+                    defaultValue={editingRow.seDate}
+                    style={{
+                      height: inputTokens.height.sm,
+                      padding: `${spacing[1]} ${spacing[2]}`,
+                      borderRadius: radius.sm,
+                      border: `1px solid ${theme.border}`,
+                      fontSize: typography.sizes.sm.fontSize,
+                      fontFamily: typography.fonts.sans.family,
+                      color: theme['text-primary'],
+                      background: theme['bg-surface'],
+                    }}
+                  />
+                </label>
+                <label style={{ display: 'grid', gap: spacing[1], fontSize: typography.sizes.xs.fontSize, color: theme['text-secondary'] }}>
+                  Status
+                  <select
+                    defaultValue="Freelancer"
+                    style={{
+                      height: inputTokens.height.sm,
+                      padding: `${spacing[1]} ${spacing[2]}`,
+                      borderRadius: radius.sm,
+                      border: `1px solid ${theme.border}`,
+                      fontSize: typography.sizes.sm.fontSize,
+                      fontFamily: typography.fonts.sans.family,
+                      color: theme['text-primary'],
+                      background: theme['bg-surface'],
+                    }}
+                  >
+                    {STATUS_OPTIONS.map((opt) => (
+                      <option key={opt} value={opt}>
+                        {opt}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: spacing[3], marginTop: spacing[3] }}>
+                {[
+                  ['Managed By', editingRow.trainer],
+                  ['Admin By', 'Rathinaswamy A'],
+                  ['Referred By', editingRow.trainer],
+                ].map(([label, value]) => (
+                  <label key={label} style={{ display: 'grid', gap: spacing[1], fontSize: typography.sizes.xs.fontSize, color: theme['text-secondary'] }}>
+                    {label}
+                    <select
+                      defaultValue={value}
+                      style={{
+                        height: inputTokens.height.sm,
+                        padding: `${spacing[1]} ${spacing[2]}`,
+                        borderRadius: radius.sm,
+                        border: `1px solid ${theme.border}`,
+                        fontSize: typography.sizes.sm.fontSize,
+                        fontFamily: typography.fonts.sans.family,
+                        color: theme['text-primary'],
+                        background: theme['bg-surface'],
+                      }}
+                    >
+                      {PEOPLE_OPTIONS.map((person) => (
+                        <option key={person} value={person}>
+                          {person}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                ))}
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'center', gap: spacing[4], marginTop: spacing[4] }}>
+                <button
+                  type="button"
+                  onClick={() => setEditingRow(null)}
+                  style={{
+                    padding: `${spacing[2]} ${spacing[4]}`,
+                    border: 'none',
+                    borderRadius: radius.sm,
+                    background: theme['btn-primary-bg'],
+                    color: theme['btn-primary-text'],
+                    fontSize: typography.sizes.sm.fontSize,
+                    fontFamily: typography.fonts.sans.family,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                  }}
+                >
+                  Save
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setEditingRow(null)}
+                  style={{
+                    padding: `${spacing[2]} ${spacing[4]}`,
+                    border: 'none',
+                    borderRadius: radius.sm,
+                    background: theme.error,
+                    color: theme['text-inverse'],
+                    fontSize: typography.sizes.sm.fontSize,
+                    fontFamily: typography.fonts.sans.family,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                  }}
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

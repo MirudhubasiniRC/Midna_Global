@@ -11,8 +11,8 @@ const navItems = [
   { label: 'My Home', Icon: House, path: '/home' },
   { label: 'MLA', Icon: Users, path: '/mla' },
   { label: 'Process', Icon: ChartColumn, path: '/process' },
-  { label: 'Resources', Icon: BookMarked, path: '/home' },
-  { label: 'Softwares', Icon: FolderCode, path: '/home' },
+  { label: 'Resources', Icon: BookMarked, path: '/resources' },
+  { label: 'Softwares', Icon: FolderCode, path: '/softwares' },
   { label: 'Live Coach', Icon: BookOpenCheck, path: '/home' },
   { label: 'Mentor', Icon: BookUser, path: '/home' },
   { label: 'Expert', Icon: UserStar, path: '/home' },
@@ -23,6 +23,8 @@ function isNavActive(item: { label: string; path: string }, pathname: string): b
   if (item.label === 'My Home') return pathname === '/home';
   if (item.path === '/mla') return pathname.startsWith('/mla');
   if (item.path === '/process') return pathname.startsWith('/process');
+  if (item.path === '/resources') return pathname === '/resources';
+  if (item.path === '/softwares') return pathname === '/softwares';
   return false;
 }
 

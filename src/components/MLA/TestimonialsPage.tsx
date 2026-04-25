@@ -22,10 +22,24 @@ const theme = colors.light;
 type TestimonialRow = {
   sno: number;
   dsa: string;
+  date: string;
   video: string;
 };
 
-const TESTIMONIALS: TestimonialRow[] = [];
+const TESTIMONIALS: TestimonialRow[] = [
+  {
+    sno: 1,
+    dsa: 'Rathinaswamy A',
+    date: '2024-06-21',
+    video: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+  },
+  {
+    sno: 2,
+    dsa: 'Rathinaswamy A',
+    date: '2023-01-03',
+    video: 'https://www.youtube.com/watch?v=3JZ_D3ELwOQ',
+  },
+];
 
 const thStyle = {
   padding: `${spacing[1]} ${spacing[2]}`,
@@ -48,7 +62,20 @@ const tdStyle = {
   fontFamily: typography.fonts.sans.family,
 } as const;
 
-const USER_OPTIONS = ['MiDNA (H.O)'];
+const USER_OPTIONS = [
+  'Rathinaswamy A',
+  'AavishkarA (Anil B+)',
+  'Dhiya Kannan',
+  'Shreshta Minds (RB)',
+  'MIDNA (H.O)',
+  'Skill Masters Academy',
+  'Devi PL',
+  'Panchapakesan',
+  'Bhuvana Pasupathi',
+  'Sureshbabu L',
+  'Priya Chhabra',
+  'The Path Finder (SEEMA)',
+];
 
 const fieldLabelStyle = {
   display: 'block' as const,
@@ -89,18 +116,6 @@ const addNewPillStyle: CSSProperties = {
   cursor: 'pointer',
 };
 
-const tableEditPillStyle: CSSProperties = {
-  padding: `${spacing[1]} ${spacing[3]}`,
-  borderRadius: radius.pill,
-  border: 'none',
-  background: theme['primary-soft'],
-  color: theme.primary,
-  fontSize: typography.sizes.xs.fontSize,
-  fontWeight: 500,
-  fontFamily: typography.fonts.sans.family,
-  cursor: 'pointer',
-};
-
 const tableDeletePillStyle: CSSProperties = {
   padding: `${spacing[1]} ${spacing[3]}`,
   borderRadius: radius.pill,
@@ -119,10 +134,10 @@ const modalSubmitPillStyle: CSSProperties = {
   justifyContent: 'center',
   minHeight: buttonTokens.height.md,
   padding: buttonTokens.padding.md,
-  borderRadius: radius.pill,
+  borderRadius: radius.sm,
   border: 'none',
-  background: theme['primary-soft'],
-  color: theme.primary,
+  background: theme['btn-primary-bg'],
+  color: theme['btn-primary-text'],
   fontSize: typography.sizes.sm.fontSize,
   fontWeight: 600,
   fontFamily: typography.fonts.sans.family,
@@ -134,17 +149,24 @@ export default function TestimonialsPage() {
   const [pageSize, setPageSize] = useState(20);
   const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState('');
+  const [associate, setAssociate] = useState('all');
+  const [pendingDelete, setPendingDelete] = useState<TestimonialRow | null>(null);
 
   const filtered = useMemo(() => {
+    let rows = TESTIMONIALS;
+    if (associate !== 'all') {
+      rows = rows.filter((r) => r.dsa === associate);
+    }
     const q = search.trim().toLowerCase();
-    if (!q) return TESTIMONIALS;
-    return TESTIMONIALS.filter(
+    if (!q) return rows;
+    return rows.filter(
       (r) =>
         String(r.sno).includes(q) ||
         r.dsa.toLowerCase().includes(q) ||
+        r.date.includes(q) ||
         r.video.toLowerCase().includes(q)
     );
-  }, [search]);
+  }, [associate, search]);
 
   const totalEntries = filtered.length;
   const totalPages =
@@ -175,43 +197,18 @@ export default function TestimonialsPage() {
         padding: spacing[5],
       }}
     >
-      <div
-        style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: spacing[4],
-          marginBottom: spacing[4],
-        }}
-      >
-        <div>
-          <h2
-            style={{
-              margin: 0,
-              fontSize: typography.sizes.xl.fontSize,
-              fontWeight: typography.fonts.heading.fontWeight,
-              fontFamily: typography.fonts.heading.family,
-              color: theme['text-primary'],
-            }}
-          >
-            My Testimonials
-          </h2>
-          <p
-            style={{
-              margin: `${spacing[2]} 0 0`,
-              fontSize: typography.sizes.sm.fontSize,
-              color: theme['text-secondary'],
-              fontFamily: typography.fonts.sans.family,
-              lineHeight: 1.5,
-            }}
-          >
-            View and manage your testimonials
-          </p>
-        </div>
-        <button type="button" onClick={() => setAddOpen(true)} style={addNewPillStyle}>
-          Add new
-        </button>
+      <div style={{ marginBottom: spacing[4] }}>
+        <h2
+          style={{
+            margin: 0,
+            fontSize: typography.sizes.xl.fontSize,
+            fontWeight: typography.fonts.heading.fontWeight,
+            fontFamily: typography.fonts.heading.family,
+            color: theme['text-primary'],
+          }}
+        >
+          My Testimonials
+        </h2>
       </div>
 
       {addOpen && <AddTestimonialModal onClose={() => setAddOpen(false)} />}
@@ -226,40 +223,76 @@ export default function TestimonialsPage() {
           marginBottom: spacing[4],
         }}
       >
-        <label
+        <div
           style={{
             display: 'flex',
+            flexWrap: 'wrap',
             alignItems: 'center',
-            gap: spacing[2],
-            fontSize: typography.sizes.sm.fontSize,
-            fontFamily: typography.fonts.sans.family,
-            color: theme['text-secondary'],
-            flex: '1 1 200px',
-            minWidth: 0,
+            gap: spacing[3],
           }}
         >
-          Search:
-          <input
-            type="search"
-            value={search}
+          <button type="button" onClick={() => setAddOpen(true)} style={addNewPillStyle}>
+            Add new
+          </button>
+          <select
+            value={associate}
             onChange={(e) => {
-              setSearch(e.target.value);
+              setAssociate(e.target.value);
               setCurrentPage(1);
             }}
-            placeholder="Search..."
             style={{
-              flex: 1,
-              maxWidth: 360,
-              padding: `${spacing[2]} ${spacing[3]}`,
+              height: inputTokens.height.sm,
+              minWidth: 190,
+              padding: `${spacing[1]} ${spacing[2]}`,
               borderRadius: radius.sm,
               border: `1px solid ${theme.border}`,
               fontSize: typography.sizes.sm.fontSize,
               fontFamily: typography.fonts.sans.family,
               color: theme['text-primary'],
-              minWidth: 160,
+              background: theme['bg-surface'],
             }}
-          />
-        </label>
+          >
+            <option value="all">Choose Associate</option>
+            {USER_OPTIONS.map((u) => (
+              <option key={u} value={u}>
+                {u}
+              </option>
+            ))}
+          </select>
+          <label
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: spacing[2],
+              fontSize: typography.sizes.sm.fontSize,
+              fontFamily: typography.fonts.sans.family,
+              color: theme['text-secondary'],
+              minWidth: 0,
+            }}
+          >
+            Search:
+            <input
+              type="search"
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setCurrentPage(1);
+              }}
+              placeholder="Search..."
+              style={{
+                width: 260,
+                maxWidth: '100%',
+                padding: `${spacing[2]} ${spacing[3]}`,
+                borderRadius: radius.sm,
+                border: `1px solid ${theme.border}`,
+                fontSize: typography.sizes.sm.fontSize,
+                fontFamily: typography.fonts.sans.family,
+                color: theme['text-primary'],
+                minWidth: 160,
+              }}
+            />
+          </label>
+        </div>
         <div
           style={{
             display: 'flex',
@@ -336,7 +369,7 @@ export default function TestimonialsPage() {
                 <th style={{ ...thStyle, textAlign: 'center', width: 72 }}>Sno</th>
                 <th style={{ ...thStyle, textAlign: 'left' }}>DSA</th>
                 <th style={{ ...thStyle, textAlign: 'left' }}>Video</th>
-                <th style={{ ...thStyle, textAlign: 'center', width: 160 }}>Options</th>
+                <th style={{ ...thStyle, textAlign: 'center', width: 96 }}>Options</th>
               </tr>
             </thead>
             <tbody className="ledger-table-body">
@@ -359,17 +392,34 @@ export default function TestimonialsPage() {
                 pageRows.map((row) => (
                   <tr key={row.sno} style={{ height: '40px' }}>
                     <td style={{ ...tdStyle, textAlign: 'center' }}>{row.sno}</td>
-                    <td style={tdStyle}>{row.dsa}</td>
-                    <td style={{ ...tdStyle, whiteSpace: 'normal', maxWidth: 320 }}>{row.video}</td>
+                    <td style={{ ...tdStyle, whiteSpace: 'normal' }}>
+                      <div>{row.dsa}</div>
+                      <div style={{ color: theme['text-secondary'], marginTop: spacing[1] }}>{row.date}</div>
+                    </td>
+                    <td style={{ ...tdStyle, whiteSpace: 'normal', maxWidth: 320 }}>
+                      <iframe
+                        title={`testimonial-${row.sno}`}
+                        src={row.video.replace('watch?v=', 'embed/')}
+                        style={{
+                          width: '100%',
+                          maxWidth: 390,
+                          height: 220,
+                          border: 'none',
+                          borderRadius: radius.sm,
+                        }}
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    </td>
                     <td style={{ ...tdStyle, textAlign: 'center' }}>
-                      <span style={{ display: 'inline-flex', gap: spacing[2], justifyContent: 'center' }}>
-                        <button type="button" style={tableEditPillStyle}>
-                          Edit
-                        </button>
-                        <button type="button" style={tableDeletePillStyle}>
-                          Delete
-                        </button>
-                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setPendingDelete(row)}
+                        style={tableDeletePillStyle}
+                        aria-label={`Delete testimonial ${row.sno}`}
+                      >
+                        X
+                      </button>
                     </td>
                   </tr>
                 ))
@@ -394,6 +444,111 @@ export default function TestimonialsPage() {
           }
         />
       </div>
+
+      {pendingDelete ? (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="confirm-delete-testimonial-title"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 1100,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: spacing[4],
+            background: 'rgba(17, 24, 39, 0.45)',
+          }}
+          onMouseDown={(e) => {
+            if (e.target === e.currentTarget) setPendingDelete(null);
+          }}
+        >
+          <div
+            onMouseDown={(e) => e.stopPropagation()}
+            style={{
+              width: '100%',
+              maxWidth: 460,
+              background: theme['bg-surface'],
+              borderRadius: radius.lg,
+              border: `1px solid ${theme.border}`,
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+              padding: spacing[5],
+            }}
+          >
+            <h3
+              id="confirm-delete-testimonial-title"
+              style={{
+                margin: 0,
+                fontSize: typography.sizes.lg.fontSize,
+                fontWeight: typography.fonts.heading.fontWeight,
+                fontFamily: typography.fonts.heading.family,
+                color: theme['text-primary'],
+              }}
+            >
+              Delete testimonial
+            </h3>
+            <p
+              style={{
+                margin: `${spacing[3]} 0 0`,
+                fontSize: typography.sizes.sm.fontSize,
+                lineHeight: 1.6,
+                fontFamily: typography.fonts.sans.family,
+                color: theme['text-secondary'],
+              }}
+            >
+              Are you sure you want to delete this testimonial for{' '}
+              <strong style={{ color: theme['text-primary'] }}>{pendingDelete.dsa}</strong>? This action cannot be
+              undone.
+            </p>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                gap: spacing[3],
+                marginTop: spacing[5],
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => setPendingDelete(null)}
+                style={{
+                  height: buttonTokens.height.sm,
+                  padding: `${spacing[2]} ${spacing[4]}`,
+                  borderRadius: radius.sm,
+                  border: `1px solid ${theme.border}`,
+                  background: theme['bg-surface'],
+                  color: theme['text-primary'],
+                  fontSize: typography.sizes.sm.fontSize,
+                  fontWeight: 600,
+                  fontFamily: typography.fonts.sans.family,
+                  cursor: 'pointer',
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => setPendingDelete(null)}
+                style={{
+                  height: buttonTokens.height.sm,
+                  padding: `${spacing[2]} ${spacing[4]}`,
+                  borderRadius: radius.sm,
+                  border: 'none',
+                  background: theme.error,
+                  color: theme['text-inverse'],
+                  fontSize: typography.sizes.sm.fontSize,
+                  fontWeight: 600,
+                  fontFamily: typography.fonts.sans.family,
+                  cursor: 'pointer',
+                }}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

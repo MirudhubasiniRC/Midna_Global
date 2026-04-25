@@ -19,7 +19,38 @@ type GoogleReviewRow = {
   uploadDate: string;
 };
 
-const GOOGLE_REVIEWS: GoogleReviewRow[] = [];
+const GOOGLE_REVIEW_ROWS: GoogleReviewRow[] = [
+  {
+    sno: 1,
+    mobileType: '9845885305 - Google',
+    links: 'https://share.google/vSHlznyiyWLXusRxr',
+    uploadDate: '19-1-2026',
+  },
+  {
+    sno: 2,
+    mobileType: '9845885305 - Google',
+    links: 'https://share.google/BXuwgySwTZwPQ5QZO',
+    uploadDate: '19-1-2026',
+  },
+  {
+    sno: 3,
+    mobileType: '9845885305 - Google',
+    links: 'https://share.google/AuEhyKQUOSX5iEnhx',
+    uploadDate: '19-1-2026',
+  },
+  {
+    sno: 4,
+    mobileType: '9845885305 - Google',
+    links: 'https://share.google/wjX1IClsPMsclTgYu',
+    uploadDate: '13-1-2026',
+  },
+  {
+    sno: 5,
+    mobileType: '9600799889 - Google',
+    links: 'https://share.google/gLyl96tvmRF1UZ5J6',
+    uploadDate: '12-1-2026',
+  },
+];
 
 const thStyle = {
   padding: `${spacing[1]} ${spacing[2]}`,
@@ -46,11 +77,14 @@ export default function GoogleReviewPage() {
   const [pageSize, setPageSize] = useState(20);
   const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState('');
+  const [addOpen, setAddOpen] = useState(false);
+  const [googleLink, setGoogleLink] = useState('');
+  const [pendingDelete, setPendingDelete] = useState<GoogleReviewRow | null>(null);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    if (!q) return GOOGLE_REVIEWS;
-    return GOOGLE_REVIEWS.filter(
+    if (!q) return GOOGLE_REVIEW_ROWS;
+    return GOOGLE_REVIEW_ROWS.filter(
       (r) =>
         String(r.sno).includes(q) ||
         r.mobileType.toLowerCase().includes(q) ||
@@ -88,60 +122,157 @@ export default function GoogleReviewPage() {
         padding: spacing[5],
       }}
     >
-      <div
-        style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          alignItems: 'flex-start',
-          justifyContent: 'space-between',
-          gap: spacing[4],
-          marginBottom: spacing[4],
-        }}
-      >
-        <div>
-          <h2
-            style={{
-              margin: 0,
-              fontSize: typography.sizes.xl.fontSize,
-              fontWeight: typography.fonts.heading.fontWeight,
-              fontFamily: typography.fonts.heading.family,
-              color: theme['text-primary'],
-            }}
-          >
-            My Google Review
-          </h2>
-          <p
-            style={{
-              margin: `${spacing[2]} 0 0`,
-              fontSize: typography.sizes.sm.fontSize,
-              color: theme['text-secondary'],
-              fontFamily: typography.fonts.sans.family,
-              lineHeight: 1.5,
-            }}
-          >
-            Add and manage Google review links
-          </p>
-        </div>
-        <button
-          type="button"
+      <div style={{ marginBottom: spacing[4] }}>
+        <h2
           style={{
-            height: buttonTokens.height.sm,
-            padding: buttonTokens.padding.sm,
-            borderRadius: radius.sm,
-            border: 'none',
-            background: theme.warning,
-            color: theme['text-inverse'],
-            fontSize: typography.sizes.sm.fontSize,
-            fontWeight: 600,
-            fontFamily: typography.fonts.sans.family,
-            cursor: 'pointer',
-            textTransform: 'uppercase',
-            letterSpacing: '0.04em',
+            margin: 0,
+            fontSize: typography.sizes.xl.fontSize,
+            fontWeight: typography.fonts.heading.fontWeight,
+            fontFamily: typography.fonts.heading.family,
+            color: theme['text-primary'],
           }}
         >
-          Add
-        </button>
+          My Google Review
+        </h2>
+        <p
+          style={{
+            margin: `${spacing[2]} 0 0`,
+            fontSize: typography.sizes.sm.fontSize,
+            color: theme['text-secondary'],
+            fontFamily: typography.fonts.sans.family,
+            lineHeight: 1.5,
+          }}
+        >
+          Add and manage Google review links
+        </p>
       </div>
+      {addOpen ? (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="add-google-review-title"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 1100,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: spacing[4],
+            background: 'rgba(17, 24, 39, 0.45)',
+          }}
+          onMouseDown={(e) => {
+            if (e.target === e.currentTarget) setAddOpen(false);
+          }}
+        >
+          <div
+            onMouseDown={(e) => e.stopPropagation()}
+            style={{
+              width: '100%',
+              maxWidth: 920,
+              background: theme['bg-surface'],
+              borderRadius: radius.lg,
+              border: `1px solid ${theme.border}`,
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+              overflow: 'hidden',
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: spacing[4],
+                borderBottom: `1px solid ${theme.border}`,
+              }}
+            >
+              <h3
+                id="add-google-review-title"
+                style={{
+                  margin: 0,
+                  fontSize: typography.sizes.lg.fontSize,
+                  fontWeight: typography.fonts.heading.fontWeight,
+                  fontFamily: typography.fonts.heading.family,
+                  color: theme['text-primary'],
+                }}
+              >
+                Add Google Review Link
+              </h3>
+              <button
+                type="button"
+                onClick={() => setAddOpen(false)}
+                aria-label="Close add review modal"
+                style={{
+                  border: 'none',
+                  background: 'transparent',
+                  color: theme['text-muted'],
+                  fontSize: typography.sizes.lg.fontSize,
+                  cursor: 'pointer',
+                }}
+              >
+                X
+              </button>
+            </div>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (!googleLink.trim()) return;
+                setAddOpen(false);
+                setGoogleLink('');
+              }}
+              style={{ padding: spacing[5] }}
+            >
+              <label
+                style={{
+                  display: 'grid',
+                  gap: spacing[2],
+                  fontSize: typography.sizes.sm.fontSize,
+                  color: theme['text-primary'],
+                  fontFamily: typography.fonts.sans.family,
+                }}
+              >
+                Google Link
+                <input
+                  type="url"
+                  value={googleLink}
+                  onChange={(e) => setGoogleLink(e.target.value)}
+                  placeholder="https://..."
+                  required
+                  style={{
+                    height: inputTokens.height.sm,
+                    padding: `${spacing[1]} ${spacing[2]}`,
+                    borderRadius: radius.sm,
+                    border: `1px solid ${theme.border}`,
+                    fontSize: typography.sizes.sm.fontSize,
+                    fontFamily: typography.fonts.sans.family,
+                    color: theme['text-primary'],
+                    background: theme['bg-surface'],
+                  }}
+                />
+              </label>
+              <div style={{ display: 'flex', justifyContent: 'center', marginTop: spacing[5] }}>
+                <button
+                  type="submit"
+                  style={{
+                    height: buttonTokens.height.sm,
+                    padding: `${spacing[2]} ${spacing[4]}`,
+                    borderRadius: radius.sm,
+                    border: 'none',
+                    background: theme['btn-primary-bg'],
+                    color: theme['btn-primary-text'],
+                    fontSize: typography.sizes.sm.fontSize,
+                    fontWeight: 600,
+                    fontFamily: typography.fonts.sans.family,
+                    cursor: 'pointer',
+                  }}
+                >
+                  Submit
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      ) : null}
 
       <div
         style={{
@@ -153,40 +284,66 @@ export default function GoogleReviewPage() {
           marginBottom: spacing[4],
         }}
       >
-        <label
+        <div
           style={{
             display: 'flex',
+            flexWrap: 'wrap',
             alignItems: 'center',
-            gap: spacing[2],
-            fontSize: typography.sizes.sm.fontSize,
-            fontFamily: typography.fonts.sans.family,
-            color: theme['text-secondary'],
-            flex: '1 1 200px',
-            minWidth: 0,
+            gap: spacing[3],
           }}
         >
-          Search:
-          <input
-            type="search"
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
-              setCurrentPage(1);
-            }}
-            placeholder="Search..."
+          <button
+            type="button"
+            onClick={() => setAddOpen(true)}
             style={{
-              flex: 1,
-              maxWidth: 360,
-              padding: `${spacing[2]} ${spacing[3]}`,
-              borderRadius: radius.sm,
-              border: `1px solid ${theme.border}`,
+              height: buttonTokens.height.sm,
+              padding: `${spacing[2]} ${spacing[4]}`,
+              borderRadius: radius.pill,
+              border: 'none',
+              background: theme['primary-soft'],
+              color: theme.primary,
+              fontSize: typography.sizes.sm.fontSize,
+              fontWeight: 600,
+              fontFamily: typography.fonts.sans.family,
+              cursor: 'pointer',
+            }}
+          >
+            Add new
+          </button>
+          <label
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: spacing[2],
               fontSize: typography.sizes.sm.fontSize,
               fontFamily: typography.fonts.sans.family,
-              color: theme['text-primary'],
-              minWidth: 160,
+              color: theme['text-secondary'],
+              minWidth: 0,
             }}
-          />
-        </label>
+          >
+            Search:
+            <input
+              type="search"
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setCurrentPage(1);
+              }}
+              placeholder="Search..."
+              style={{
+                width: 260,
+                maxWidth: '100%',
+                padding: `${spacing[2]} ${spacing[3]}`,
+                borderRadius: radius.sm,
+                border: `1px solid ${theme.border}`,
+                fontSize: typography.sizes.sm.fontSize,
+                fontFamily: typography.fonts.sans.family,
+                color: theme['text-primary'],
+                minWidth: 160,
+              }}
+            />
+          </label>
+        </div>
         <div
           style={{
             display: 'flex',
@@ -312,27 +469,13 @@ export default function GoogleReviewPage() {
                       >
                         <button
                           type="button"
+                          onClick={() => setPendingDelete(row)}
                           style={{
-                            padding: `${spacing[1]} ${spacing[2]}`,
-                            borderRadius: radius.sm,
-                            border: `1px solid ${theme.primary}`,
-                            background: theme['bg-surface'],
-                            color: theme.primary,
-                            fontSize: typography.sizes['2xs'].fontSize,
-                            fontWeight: 600,
-                            cursor: 'pointer',
-                          }}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          type="button"
-                          style={{
-                            padding: `${spacing[1]} ${spacing[2]}`,
-                            borderRadius: radius.sm,
-                            border: `1px solid ${theme.secondary}`,
-                            background: theme.secondary,
-                            color: theme['btn-secondary-text'],
+                            padding: `${spacing[1]} ${spacing[3]}`,
+                            borderRadius: radius.pill,
+                            border: `1px solid ${theme.error}`,
+                            background: theme['error-bg'],
+                            color: theme.error,
                             fontSize: typography.sizes['2xs'].fontSize,
                             fontWeight: 600,
                             cursor: 'pointer',
@@ -365,6 +508,111 @@ export default function GoogleReviewPage() {
           }
         />
       </div>
+
+      {pendingDelete ? (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="confirm-delete-google-review-title"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 1100,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: spacing[4],
+            background: 'rgba(17, 24, 39, 0.45)',
+          }}
+          onMouseDown={(e) => {
+            if (e.target === e.currentTarget) setPendingDelete(null);
+          }}
+        >
+          <div
+            onMouseDown={(e) => e.stopPropagation()}
+            style={{
+              width: '100%',
+              maxWidth: 460,
+              background: theme['bg-surface'],
+              borderRadius: radius.lg,
+              border: `1px solid ${theme.border}`,
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+              padding: spacing[5],
+            }}
+          >
+            <h3
+              id="confirm-delete-google-review-title"
+              style={{
+                margin: 0,
+                fontSize: typography.sizes.lg.fontSize,
+                fontWeight: typography.fonts.heading.fontWeight,
+                fontFamily: typography.fonts.heading.family,
+                color: theme['text-primary'],
+              }}
+            >
+              Delete Google review link
+            </h3>
+            <p
+              style={{
+                margin: `${spacing[3]} 0 0`,
+                fontSize: typography.sizes.sm.fontSize,
+                lineHeight: 1.6,
+                fontFamily: typography.fonts.sans.family,
+                color: theme['text-secondary'],
+              }}
+            >
+              Are you sure you want to delete this Google review link for{' '}
+              <strong style={{ color: theme['text-primary'] }}>{pendingDelete.mobileType}</strong>? This action cannot
+              be undone.
+            </p>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                gap: spacing[3],
+                marginTop: spacing[5],
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => setPendingDelete(null)}
+                style={{
+                  height: buttonTokens.height.sm,
+                  padding: `${spacing[2]} ${spacing[4]}`,
+                  borderRadius: radius.sm,
+                  border: `1px solid ${theme.border}`,
+                  background: theme['bg-surface'],
+                  color: theme['text-primary'],
+                  fontSize: typography.sizes.sm.fontSize,
+                  fontWeight: 600,
+                  fontFamily: typography.fonts.sans.family,
+                  cursor: 'pointer',
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => setPendingDelete(null)}
+                style={{
+                  height: buttonTokens.height.sm,
+                  padding: `${spacing[2]} ${spacing[4]}`,
+                  borderRadius: radius.sm,
+                  border: 'none',
+                  background: theme.error,
+                  color: theme['text-inverse'],
+                  fontSize: typography.sizes.sm.fontSize,
+                  fontWeight: 600,
+                  fontFamily: typography.fonts.sans.family,
+                  cursor: 'pointer',
+                }}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

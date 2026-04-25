@@ -109,6 +109,7 @@ export default function ABCLedgerPage() {
   const [pageSize, setPageSize] = useState(20);
   const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState('');
+  const [selectedLedger, setSelectedLedger] = useState<ABCLedgerRow | null>(null);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -358,7 +359,26 @@ export default function ABCLedgerPage() {
                 pageRows.map((row) => (
                   <tr key={row.sno} style={{ height: '40px' }}>
                     <td style={{ ...tdStyle, textAlign: 'center' }}>{row.sno}</td>
-                    <td style={tdStyle}>{row.ledgerName}</td>
+                    <td style={tdStyle}>
+                      <button
+                        type="button"
+                        onClick={() => setSelectedLedger(row)}
+                        style={{
+                          display: 'inline-block',
+                          padding: `${spacing[1]} ${spacing[3]}`,
+                          border: `1px solid ${theme.info}`,
+                          background: theme['info-bg'],
+                          color: theme.info,
+                          borderRadius: radius.pill,
+                          fontSize: typography.sizes.xs.fontSize,
+                          fontFamily: typography.fonts.sans.family,
+                          fontWeight: 500,
+                          cursor: 'pointer',
+                        }}
+                      >
+                        {row.ledgerName}
+                      </button>
+                    </td>
                     <td style={tdStyle}>{row.mobile}</td>
                     <td style={tdStyle}>{row.city}</td>
                     <td style={tdStyle}>{row.status}</td>
@@ -454,6 +474,148 @@ export default function ABCLedgerPage() {
           }
         />
       </div>
+
+      {selectedLedger ? (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0, 0, 0, 0.45)',
+            zIndex: 1000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: spacing[5],
+          }}
+          onClick={() => setSelectedLedger(null)}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Add New Entry"
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              width: 'min(920px, 100%)',
+              background: theme['bg-surface'],
+              borderRadius: radius.md,
+              border: `1px solid ${theme.border}`,
+              boxShadow: '0 12px 30px rgba(0, 0, 0, 0.18)',
+              overflow: 'hidden',
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: spacing[4],
+                borderBottom: `1px solid ${theme.border}`,
+              }}
+            >
+              <h3
+                style={{
+                  margin: 0,
+                  fontSize: typography.sizes.xl.fontSize,
+                  fontFamily: typography.fonts.heading.family,
+                  fontWeight: typography.fonts.heading.fontWeight,
+                  color: theme['text-primary'],
+                }}
+              >
+                Add New Entry
+              </h3>
+              <button
+                type="button"
+                onClick={() => setSelectedLedger(null)}
+                style={{
+                  border: 'none',
+                  background: 'transparent',
+                  color: theme['text-muted'],
+                  fontSize: typography.sizes.lg.fontSize,
+                  cursor: 'pointer',
+                }}
+                aria-label="Close add entry modal"
+              >
+                X
+              </button>
+            </div>
+
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                setSelectedLedger(null);
+              }}
+              style={{ padding: spacing[4] }}
+            >
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: spacing[3] }}>
+                <label style={{ display: 'grid', gap: spacing[1], fontSize: typography.sizes.xs.fontSize, color: theme['text-secondary'] }}>
+                  To
+                  <input
+                    type="text"
+                    value={selectedLedger.ledgerName}
+                    readOnly
+                    style={{
+                      height: inputTokens.height.sm,
+                      padding: `${spacing[1]} ${spacing[2]}`,
+                      borderRadius: radius.sm,
+                      border: `1px solid ${theme.border}`,
+                      fontSize: typography.sizes.sm.fontSize,
+                      fontFamily: typography.fonts.sans.family,
+                      color: theme['text-primary'],
+                      background: theme['table-header-gray'],
+                    }}
+                  />
+                </label>
+                <label style={{ display: 'grid', gap: spacing[1], fontSize: typography.sizes.xs.fontSize, color: theme['text-secondary'] }}>
+                  From
+                  <select style={{ height: inputTokens.height.sm, padding: `${spacing[1]} ${spacing[2]}`, borderRadius: radius.sm, border: `1px solid ${theme.border}`, fontSize: typography.sizes.sm.fontSize, fontFamily: typography.fonts.sans.family }}>
+                    <option>Choose</option>
+                    <option>Rathinaswamy A</option>
+                    <option>MiDNA (H.O)</option>
+                  </select>
+                </label>
+                <label style={{ display: 'grid', gap: spacing[1], fontSize: typography.sizes.xs.fontSize, color: theme['text-secondary'] }}>
+                  Journal Date
+                  <input type="date" style={{ height: inputTokens.height.sm, padding: `${spacing[1]} ${spacing[2]}`, borderRadius: radius.sm, border: `1px solid ${theme.border}`, fontSize: typography.sizes.sm.fontSize, fontFamily: typography.fonts.sans.family }} />
+                </label>
+                <label style={{ display: 'grid', gap: spacing[1], fontSize: typography.sizes.xs.fontSize, color: theme['text-secondary'] }}>
+                  Type
+                  <select style={{ height: inputTokens.height.sm, padding: `${spacing[1]} ${spacing[2]}`, borderRadius: radius.sm, border: `1px solid ${theme.border}`, fontSize: typography.sizes.sm.fontSize, fontFamily: typography.fonts.sans.family }}>
+                    <option>Choose</option>
+                    <option>Credit</option>
+                    <option>Debit</option>
+                  </select>
+                </label>
+                <label style={{ display: 'grid', gap: spacing[1], fontSize: typography.sizes.xs.fontSize, color: theme['text-secondary'] }}>
+                  Amount
+                  <input type="number" min={0} style={{ height: inputTokens.height.sm, padding: `${spacing[1]} ${spacing[2]}`, borderRadius: radius.sm, border: `1px solid ${theme.border}`, fontSize: typography.sizes.sm.fontSize, fontFamily: typography.fonts.sans.family }} />
+                </label>
+                <label style={{ display: 'grid', gap: spacing[1], fontSize: typography.sizes.xs.fontSize, color: theme['text-secondary'] }}>
+                  Remarks
+                  <input type="text" style={{ height: inputTokens.height.sm, padding: `${spacing[1]} ${spacing[2]}`, borderRadius: radius.sm, border: `1px solid ${theme.border}`, fontSize: typography.sizes.sm.fontSize, fontFamily: typography.fonts.sans.family }} />
+                </label>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'center', marginTop: spacing[4] }}>
+                <button
+                  type="submit"
+                  style={{
+                    padding: `${spacing[2]} ${spacing[4]}`,
+                    border: 'none',
+                    borderRadius: radius.sm,
+                    background: theme['btn-primary-bg'],
+                    color: theme['btn-primary-text'],
+                    fontSize: typography.sizes.sm.fontSize,
+                    fontFamily: typography.fonts.sans.family,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                  }}
+                >
+                  Submit
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
