@@ -319,9 +319,9 @@ export default function SRAPage() {
                 style={{
                   padding: `${spacing[2]} ${spacing[3]}`,
                   borderRadius: radius.pill,
-                  border: `1px solid ${active ? theme.primary : theme.border}`,
-                  background: active ? theme.primary : theme['bg-surface'],
-                  color: active ? theme['text-inverse'] : theme['text-secondary'],
+                  border: `1px solid ${theme.primary}`,
+                  background: active ? theme.primary : theme['primary-soft'],
+                  color: active ? theme['text-inverse'] : theme.primary,
                   fontSize: typography.sizes.sm.fontSize,
                   fontWeight: 500,
                   fontFamily: typography.fonts.sans.family,

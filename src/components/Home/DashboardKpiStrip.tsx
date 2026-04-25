@@ -11,8 +11,8 @@ import { colors, spacing, radius, typography } from '../../styles/theme';
 
 const theme = colors.light;
 
-const ICON_SIZE = 22;
-const CIRCLE = 48;
+const ICON_SIZE = 20;
+const CIRCLE = 40;
 
 type KpiItem = {
   label: string;
@@ -126,7 +126,8 @@ function KpiCard({ label, value, Icon, circleBg }: KpiItem) {
           width: CIRCLE,
           height: CIRCLE,
           borderRadius: '50%',
-          background: circleBg,
+          background: theme['bg-surface'],
+          border: `1.5px solid ${circleBg}`,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -134,7 +135,7 @@ function KpiCard({ label, value, Icon, circleBg }: KpiItem) {
         }}
         aria-hidden
       >
-        <Icon size={ICON_SIZE} color={theme['text-inverse']} strokeWidth={2} />
+        <Icon size={ICON_SIZE} color={circleBg} strokeWidth={2} />
       </div>
       <div style={{ minWidth: 0 }}>
         <div style={kpiValueStyle}>{value}</div>

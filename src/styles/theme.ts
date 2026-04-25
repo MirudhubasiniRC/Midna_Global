@@ -80,7 +80,7 @@ export const sidebarTokens = {
   width: {
     expanded: 220,
     collapsed: 72,
-    sectionExpanded: 280,
+    sectionExpanded: 220,
   } as const,
   iconSize: 20,
   collapseIconSize: 22,
