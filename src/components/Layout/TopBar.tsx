@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import {
   House,
   Users,
@@ -17,8 +17,9 @@ import {
   DollarSign,
   ChevronDown,
   ChevronRight,
+  LogOut,
 } from 'lucide-react';
-import { colors, spacing, typography } from '../../styles/theme';
+import { colors, spacing, typography, radius } from '../../styles/theme';
 import logo from '../../assets/Name_only.png';
 
 const theme = colors.light;
@@ -76,9 +77,11 @@ type TopStatusKey = 'inr' | 'usd' | 'alerts';
 
 export default function TopBar() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [showNotifications, setShowNotifications] = useState(false);
   const [expandedSection, setExpandedSection] = useState<TopStatusKey | null>(null);
   const [showProfileCard, setShowProfileCard] = useState(false);
+  const [showProfileActions, setShowProfileActions] = useState(false);
   const statusWrapRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -88,6 +91,7 @@ export default function TopBar() {
       if (event.key === 'Escape') {
         setShowNotifications(false);
         setShowProfileCard(false);
+        setShowProfileActions(false);
       }
     };
 
@@ -95,6 +99,7 @@ export default function TopBar() {
       if (!statusWrapRef.current?.contains(event.target as Node)) {
         setShowNotifications(false);
         setShowProfileCard(false);
+        setShowProfileActions(false);
       }
     };
 
@@ -126,6 +131,15 @@ export default function TopBar() {
     },
   ];
   const totalNotificationCount = statusConfig.reduce((sum, item) => sum + item.count, 0);
+
+  const handleLogout = () => {
+    setShowProfileCard(false);
+    setShowProfileActions(false);
+    setShowNotifications(false);
+    localStorage.removeItem('midna_notice_read_v1');
+    sessionStorage.clear();
+    navigate('/');
+  };
 
   return (
     <>
@@ -229,16 +243,20 @@ export default function TopBar() {
           <div
             onMouseEnter={() => {
               setShowProfileCard(true);
+              setShowProfileActions(false);
               setShowNotifications(false);
             }}
-            onMouseLeave={() => setShowProfileCard(false)}
+            onMouseLeave={() => {
+              if (!showProfileActions) setShowProfileCard(false);
+            }}
             style={{ position: 'relative' }}
           >
             <button
               type="button"
               aria-label="Open profile details"
               onClick={() => {
-                setShowProfileCard((prev) => !prev);
+                setShowProfileCard(true);
+                setShowProfileActions((prev) => !prev);
                 setShowNotifications(false);
               }}
               style={{
@@ -296,7 +314,7 @@ export default function TopBar() {
                   <div>
                     <div
                       style={{
-                        fontSize: typography.sizes.sm.fontSize,
+                        fontSize: typography.sizes.base.fontSize,
                         fontWeight: 600,
                         fontFamily: typography.fonts.sans.family,
                         color: theme['text-primary'],
@@ -307,7 +325,7 @@ export default function TopBar() {
                     </div>
                     <div
                       style={{
-                        fontSize: typography.sizes.xs.fontSize,
+                        fontSize: typography.sizes.sm.fontSize,
                         color: theme['text-secondary'],
                         fontFamily: typography.fonts.sans.family,
                       }}
@@ -316,6 +334,40 @@ export default function TopBar() {
                     </div>
                   </div>
                 </div>
+                {showProfileActions ? (
+                  <div
+                    style={{
+                      marginTop: spacing[3],
+                      paddingTop: spacing[3],
+                      borderTop: `1px solid ${theme.border}`,
+                      display: 'flex',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <button
+                      type="button"
+                      onClick={handleLogout}
+                      style={{
+                        border: `1px solid ${theme.primary}`,
+                        background: theme['primary-soft'],
+                        color: theme.primary,
+                        borderRadius: radius.sm,
+                        padding: `${spacing[2]} ${spacing[3]}`,
+                        fontFamily: typography.fonts.sans.family,
+                        fontSize: typography.sizes.sm.fontSize,
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        outlineColor: theme['focus-ring'],
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: spacing[1],
+                      }}
+                    >
+                      <LogOut size={14} strokeWidth={2} />
+                      Log out
+                    </button>
+                  </div>
+                ) : null}
               </div>
             ) : null}
           </div>
