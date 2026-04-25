@@ -3,7 +3,7 @@ import { colors, spacing, radius, typography } from '../../styles/theme';
 
 const theme = colors.light;
 
-const notices = [
+export const NOTICE_ITEMS = [
   'Alert !!!!!!!! - MLAs with Zero scans in last 30 days will be denied Login Rights. Please request for activation when required.',
   'Kind Attn: MiDNA Brand Ambassadors! Please select "Special Offer" as Client type while uploading scans for "MIDNA Jodi Offer" to get refund for the "Wife Scan".',
   'Wef 1.1.26 No need to share the consent forms in whatsapp group. Please keep it with you for statutory Requirement. Your declaration while uploading the scans is enough for H.O records. You are responsible for the Liabilities due to Lapses in maintaining the SOP. Please take care.',
@@ -97,7 +97,7 @@ export default function NoticeBoard() {
             overflowY: 'auto',
           }}
         >
-          {notices.map((text, i) => (
+          {NOTICE_ITEMS.map((text, i) => (
             <div
               key={i}
             style={{
