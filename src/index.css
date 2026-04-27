@@ -35,3 +35,62 @@ button:focus-visible {
 button {
   font-family: inherit;
 }
+
+/* Shared pill filters (SRA NLA Network, Resources GBP, etc.) */
+.midna-filter-pill {
+  padding: 8px 12px;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  border: 1px solid var(--mp-primary);
+  background: var(--mp-soft);
+  color: var(--mp-primary);
+  transition:
+    transform 0.2s cubic-bezier(0.33, 1, 0.68, 1),
+    box-shadow 0.2s ease,
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.midna-filter-pill--on {
+  background: var(--mp-primary);
+  color: var(--mp-inverse);
+  border-color: var(--mp-primary);
+}
+
+.midna-filter-pill--off {
+  background: var(--mp-soft);
+  color: var(--mp-primary);
+  border-color: var(--mp-primary);
+}
+
+.midna-filter-pill:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  transform: none;
+  box-shadow: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .midna-filter-pill--off:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(147, 32, 122, 0.2);
+  }
+
+  .midna-filter-pill--on:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(147, 32, 122, 0.35);
+    background: var(--mp-primary-hover);
+    border-color: var(--mp-primary-hover);
+    color: var(--mp-inverse);
+  }
+
+  .midna-filter-pill:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(147, 32, 122, 0.18);
+  }
+}

@@ -164,7 +164,7 @@ export default function SoftwaresPage() {
             </label>
             <div
               style={{
-                display: 'flex',
+                display: 'none',
                 alignItems: 'center',
                 gap: spacing[2],
                 flexShrink: 0,

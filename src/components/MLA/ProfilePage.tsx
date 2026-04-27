@@ -1,6 +1,15 @@
-import { useEffect, useState } from 'react';
-import { User, X } from 'lucide-react';
-import { colors, spacing, radius, typography, buttonTokens, inputTokens } from '../../styles/theme';
+import { useState } from 'react';
+import { User } from 'lucide-react';
+import {
+  colors,
+  spacing,
+  radius,
+  typography,
+  buttonTokens,
+  inputTokens,
+  modalTokens,
+} from '../../styles/theme';
+import AppModal from '../ui/AppModal';
 
 const theme = colors.light;
 
@@ -27,6 +36,7 @@ const editFormDefaults = {
   city: 'Coimbatore',
   state: 'Tamil Nadu',
   pincode: '641024',
+  address: '123 Sample Street, Coimbatore',
   uid: 'C3C3x | C3xA1 | A1A1 | C3C3 | A1A1',
   mailId: 'midna.global@gmail.com',
   nurturingServices:
@@ -331,18 +341,6 @@ function EditProfileModal({ onClose }: { onClose: () => void }) {
   const [form, setForm] = useState(editFormDefaults);
   const [emailError, setEmailError] = useState('');
 
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    document.addEventListener('keydown', onKey);
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.removeEventListener('keydown', onKey);
-      document.body.style.overflow = '';
-    };
-  }, [onClose]);
-
   const setField = (key: keyof typeof editFormDefaults, value: string) => {
     setForm((f) => ({ ...f, [key]: value }));
   };
@@ -363,80 +361,39 @@ function EditProfileModal({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="edit-profile-title"
-      style={{
-        position: 'fixed',
-        inset: 0,
-        zIndex: 1000,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: spacing[4],
-        background: 'rgba(17, 24, 39, 0.45)',
-      }}
-      onMouseDown={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
-    >
-      <div
-        onMouseDown={(e) => e.stopPropagation()}
-        style={{
-          width: '100%',
-          maxWidth: 720,
-          maxHeight: 'min(90vh, 900px)',
-          overflow: 'auto',
-          background: theme['bg-surface'],
-          borderRadius: radius.lg,
-          border: `1px solid ${theme.border}`,
-          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-        }}
-      >
-        <div
+    <AppModal
+      open
+      onClose={onClose}
+      titleId="edit-profile-title"
+      title="Edit your profile"
+      subtitle="Update your contact details, photo, and certificate."
+      size="2xl"
+      maxWidthPx={720}
+      maxHeight="min(90vh, 900px)"
+      scrollBody
+      footer={
+        <button
+          type="submit"
+          form="edit-profile-form"
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: `${spacing[4]} ${spacing[5]} ${spacing[3]}`,
-            borderBottom: `1px solid ${theme.border}`,
+            height: buttonTokens.height.md,
+            padding: buttonTokens.padding.md,
+            borderRadius: radius.pill,
+            border: 'none',
+            background: theme['btn-primary-bg'],
+            color: theme['btn-primary-text'],
+            fontSize: typography.sizes.sm.fontSize,
+            fontWeight: 600,
+            fontFamily: typography.fonts.sans.family,
+            cursor: 'pointer',
+            boxShadow: modalTokens.primaryActionBoxShadow,
           }}
         >
-          <h3
-            id="edit-profile-title"
-            style={{
-              margin: 0,
-              fontSize: typography.sizes.lg.fontSize,
-              fontWeight: typography.fonts.heading.fontWeight,
-              fontFamily: typography.fonts.heading.family,
-              color: theme['text-primary'],
-            }}
-          >
-            Edit your profile
-          </h3>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Close"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: 40,
-              height: 40,
-              border: 'none',
-              borderRadius: radius.sm,
-              background: 'transparent',
-              color: theme['text-secondary'],
-              cursor: 'pointer',
-            }}
-          >
-            <X size={22} strokeWidth={2} />
-          </button>
-        </div>
-
-        <form onSubmit={handleSubmit} style={{ padding: spacing[5] }}>
+          Submit
+        </button>
+      }
+    >
+        <form id="edit-profile-form" onSubmit={handleSubmit} style={{ margin: 0, padding: 0 }}>
           <div
             style={{
               display: 'grid',
@@ -521,6 +478,15 @@ function EditProfileModal({ onClose }: { onClose: () => void }) {
                 inputMode="numeric"
                 pattern="[0-9]*"
                 maxLength={6}
+                style={inputBase}
+              />
+            </Field>
+            <Field label="Address" htmlFor="ep-address">
+              <input
+                id="ep-address"
+                type="text"
+                value={form.address}
+                onChange={(e) => setField('address', e.target.value)}
                 style={inputBase}
               />
             </Field>
@@ -628,35 +594,21 @@ function EditProfileModal({ onClose }: { onClose: () => void }) {
               </div>
             </div>
           </div>
-
-          <div
-            style={{
-              marginTop: spacing[6],
-              display: 'flex',
-              justifyContent: 'flex-end',
-            }}
-          >
-            <button
-              type="submit"
+          <div style={{ marginTop: spacing[5] }}>
+            <div style={{ ...labelStyle, marginBottom: spacing[3] }}>Upload certificate</div>
+            <input
+              type="file"
+              accept=".pdf,.jpg,.jpeg,.png"
               style={{
-                height: buttonTokens.height.md,
-                padding: buttonTokens.padding.md,
-                borderRadius: radius.sm,
-                border: 'none',
-                background: theme['btn-primary-bg'],
-                color: theme['btn-primary-text'],
                 fontSize: typography.sizes.sm.fontSize,
-                fontWeight: 600,
                 fontFamily: typography.fonts.sans.family,
-                cursor: 'pointer',
+                color: theme['text-primary'],
+                maxWidth: '100%',
               }}
-            >
-              Submit
-            </button>
+            />
           </div>
         </form>
-      </div>
-    </div>
+    </AppModal>
   );
 }
 
@@ -675,18 +627,6 @@ function ChangePasswordModal({ onClose }: { onClose: () => void }) {
     strongPassword &&
     bothFilled &&
     passwordsMatch;
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    document.addEventListener('keydown', onKey);
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.removeEventListener('keydown', onKey);
-      document.body.style.overflow = '';
-    };
-  }, [onClose]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -707,80 +647,68 @@ function ChangePasswordModal({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="change-password-title"
-      style={{
-        position: 'fixed',
-        inset: 0,
-        zIndex: 1000,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: spacing[4],
-        background: 'rgba(17, 24, 39, 0.45)',
-      }}
-      onMouseDown={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
-    >
-      <div
-        onMouseDown={(e) => e.stopPropagation()}
-        style={{
-          width: '100%',
-          maxWidth: 440,
-          maxHeight: 'min(90vh, 720px)',
-          overflow: 'auto',
-          background: theme['bg-surface'],
-          borderRadius: radius.lg,
-          border: `1px solid ${theme.border}`,
-          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-        }}
-      >
+    <AppModal
+      open
+      onClose={onClose}
+      titleId="change-password-title"
+      title="Change password"
+      subtitle="Current password, then a new password that meets the strength rules."
+      size="md"
+      maxWidthPx={440}
+      maxHeight="min(90vh, 720px)"
+      scrollBody
+      footer={
         <div
           style={{
             display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: `${spacing[4]} ${spacing[5]} ${spacing[3]}`,
-            borderBottom: `1px solid ${theme.border}`,
+            flexDirection: 'column',
+            width: '100%',
+            gap: spacing[2],
+            alignItems: 'stretch',
           }}
         >
-          <h3
-            id="change-password-title"
+          <button
+            type="submit"
+            form="change-password-form"
+            disabled={!canSubmit}
             style={{
-              margin: 0,
-              fontSize: typography.sizes.lg.fontSize,
-              fontWeight: typography.fonts.heading.fontWeight,
-              fontFamily: typography.fonts.heading.family,
-              color: theme['text-primary'],
+              height: buttonTokens.height.md,
+              padding: buttonTokens.padding.md,
+              borderRadius: radius.pill,
+              border: 'none',
+              background: canSubmit ? theme['btn-primary-bg'] : theme['btn-disabled-bg'],
+              color: canSubmit ? theme['btn-primary-text'] : theme['btn-disabled-text'],
+              fontSize: typography.sizes.sm.fontSize,
+              fontWeight: 600,
+              fontFamily: typography.fonts.sans.family,
+              cursor: canSubmit ? 'pointer' : 'not-allowed',
+              boxShadow: canSubmit ? modalTokens.primaryActionBoxShadow : 'none',
             }}
           >
-            Change password
-          </h3>
+            Submit
+          </button>
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close"
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: 40,
-              height: 40,
-              border: 'none',
-              borderRadius: radius.sm,
-              background: 'transparent',
+              width: '100%',
+              height: buttonTokens.height.sm,
+              border: `1px solid ${theme.border}`,
+              borderRadius: radius.pill,
+              background: theme['bg-surface'],
               color: theme['text-secondary'],
+              fontSize: typography.sizes.sm.fontSize,
+              fontWeight: 500,
+              fontFamily: typography.fonts.sans.family,
               cursor: 'pointer',
             }}
           >
-            <X size={22} strokeWidth={2} />
+            Cancel
           </button>
         </div>
-
-        <form onSubmit={handleSubmit} style={{ padding: spacing[5] }}>
+      }
+    >
+        <form id="change-password-form" onSubmit={handleSubmit} style={{ margin: 0, padding: 0 }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: spacing[4] }}>
             <Field label="Current password" htmlFor="cp-current">
               <input
@@ -902,36 +830,8 @@ function ChangePasswordModal({ onClose }: { onClose: () => void }) {
               {error}
             </p>
           ) : null}
-
-          <div
-            style={{
-              marginTop: spacing[6],
-              display: 'flex',
-              justifyContent: 'flex-end',
-            }}
-          >
-            <button
-              type="submit"
-              disabled={!canSubmit}
-              style={{
-                height: buttonTokens.height.md,
-                padding: buttonTokens.padding.md,
-                borderRadius: radius.sm,
-                border: 'none',
-                background: !canSubmit ? theme['btn-disabled-bg'] : theme['btn-primary-bg'],
-                color: !canSubmit ? theme['btn-disabled-text'] : theme['btn-primary-text'],
-                fontSize: typography.sizes.sm.fontSize,
-                fontWeight: 600,
-                fontFamily: typography.fonts.sans.family,
-                cursor: !canSubmit ? 'not-allowed' : 'pointer',
-              }}
-            >
-              Submit
-            </button>
-          </div>
         </form>
-      </div>
-    </div>
+    </AppModal>
   );
 }
 

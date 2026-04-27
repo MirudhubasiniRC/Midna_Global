@@ -9,12 +9,11 @@ import ReportsPage from './components/MLA/ReportsPage'
 import LedgerPage from './components/MLA/LedgerPage'
 import ProfilePage from './components/MLA/ProfilePage'
 import SRAPage from './components/MLA/SRAPage'
-import TransactionsPage from './components/MLA/TransactionsPage'
-import TestimonialsPage from './components/MLA/TestimonialsPage'
-import FeedbackPage from './components/MLA/FeedbackPage'
 import GoogleReviewPage from './components/MLA/GoogleReviewPage'
+import PromotionsPage from './components/MLA/PromotionsPage'
 import ABCLedgerPage from './components/MLA/ABCLedgerPage'
 import ProcessPage from './components/Process/ProcessPage'
+import PreProcessPage from './components/Process/PreProcessPage'
 import DataReviewPage from './components/Process/DataReviewPage'
 import DataProcessPage from './components/Process/DataProcessPage'
 import UploadReportPage from './components/Process/UploadReportPage'
@@ -78,15 +77,17 @@ function App() {
         <Route path="ledger" element={<LedgerPage />} />
         <Route path="profile" element={<ProfilePage />} />
         <Route path="sra" element={<SRAPage />} />
-        <Route path="transactions" element={<TransactionsPage />} />
-        <Route path="testimonials" element={<TestimonialsPage />} />
-        <Route path="feedbacks" element={<FeedbackPage />} />
+        {/* <Route path="transactions" element={<TransactionsPage />} /> */}
+        {/* <Route path="testimonials" element={<TestimonialsPage />} /> */}
+        {/* <Route path="feedbacks" element={<FeedbackPage />} /> */}
         <Route path="google-review" element={<GoogleReviewPage />} />
+        <Route path="promotions" element={<PromotionsPage />} />
         <Route path="abc-ledger" element={<ABCLedgerPage />} />
         <Route path=":section" element={<MLASection />} />
       </Route>
       <Route path="/process" element={<ProcessPage />}>
         <Route index element={null} />
+        <Route path="pre-process" element={<PreProcessPage />} />
         <Route path="data-review" element={<DataReviewPage />} />
         <Route path="data-process" element={<DataProcessPage />} />
         <Route path="upload-report" element={<UploadReportPage />} />

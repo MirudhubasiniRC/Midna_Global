@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { colors, spacing, radius, typography } from '../../styles/theme';
 
 const theme = colors.light;
@@ -11,6 +12,8 @@ const quickLinks = [
 ];
 
 export default function QuickLinks() {
+  const [expanded, setExpanded] = useState(false);
+
   return (
     <div
       style={{
@@ -47,7 +50,25 @@ export default function QuickLinks() {
           Shortcuts and account overview
         </p>
       </div>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: spacing[2], flexDirection: 'row' }}>
+      <button
+        type="button"
+        onClick={() => setExpanded((v) => !v)}
+        style={{
+          background: theme['btn-primary-bg'],
+          border: 'none',
+          borderRadius: radius.sm,
+          padding: `${spacing[2]} ${spacing[4]}`,
+          color: theme['btn-primary-text'],
+          fontSize: typography.sizes.sm.fontSize,
+          fontFamily: typography.fonts.sans.family,
+          fontWeight: 600,
+          cursor: 'pointer',
+          marginBottom: spacing[3],
+        }}
+      >
+        Quick link menu {expanded ? '▲' : '▼'}
+      </button>
+      <div style={{ display: expanded ? 'flex' : 'none', flexWrap: 'wrap', gap: spacing[2], flexDirection: 'row' }}>
         {quickLinks.map((label) => (
           <button
             key={label}

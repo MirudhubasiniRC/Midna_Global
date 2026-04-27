@@ -8,6 +8,7 @@ import {
 } from '../../styles/theme';
 import Pagination from '../ui/Pagination';
 import TablePaginationFooter from '../ui/TablePaginationFooter';
+import CustomDateRangeModal from '../ui/CustomDateRangeModal';
 
 const theme = colors.light;
 
@@ -292,8 +293,6 @@ export default function TransactionsPage() {
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
   const [showCustomDateForm, setShowCustomDateForm] = useState(false);
-  const [draftFromDate, setDraftFromDate] = useState('');
-  const [draftToDate, setDraftToDate] = useState('');
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -370,11 +369,7 @@ export default function TransactionsPage() {
         <div style={{ display: 'flex', alignItems: 'center', gap: spacing[3] }}>
           <button
             type="button"
-            onClick={() => {
-              setDraftFromDate(fromDate);
-              setDraftToDate(toDate);
-              setShowCustomDateForm(true);
-            }}
+            onClick={() => setShowCustomDateForm(true)}
             style={{
               height: inputTokens.height.sm,
               padding: `${spacing[2]} ${spacing[4]}`,
@@ -393,159 +388,19 @@ export default function TransactionsPage() {
         </div>
       </div>
 
-      {showCustomDateForm ? (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="custom-date-range-title"
-          style={{
-            position: 'fixed',
-            inset: 0,
-            zIndex: 1100,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: spacing[4],
-            background: 'rgba(17, 24, 39, 0.45)',
-          }}
-          onMouseDown={(e) => {
-            if (e.target === e.currentTarget) setShowCustomDateForm(false);
-          }}
-        >
-          <div
-            onMouseDown={(e) => e.stopPropagation()}
-            style={{
-              width: '100%',
-              maxWidth: 520,
-              background: theme['bg-surface'],
-              borderRadius: radius.lg,
-              border: `1px solid ${theme.border}`,
-              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-              padding: spacing[5],
-            }}
-          >
-            <h3
-              id="custom-date-range-title"
-              style={{
-                margin: 0,
-                fontSize: typography.sizes.lg.fontSize,
-                fontWeight: typography.fonts.heading.fontWeight,
-                fontFamily: typography.fonts.heading.family,
-                color: theme['text-primary'],
-              }}
-            >
-              Select Custom Date Range
-            </h3>
-
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                setFromDate(draftFromDate);
-                setToDate(draftToDate);
-                setCurrentPage(1);
-                setShowCustomDateForm(false);
-              }}
-              style={{ display: 'flex', flexDirection: 'column', gap: spacing[3], marginTop: spacing[4] }}
-            >
-              <label
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  gap: spacing[3],
-                  fontSize: typography.sizes.sm.fontSize,
-                  color: theme['text-secondary'],
-                  fontFamily: typography.fonts.sans.family,
-                }}
-              >
-                From:
-                <input
-                  type="date"
-                  value={draftFromDate}
-                  onChange={(e) => setDraftFromDate(e.target.value)}
-                  style={{
-                    height: inputTokens.height.sm,
-                    padding: `${spacing[1]} ${spacing[2]}`,
-                    borderRadius: radius.sm,
-                    border: `1px solid ${theme.border}`,
-                    fontSize: typography.sizes.sm.fontSize,
-                    fontFamily: typography.fonts.sans.family,
-                    color: theme['text-primary'],
-                    background: theme['bg-surface'],
-                    minWidth: 200,
-                  }}
-                />
-              </label>
-              <label
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  gap: spacing[3],
-                  fontSize: typography.sizes.sm.fontSize,
-                  color: theme['text-secondary'],
-                  fontFamily: typography.fonts.sans.family,
-                }}
-              >
-                To:
-                <input
-                  type="date"
-                  value={draftToDate}
-                  onChange={(e) => setDraftToDate(e.target.value)}
-                  style={{
-                    height: inputTokens.height.sm,
-                    padding: `${spacing[1]} ${spacing[2]}`,
-                    borderRadius: radius.sm,
-                    border: `1px solid ${theme.border}`,
-                    fontSize: typography.sizes.sm.fontSize,
-                    fontFamily: typography.fonts.sans.family,
-                    color: theme['text-primary'],
-                    background: theme['bg-surface'],
-                    minWidth: 200,
-                  }}
-                />
-              </label>
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: spacing[2], marginTop: spacing[2] }}>
-                <button
-                  type="button"
-                  onClick={() => setShowCustomDateForm(false)}
-                  style={{
-                    height: inputTokens.height.sm,
-                    padding: `${spacing[2]} ${spacing[4]}`,
-                    borderRadius: radius.sm,
-                    border: `1px solid ${theme.border}`,
-                    background: theme['bg-surface'],
-                    color: theme['text-primary'],
-                    fontSize: typography.sizes.sm.fontSize,
-                    fontFamily: typography.fonts.sans.family,
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                  }}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  style={{
-                    height: inputTokens.height.sm,
-                    padding: `${spacing[2]} ${spacing[4]}`,
-                    borderRadius: radius.sm,
-                    border: 'none',
-                    background: theme['btn-primary-bg'],
-                    color: theme['btn-primary-text'],
-                    fontSize: typography.sizes.sm.fontSize,
-                    fontFamily: typography.fonts.sans.family,
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                  }}
-                >
-                  Select
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      ) : null}
+      <CustomDateRangeModal
+        open={showCustomDateForm}
+        onClose={() => setShowCustomDateForm(false)}
+        fromDate={fromDate}
+        toDate={toDate}
+        titleId="tx-custom-date-range-title"
+        onApply={({ from, to }) => {
+          setFromDate(from);
+          setToDate(to);
+          setCurrentPage(1);
+          setShowCustomDateForm(false);
+        }}
+      />
 
       <div
         style={{
@@ -593,7 +448,7 @@ export default function TransactionsPage() {
         </label>
         <div
           style={{
-            display: 'flex',
+            display: 'none',
             alignItems: 'center',
             gap: spacing[2],
             flexShrink: 0,

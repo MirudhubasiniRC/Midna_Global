@@ -3,6 +3,7 @@ import { colors, spacing, radius, typography } from '../../styles/theme';
 import TopBar from '../Layout/TopBar';
 import Pagination from '../ui/Pagination';
 import TablePaginationFooter from '../ui/TablePaginationFooter';
+import FilterPillButton from '../ui/FilterPillButton';
 
 const theme = colors.light;
 
@@ -185,31 +186,16 @@ export default function ResourcesPage() {
             {FILTER_CHIPS.map((chip) => {
               const isOn = chip.id === 'all' ? categoryFilter === 'all' : categoryFilter === chip.id;
               return (
-                <button
-                  className="resources-filter-chip"
+                <FilterPillButton
                   key={chip.id}
-                  type="button"
+                  active={isOn}
                   onClick={() => {
                     setCategoryFilter(chip.id);
                     setCurrentPage(1);
                   }}
-                  style={{
-                    padding: `${spacing[2]} ${spacing[3]}`,
-                    borderRadius: radius.pill,
-                    fontSize: typography.sizes.sm.fontSize,
-                    fontWeight: 500,
-                    fontFamily: typography.fonts.sans.family,
-                    letterSpacing: '0.01em',
-                    border: `1px solid ${isOn ? theme.primary : theme.border}`,
-                    background: isOn ? theme.primary : theme['bg-surface'],
-                    color: isOn ? theme['text-inverse'] : theme['text-secondary'],
-                    cursor: 'pointer',
-                    lineHeight: 1.2,
-                    transition: 'background 0.15s ease, color 0.15s ease, border-color 0.15s ease',
-                  }}
                 >
                   {chip.label}
-                </button>
+                </FilterPillButton>
               );
             })}
           </div>
@@ -262,11 +248,12 @@ export default function ResourcesPage() {
             </label>
             <div
               style={{
-                display: 'flex',
+                display: 'none',
                 alignItems: 'center',
                 gap: spacing[2],
                 flexShrink: 0,
                 marginLeft: 'auto',
+                // Commented out per request: Show records per page control
               }}
             >
               <span
@@ -307,7 +294,6 @@ export default function ResourcesPage() {
           <style>{`
             .resources-table-body tr:nth-child(even) { background: ${theme['table-zebra']}; }
             .resources-table-body tr:hover { background: ${theme['table-row-hover']}; }
-            .resources-filter-chip:focus-visible,
             .resources-action-pill:focus-visible {
               outline: 2px solid ${theme['focus-ring']};
               outline-offset: 2px;

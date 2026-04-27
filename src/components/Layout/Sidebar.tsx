@@ -5,11 +5,9 @@ import {
   BookOpen,
   User,
   Award,
-  Receipt,
-  MessageSquareQuote,
-  MessageCircle,
   Star,
   BookMarked,
+  Sparkles,
   PanelLeftClose,
   PanelLeft,
 } from 'lucide-react';
@@ -28,10 +26,11 @@ const mlaMenuItems = [
   { label: 'My Ledger', Icon: BookOpen, path: '/mla/ledger' },
   { label: 'My Profile', Icon: User, path: '/mla/profile' },
   { label: 'My SRA', Icon: Award, path: '/mla/sra' },
-  { label: 'My Transactions', Icon: Receipt, path: '/mla/transactions' },
-  { label: 'My Testimonials', Icon: MessageSquareQuote, path: '/mla/testimonials' },
-  { label: 'My Feedbacks', Icon: MessageCircle, path: '/mla/feedbacks' },
+  // { label: 'My Transactions', Icon: Receipt, path: '/mla/transactions' },
+  // { label: 'My Testimonials', Icon: MessageSquareQuote, path: '/mla/testimonials' },
+  // { label: 'My Feedbacks', Icon: MessageCircle, path: '/mla/feedbacks' },
   { label: 'My Google Review', Icon: Star, path: '/mla/google-review' },
+  { label: 'My Promotions', Icon: Sparkles, path: '/mla/promotions' },
   { label: 'My ABC Ledger', Icon: BookMarked, path: '/mla/abc-ledger' },
 ];
 

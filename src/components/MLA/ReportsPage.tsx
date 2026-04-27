@@ -1,12 +1,16 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   colors,
   spacing,
   radius,
   typography,
+  buttonTokens,
+  modalTokens,
 } from '../../styles/theme';
 import Pagination from '../ui/Pagination';
 import TablePaginationFooter from '../ui/TablePaginationFooter';
+import CustomDateRangeModal from '../ui/CustomDateRangeModal';
+import AppModal, { APP_MODAL_FIELD_ATTR } from '../ui/AppModal';
 
 const theme = colors.light;
 
@@ -55,18 +59,30 @@ const sampleData = [
   },
 ];
 
-const TOTAL_ENTRIES = sampleData.length;
-const PAGE_SIZE = 20;
-const TOTAL_PAGES = Math.max(1, Math.ceil(TOTAL_ENTRIES / PAGE_SIZE));
-
 export default function ReportsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
   const [search, setSearch] = useState('');
+  const [fromDate, setFromDate] = useState('');
+  const [toDate, setToDate] = useState('');
+  const [showCustomDateForm, setShowCustomDateForm] = useState(false);
   const [selectedScan, setSelectedScan] = useState<(typeof sampleData)[number] | null>(null);
   const [upgradeRow, setUpgradeRow] = useState<(typeof sampleData)[number] | null>(null);
-  const from = (currentPage - 1) * pageSize + 1;
-  const to = Math.min(currentPage * pageSize, TOTAL_ENTRIES);
+  const todayIso = new Date().toISOString().slice(0, 10);
+  const filteredData = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return sampleData.filter((row) => {
+      const searchMatch = !q || row.scanId.toLowerCase().includes(q);
+      const dateMatch =
+        (!fromDate || row.scanDate >= fromDate) &&
+        (!toDate || row.scanDate <= toDate);
+      return searchMatch && dateMatch;
+    });
+  }, [search, fromDate, toDate]);
+  const totalEntries = filteredData.length;
+  const totalPages = Math.max(1, Math.ceil(totalEntries / pageSize));
+  const from = totalEntries === 0 ? 0 : (currentPage - 1) * pageSize + 1;
+  const to = Math.min(currentPage * pageSize, totalEntries);
 
   return (
     <div
@@ -127,12 +143,12 @@ export default function ReportsPage() {
             minWidth: 0,
           }}
         >
-          Search:
+          Search Scan Id:
           <input
             type="search"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search..."
+            placeholder="Search by scan id..."
             style={{
               flex: 1,
               maxWidth: 360,
@@ -146,9 +162,26 @@ export default function ReportsPage() {
             }}
           />
         </label>
+        <button
+          type="button"
+          onClick={() => setShowCustomDateForm(true)}
+          style={{
+            padding: `${spacing[2]} ${spacing[4]}`,
+            borderRadius: radius.sm,
+            border: `1px solid ${theme.primary}`,
+            background: theme['primary-soft'],
+            color: theme.primary,
+            fontSize: typography.sizes.sm.fontSize,
+            fontFamily: typography.fonts.sans.family,
+            fontWeight: 600,
+            cursor: 'pointer',
+          }}
+        >
+          Select custom date range
+        </button>
         <div
           style={{
-            display: 'flex',
+            display: 'none',
             alignItems: 'center',
             gap: spacing[2],
             flexShrink: 0,
@@ -214,14 +247,13 @@ export default function ReportsPage() {
               <th style={{ ...thStyle, textAlign: 'left' }}>Client Type / DDS</th>
               <th style={{ ...thStyle, textAlign: 'left' }}>SRA</th>
               <th style={{ ...thStyle, textAlign: 'center' }}>Report</th>
-              <th style={{ ...thStyle, textAlign: 'center' }}>Upgrade</th>
-              <th style={{ ...thStyle, textAlign: 'center' }}>DDS</th>
+              <th style={{ ...thStyle, textAlign: 'center' }}>Upgrade Journal</th>
               <th style={{ ...thStyle, textAlign: 'right' }}>Amount</th>
               <th style={{ ...thStyle, textAlign: 'center' }}>Scan</th>
             </tr>
           </thead>
           <tbody className="reports-table-body">
-            {sampleData.map((row) => (
+            {filteredData.map((row) => (
               <tr key={row.scanId} style={{ height: '40px' }}>
                 <td style={{ ...tdStyle, textAlign: 'center' }}>{row.sno}</td>
                 <td style={tdStyle}>
@@ -285,23 +317,6 @@ export default function ReportsPage() {
                     Request
                   </button>
                 </td>
-                <td style={{ ...tdStyle, textAlign: 'center' }}>
-                  <span
-                    style={{
-                      display: 'inline-block',
-                      padding: `${spacing[1]} ${spacing[3]}`,
-                      border: `1px solid ${theme.warning}`,
-                      background: theme['warning-bg'],
-                      color: theme.warning,
-                      borderRadius: radius.pill,
-                      fontSize: typography.sizes.xs.fontSize,
-                      fontFamily: typography.fonts.sans.family,
-                      fontWeight: 500,
-                    }}
-                  >
-                    Request
-                  </span>
-                </td>
                 <td style={{ ...tdStyle, textAlign: 'right' }}>{row.amount}</td>
                 <td style={{ ...tdStyle, textAlign: 'center' }}>
                   <span
@@ -327,173 +342,28 @@ export default function ReportsPage() {
       </div>
 
       <TablePaginationFooter
-        summary={`Showing ${from} to ${to} of ${TOTAL_ENTRIES} entries`}
+        summary={`Showing ${from} to ${to} of ${totalEntries} entries`}
         pagination={
           <Pagination
             currentPage={currentPage}
-            totalPages={TOTAL_PAGES}
+            totalPages={totalPages}
             onPageChange={setCurrentPage}
           />
         }
       />
 
-      {selectedScan ? (
-        <div
-          style={{
-            position: 'fixed',
-            inset: 0,
-            background: 'rgba(0, 0, 0, 0.45)',
-            zIndex: 1000,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: spacing[5],
-          }}
-          onClick={() => setSelectedScan(null)}
-        >
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-label="Scan Images"
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              width: 'min(960px, 100%)',
-              maxHeight: '88vh',
-              overflowY: 'auto',
-              background: theme['bg-surface'],
-              borderRadius: radius.md,
-              border: `1px solid ${theme.border}`,
-              boxShadow: '0 12px 30px rgba(0, 0, 0, 0.18)',
-            }}
-          >
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: spacing[4],
-                borderBottom: `1px solid ${theme.border}`,
-              }}
-            >
-              <div>
-                <h3
-                  style={{
-                    margin: 0,
-                    fontSize: typography.sizes.xl.fontSize,
-                    fontFamily: typography.fonts.heading.family,
-                    fontWeight: typography.fonts.heading.fontWeight,
-                    color: theme['text-primary'],
-                  }}
-                >
-                  Scan Images
-                </h3>
-                <p
-                  style={{
-                    margin: `${spacing[1]} 0 0 0`,
-                    color: theme['text-secondary'],
-                    fontSize: typography.sizes.sm.fontSize,
-                    fontFamily: typography.fonts.sans.family,
-                  }}
-                >
-                  Scan ID : {selectedScan.scanId} . Name : {selectedScan.name.split('/')[0].trim()}
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setSelectedScan(null)}
-                aria-label="Close scan images"
-                style={{
-                  border: 'none',
-                  background: 'transparent',
-                  color: theme['text-muted'],
-                  fontSize: typography.sizes.lg.fontSize,
-                  cursor: 'pointer',
-                }}
-              >
-                X
-              </button>
-            </div>
-
-            <div style={{ padding: spacing[5] }}>
-              {(['Left Hand', 'Right Hand'] as const).map((hand) => (
-                <div key={hand} style={{ marginBottom: spacing[5] }}>
-                  <h4
-                    style={{
-                      margin: `0 0 ${spacing[2]} 0`,
-                      textAlign: 'center',
-                      fontSize: typography.sizes.lg.fontSize,
-                      color: theme['text-primary'],
-                      fontFamily: typography.fonts.heading.family,
-                    }}
-                  >
-                    {hand}
-                  </h4>
-                  <div
-                    style={{
-                      display: 'grid',
-                      gridTemplateColumns: 'repeat(5, minmax(110px, 1fr))',
-                      gap: spacing[2],
-                    }}
-                  >
-                    {Array.from({ length: 5 }).map((_, idx) => (
-                      <div
-                        key={`${hand}-${idx}`}
-                        style={{
-                          height: 140,
-                          borderRadius: radius.sm,
-                          background:
-                            'radial-gradient(circle at 50% 50%, #f6f6f6 0%, #d6d6d6 14%, #9c9c9c 28%, #2c2c2c 45%, #000 70%)',
-                          border: `1px solid ${theme.border}`,
-                          boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.06)',
-                        }}
-                      />
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      ) : null}
-
-      {upgradeRow ? (
-        <div
-          style={{
-            position: 'fixed',
-            inset: 0,
-            background: 'rgba(0, 0, 0, 0.45)',
-            zIndex: 1000,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: spacing[5],
-          }}
-          onClick={() => setUpgradeRow(null)}
-        >
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-label="Upgrade"
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              width: 'min(920px, 100%)',
-              background: theme['bg-surface'],
-              borderRadius: radius.md,
-              border: `1px solid ${theme.border}`,
-              boxShadow: '0 12px 30px rgba(0, 0, 0, 0.18)',
-              overflow: 'hidden',
-            }}
-          >
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: spacing[4],
-                borderBottom: `1px solid ${theme.border}`,
-              }}
-            >
-              <h3
+      <AppModal
+        open={!!selectedScan}
+        onClose={() => setSelectedScan(null)}
+        titleId="reports-fp-images-title"
+        ariaLabel="Scan images"
+        size="3xl"
+        maxHeight="88vh"
+        headerContent={
+          selectedScan ? (
+            <div>
+              <h2
+                id="reports-fp-images-title"
                 style={{
                   margin: 0,
                   fontSize: typography.sizes.xl.fontSize,
@@ -502,110 +372,269 @@ export default function ReportsPage() {
                   color: theme['text-primary'],
                 }}
               >
-                Upgrade
-              </h3>
-              <button
-                type="button"
-                onClick={() => setUpgradeRow(null)}
+                Finger Print Images
+              </h2>
+              <p
                 style={{
-                  border: 'none',
-                  background: 'transparent',
-                  color: theme['text-muted'],
-                  fontSize: typography.sizes.lg.fontSize,
-                  cursor: 'pointer',
-                }}
-                aria-label="Close upgrade modal"
-              >
-                X
-              </button>
-            </div>
-
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                setUpgradeRow(null);
-              }}
-              style={{ padding: spacing[4] }}
-            >
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: spacing[3] }}>
-                <label style={{ display: 'grid', gap: spacing[1], fontSize: typography.sizes.xs.fontSize, color: theme['text-secondary'] }}>
-                  From
-                  <select style={{ padding: `${spacing[2]} ${spacing[2]}`, borderRadius: radius.sm, border: `1px solid ${theme.border}`, fontSize: typography.sizes.sm.fontSize, fontFamily: typography.fonts.sans.family }}>
-                    <option>Rathinaswamy A</option>
-                  </select>
-                </label>
-                <label style={{ display: 'grid', gap: spacing[1], fontSize: typography.sizes.xs.fontSize, color: theme['text-secondary'] }}>
-                  To
-                  <select style={{ padding: `${spacing[2]} ${spacing[2]}`, borderRadius: radius.sm, border: `1px solid ${theme.border}`, fontSize: typography.sizes.sm.fontSize, fontFamily: typography.fonts.sans.family }}>
-                    <option>Rathinaswamy A</option>
-                  </select>
-                </label>
-                <label style={{ display: 'grid', gap: spacing[1], fontSize: typography.sizes.xs.fontSize, color: theme['text-secondary'] }}>
-                  Journal Date
-                  <input type="date" style={{ padding: `${spacing[2]} ${spacing[2]}`, borderRadius: radius.sm, border: `1px solid ${theme.border}`, fontSize: typography.sizes.sm.fontSize, fontFamily: typography.fonts.sans.family }} />
-                </label>
-                <label style={{ display: 'grid', gap: spacing[1], fontSize: typography.sizes.xs.fontSize, color: theme['text-secondary'] }}>
-                  Type
-                  <select style={{ padding: `${spacing[2]} ${spacing[2]}`, borderRadius: radius.sm, border: `1px solid ${theme.border}`, fontSize: typography.sizes.sm.fontSize, fontFamily: typography.fonts.sans.family }}>
-                    <option>Credit</option>
-                    <option>Debit</option>
-                  </select>
-                </label>
-              </div>
-              <div style={{ marginTop: spacing[3], fontSize: typography.sizes.xs.fontSize, color: theme['text-secondary'] }}>
-                (OLD MRP 2000.00) Select New MRP
-              </div>
-              <input
-                type="number"
-                min={2000}
-                max={5000}
-                placeholder="Enter amount (2000.00 - 5000.00)"
-                style={{
-                  width: '100%',
-                  marginTop: spacing[2],
-                  padding: `${spacing[2]} ${spacing[2]}`,
-                  borderRadius: radius.sm,
-                  border: `1px solid ${theme.border}`,
+                  margin: `${spacing[1]} 0 0 0`,
+                  color: theme['text-secondary'],
                   fontSize: typography.sizes.sm.fontSize,
                   fontFamily: typography.fonts.sans.family,
                 }}
-              />
-              <label style={{ display: 'grid', gap: spacing[1], marginTop: spacing[3], fontSize: typography.sizes.xs.fontSize, color: theme['text-secondary'] }}>
-                Remarks
-                <input
-                  type="text"
-                  defaultValue={`DDS - ${upgradeRow.name.split('/')[0].trim()} - Upgrade - Rathinaswamy A`}
+              >
+                Scan ID : {selectedScan.scanId} . Name : {selectedScan.name.split('/')[0].trim()}
+              </p>
+            </div>
+          ) : null
+        }
+        headerActions={
+          <button
+            type="button"
+            onClick={() => window.print()}
+            style={{
+              border: `1px solid ${theme.primary}`,
+              background: theme['primary-soft'],
+              color: theme.primary,
+              fontSize: typography.sizes.xs.fontSize,
+              fontFamily: typography.fonts.sans.family,
+              fontWeight: 600,
+              cursor: 'pointer',
+              borderRadius: radius.pill,
+              padding: `${spacing[1]} ${spacing[3]}`,
+            }}
+          >
+            Print
+          </button>
+        }
+      >
+        {selectedScan
+          ? (['Left Hand', 'Right Hand'] as const).map((hand) => (
+              <div key={hand} style={{ marginBottom: spacing[5] }}>
+                <h4
+                  style={{
+                    margin: `0 0 ${spacing[2]} 0`,
+                    textAlign: 'center',
+                    fontSize: typography.sizes.lg.fontSize,
+                    color: theme['text-primary'],
+                    fontFamily: typography.fonts.heading.family,
+                  }}
+                >
+                  {hand}
+                </h4>
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(5, minmax(110px, 1fr))',
+                    gap: spacing[2],
+                  }}
+                >
+                  {Array.from({ length: 5 }).map((_, idx) => (
+                    <div
+                      key={`${hand}-${idx}`}
+                      style={{
+                        height: 140,
+                        borderRadius: radius.sm,
+                        background:
+                          'radial-gradient(circle at 50% 50%, #f6f6f6 0%, #d6d6d6 14%, #9c9c9c 28%, #2c2c2c 45%, #000 70%)',
+                        border: `1px solid ${theme.border}`,
+                        boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.06)',
+                      }}
+                    />
+                  ))}
+                </div>
+              </div>
+            ))
+          : null}
+      </AppModal>
+
+      <AppModal
+        open={!!upgradeRow}
+        onClose={() => setUpgradeRow(null)}
+        titleId="reports-upgrade-journal-title"
+        ariaLabel="Upgrade journal"
+        title="Upgrade Journal"
+        subtitle="Update journal and MRP for this record."
+        size="2xl"
+        footer={
+          <button
+            type="submit"
+            form="reports-upgrade-journal-form"
+            style={{
+              height: buttonTokens.height.md,
+              padding: buttonTokens.padding.md,
+              borderRadius: radius.pill,
+              border: 'none',
+              background: theme['btn-primary-bg'],
+              color: theme['btn-primary-text'],
+              fontSize: typography.sizes.sm.fontSize,
+              fontFamily: typography.fonts.sans.family,
+              fontWeight: 600,
+              cursor: 'pointer',
+              boxShadow: modalTokens.primaryActionBoxShadow,
+            }}
+          >
+            Upgrade
+          </button>
+        }
+      >
+        {upgradeRow ? (
+          <form
+            id="reports-upgrade-journal-form"
+            onSubmit={(e) => {
+              e.preventDefault();
+              setUpgradeRow(null);
+            }}
+            style={{ display: 'grid', gap: spacing[3], margin: 0, padding: 0 }}
+          >
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: spacing[3] }}>
+              <label
+                style={{
+                  display: 'grid',
+                  gap: spacing[1],
+                  fontSize: typography.sizes.xs.fontSize,
+                  color: theme['text-secondary'],
+                }}
+              >
+                From
+                <select
+                  {...APP_MODAL_FIELD_ATTR}
                   style={{
                     padding: `${spacing[2]} ${spacing[2]}`,
-                    borderRadius: radius.sm,
+                    borderRadius: radius.md,
+                    border: `1px solid ${theme.border}`,
+                    fontSize: typography.sizes.sm.fontSize,
+                    fontFamily: typography.fonts.sans.family,
+                  }}
+                >
+                  <option>Rathinaswamy A</option>
+                </select>
+              </label>
+              <label
+                style={{
+                  display: 'grid',
+                  gap: spacing[1],
+                  fontSize: typography.sizes.xs.fontSize,
+                  color: theme['text-secondary'],
+                }}
+              >
+                To
+                <select
+                  {...APP_MODAL_FIELD_ATTR}
+                  style={{
+                    padding: `${spacing[2]} ${spacing[2]}`,
+                    borderRadius: radius.md,
+                    border: `1px solid ${theme.border}`,
+                    fontSize: typography.sizes.sm.fontSize,
+                    fontFamily: typography.fonts.sans.family,
+                  }}
+                >
+                  <option>Rathinaswamy A</option>
+                </select>
+              </label>
+              <label
+                style={{
+                  display: 'grid',
+                  gap: spacing[1],
+                  fontSize: typography.sizes.xs.fontSize,
+                  color: theme['text-secondary'],
+                }}
+              >
+                Journal Date
+                <input
+                  {...APP_MODAL_FIELD_ATTR}
+                  type="date"
+                  value={todayIso}
+                  readOnly
+                  style={{
+                    padding: `${spacing[2]} ${spacing[2]}`,
+                    borderRadius: radius.md,
                     border: `1px solid ${theme.border}`,
                     fontSize: typography.sizes.sm.fontSize,
                     fontFamily: typography.fonts.sans.family,
                   }}
                 />
               </label>
-              <div style={{ display: 'flex', justifyContent: 'center', marginTop: spacing[4] }}>
-                <button
-                  type="submit"
+              <label
+                style={{
+                  display: 'grid',
+                  gap: spacing[1],
+                  fontSize: typography.sizes.xs.fontSize,
+                  color: theme['text-secondary'],
+                }}
+              >
+                Type
+                <select
+                  value="Debit"
+                  disabled
                   style={{
-                    padding: `${spacing[2]} ${spacing[4]}`,
-                    border: 'none',
-                    borderRadius: radius.sm,
-                    background: theme['btn-primary-bg'],
-                    color: theme['btn-primary-text'],
+                    padding: `${spacing[2]} ${spacing[2]}`,
+                    borderRadius: radius.md,
+                    border: `1px solid ${theme.border}`,
                     fontSize: typography.sizes.sm.fontSize,
                     fontFamily: typography.fonts.sans.family,
-                    fontWeight: 600,
-                    cursor: 'pointer',
                   }}
                 >
-                  Upgrade
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      ) : null}
+                  <option>Debit</option>
+                </select>
+              </label>
+            </div>
+            <div style={{ fontSize: typography.sizes.xs.fontSize, color: theme['text-secondary'] }}>
+              (OLD MRP 2000.00) Select New MRP
+            </div>
+            <input
+              {...APP_MODAL_FIELD_ATTR}
+              type="number"
+              min={2000}
+              max={5000}
+              placeholder="Enter amount (2000.00 - 5000.00)"
+              style={{
+                width: '100%',
+                padding: `${spacing[2]} ${spacing[2]}`,
+                borderRadius: radius.md,
+                border: `1px solid ${theme.border}`,
+                fontSize: typography.sizes.sm.fontSize,
+                fontFamily: typography.fonts.sans.family,
+              }}
+            />
+            <label
+              style={{
+                display: 'grid',
+                gap: spacing[1],
+                fontSize: typography.sizes.xs.fontSize,
+                color: theme['text-secondary'],
+              }}
+            >
+              Remarks
+              <input
+                {...APP_MODAL_FIELD_ATTR}
+                type="text"
+                defaultValue={`DDS - ${upgradeRow.name.split('/')[0].trim()} - Upgrade - Rathinaswamy A`}
+                style={{
+                  padding: `${spacing[2]} ${spacing[2]}`,
+                  borderRadius: radius.md,
+                  border: `1px solid ${theme.border}`,
+                  fontSize: typography.sizes.sm.fontSize,
+                  fontFamily: typography.fonts.sans.family,
+                }}
+              />
+            </label>
+          </form>
+        ) : null}
+      </AppModal>
+
+      <CustomDateRangeModal
+        open={showCustomDateForm}
+        onClose={() => setShowCustomDateForm(false)}
+        fromDate={fromDate}
+        toDate={toDate}
+        titleId="reports-custom-date-range-title"
+        onApply={({ from, to }) => {
+          setFromDate(from);
+          setToDate(to);
+          setCurrentPage(1);
+          setShowCustomDateForm(false);
+        }}
+      />
     </div>
   );
 }

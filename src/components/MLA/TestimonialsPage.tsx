@@ -295,7 +295,7 @@ export default function TestimonialsPage() {
         </div>
         <div
           style={{
-            display: 'flex',
+            display: 'none',
             alignItems: 'center',
             gap: spacing[2],
             flexShrink: 0,

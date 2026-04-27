@@ -72,8 +72,56 @@ export const inputTokens = {
   padding: '12px 16px',
 };
 
+/** Shared modal / dialog shell (see `AppModal` in components/ui) */
+export const modalTokens = {
+  zIndex: 1100,
+  overlayBackground: 'rgba(15, 23, 42, 0.48)',
+  overlayBackdropBlur: '6px',
+  cardBoxShadow:
+    '0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 25px 50px -12px rgba(15, 23, 42, 0.22)',
+  /** Primary action button glow (Add link, Submit, etc.) */
+  primaryActionBoxShadow: '0 4px 14px rgba(147, 32, 122, 0.35)',
+  closeButtonSize: 36,
+  /** Match `pageTokens.cardPadding` / Process list cards */
+  contentPadding: spacing[5],
+  headerPadding: spacing[5],
+  /** Footer bar: top | horizontal | bottom */
+  footerPadding: `${spacing[4]} ${spacing[5]} ${spacing[5]}` as const,
+  /** Preset `max-width` values in px for `AppModal` */
+  maxWidth: {
+    narrow: 420,
+    sm: 400,
+    md: 440,
+    lg: 560,
+    xl: 760,
+    '2xl': 920,
+    '3xl': 960,
+  } as const,
+} as const;
+
+export type ModalSize = keyof typeof modalTokens.maxWidth;
+
 export const tableTokens = {
   rowHeight: '48px',
+} as const;
+
+/**
+ * List / detail pages (e.g. Process → Pre-process, MLA tables).
+ * Use with `colors.light` for borders and text.
+ */
+export const pageTokens = {
+  cardPadding: spacing[5],
+  cardRadius: radius.lg,
+  /** After page title, before toolbar */
+  titleToContentGap: spacing[4],
+  /** Below search/toolbar, before table */
+  toolbarToTableGap: spacing[4],
+  /** “Search:” + field row — matches Process / My Reports */
+  search: {
+    labelGap: spacing[2],
+    inputWidth: 260,
+    inputMinWidth: 160,
+  },
 } as const;
 
 export const sidebarTokens = {
@@ -148,6 +196,35 @@ export const colors = {
   } as const,
 };
 
+/**
+ * Reusable data-table cell styles (Process, MLA, Promotions, etc.)
+ * Pass `colors.light` as `theme`.
+ */
+export function getTableHeaderStyle(theme: (typeof colors)['light']) {
+  return {
+    padding: `${spacing[1]} ${spacing[2]}`,
+    height: '40px',
+    background: theme['table-header-muted-secondary'],
+    color: theme['text-primary'],
+    fontSize: typography.sizes.xs.fontSize,
+    fontWeight: 600,
+    borderBottom: `1px solid ${theme['table-border']}`,
+    fontFamily: typography.fonts.sans.family,
+    whiteSpace: 'nowrap' as const,
+  } as const;
+}
+
+export function getTableCellStyle(theme: (typeof colors)['light']) {
+  return {
+    padding: `${spacing[1]} ${spacing[2]}`,
+    color: theme['text-primary'],
+    fontSize: typography.sizes.xs.fontSize,
+    fontWeight: 400,
+    borderBottom: `1px solid ${theme['table-border']}`,
+    fontFamily: typography.fonts.sans.family,
+  } as const;
+}
+
 // ─── Theme Helper ─────────────────────────────────────────────────────────────
 
 export const getTheme = (mode: ThemeMode) => colors[mode];
@@ -180,6 +257,18 @@ export const getThemeCssVars = (mode: ThemeMode): Record<string, string> => {
   }
   vars['--input-padding'] = inputTokens.padding;
   vars['--table-row-height'] = tableTokens.rowHeight;
+
+  vars['--modal-z-index'] = String(modalTokens.zIndex);
+  vars['--modal-overlay-bg'] = modalTokens.overlayBackground;
+  vars['--modal-backdrop-blur'] = modalTokens.overlayBackdropBlur;
+  vars['--modal-card-shadow'] = modalTokens.cardBoxShadow;
+  vars['--modal-primary-action-shadow'] = modalTokens.primaryActionBoxShadow;
+  for (const [key, value] of Object.entries(modalTokens.maxWidth)) {
+    vars[`--modal-max-w-${key}`] = `${value}px`;
+  }
+  vars['--page-card-padding'] = pageTokens.cardPadding;
+  vars['--modal-content-padding'] = modalTokens.contentPadding;
+  vars['--modal-footer-padding'] = modalTokens.footerPadding;
 
   // Typography
   for (const [key, val] of Object.entries(typography.sizes)) {

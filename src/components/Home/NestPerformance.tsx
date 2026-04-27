@@ -48,7 +48,7 @@ export default function NestPerformance() {
             textAlign: 'left',
           }}
         >
-          Nest performance
+          NEST Performance
         </h2>
         <p
           style={{

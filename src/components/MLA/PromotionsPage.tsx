@@ -14,44 +14,15 @@ import AppModal, { APP_MODAL_FIELD_ATTR } from '../ui/AppModal';
 
 const theme = colors.light;
 
-type GoogleReviewRow = {
+type PromotionRow = {
   sno: number;
-  mobileType: string;
-  links: string;
-  uploadDate: string;
+  platform: string;
+  link: string;
 };
 
-const GOOGLE_REVIEW_ROWS: GoogleReviewRow[] = [
-  {
-    sno: 1,
-    mobileType: '9845885305 - Google',
-    links: 'https://share.google/vSHlznyiyWLXusRxr',
-    uploadDate: '19-1-2026',
-  },
-  {
-    sno: 2,
-    mobileType: '9845885305 - Google',
-    links: 'https://share.google/BXuwgySwTZwPQ5QZO',
-    uploadDate: '19-1-2026',
-  },
-  {
-    sno: 3,
-    mobileType: '9845885305 - Google',
-    links: 'https://share.google/AuEhyKQUOSX5iEnhx',
-    uploadDate: '19-1-2026',
-  },
-  {
-    sno: 4,
-    mobileType: '9845885305 - Google',
-    links: 'https://share.google/wjX1IClsPMsclTgYu',
-    uploadDate: '13-1-2026',
-  },
-  {
-    sno: 5,
-    mobileType: '9600799889 - Google',
-    links: 'https://share.google/gLyl96tvmRF1UZ5J6',
-    uploadDate: '12-1-2026',
-  },
+const PROMOTIONS: PromotionRow[] = [
+  { sno: 1, platform: 'Google', link: 'https://example.com/google-review' },
+  { sno: 2, platform: 'Instagram', link: 'https://example.com/instagram' },
 ];
 
 const thStyle = {
@@ -75,29 +46,27 @@ const tdStyle = {
   fontFamily: typography.fonts.sans.family,
 } as const;
 
-export default function GoogleReviewPage() {
+export default function PromotionsPage() {
   const [pageSize, setPageSize] = useState(20);
   const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState('');
   const [addOpen, setAddOpen] = useState(false);
-  const [googleLink, setGoogleLink] = useState('');
-  const [pendingDelete, setPendingDelete] = useState<GoogleReviewRow | null>(null);
+  const [platform, setPlatform] = useState('Google');
+  const [link, setLink] = useState('');
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    if (!q) return GOOGLE_REVIEW_ROWS;
-    return GOOGLE_REVIEW_ROWS.filter(
+    if (!q) return PROMOTIONS;
+    return PROMOTIONS.filter(
       (r) =>
         String(r.sno).includes(q) ||
-        r.mobileType.toLowerCase().includes(q) ||
-        r.links.toLowerCase().includes(q) ||
-        r.uploadDate.toLowerCase().includes(q)
+        r.platform.toLowerCase().includes(q) ||
+        r.link.toLowerCase().includes(q)
     );
   }, [search]);
 
   const totalEntries = filtered.length;
-  const totalPages =
-    totalEntries === 0 ? 0 : Math.max(1, Math.ceil(totalEntries / pageSize));
+  const totalPages = totalEntries === 0 ? 0 : Math.max(1, Math.ceil(totalEntries / pageSize));
 
   useEffect(() => {
     if (totalPages === 0) return;
@@ -134,7 +103,7 @@ export default function GoogleReviewPage() {
             color: theme['text-primary'],
           }}
         >
-          My Google Review
+          My Promotions
         </h2>
         <p
           style={{
@@ -145,47 +114,70 @@ export default function GoogleReviewPage() {
             lineHeight: 1.5,
           }}
         >
-          Add and manage Google review links
+          Add and manage your promotion platform links
         </p>
       </div>
+
       <AppModal
         open={addOpen}
         onClose={() => setAddOpen(false)}
-        titleId="add-google-review-title"
-        title="Add Google Review Link"
-        subtitle="Paste the share link from Google."
-        size="2xl"
+        titleId="add-promotion-title"
+        title="Add promotion"
+        subtitle="Choose a platform and paste the link you want to share."
+        size="md"
         footer={
-          <button
-            type="submit"
-            form="add-google-review-form"
-            style={{
-              height: buttonTokens.height.md,
-              padding: buttonTokens.padding.md,
-              borderRadius: radius.pill,
-              border: 'none',
-              background: theme['btn-primary-bg'],
-              color: theme['btn-primary-text'],
-              fontSize: typography.sizes.sm.fontSize,
-              fontWeight: 600,
-              fontFamily: typography.fonts.sans.family,
-              cursor: 'pointer',
-              boxShadow: modalTokens.primaryActionBoxShadow,
-            }}
-          >
-            Submit
-          </button>
+          <>
+            <button
+              type="button"
+              onClick={() => setAddOpen(false)}
+              style={{
+                height: buttonTokens.height.md,
+                padding: buttonTokens.padding.md,
+                borderRadius: radius.pill,
+                border: `1px solid ${theme.border}`,
+                background: theme['bg-surface'],
+                color: theme['text-primary'],
+                fontSize: typography.sizes.sm.fontSize,
+                fontWeight: 600,
+                fontFamily: typography.fonts.sans.family,
+                cursor: 'pointer',
+                boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+              }}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              form="promo-add-form"
+              style={{
+                height: buttonTokens.height.md,
+                padding: buttonTokens.padding.md,
+                borderRadius: radius.pill,
+                border: 'none',
+                background: theme['btn-primary-bg'],
+                color: theme['btn-primary-text'],
+                fontSize: typography.sizes.sm.fontSize,
+                fontWeight: 600,
+                fontFamily: typography.fonts.sans.family,
+                cursor: 'pointer',
+                boxShadow: modalTokens.primaryActionBoxShadow,
+              }}
+            >
+              Add link
+            </button>
+          </>
         }
       >
         <form
-          id="add-google-review-form"
+          id="promo-add-form"
           onSubmit={(e) => {
             e.preventDefault();
-            if (!googleLink.trim()) return;
+            if (!link.trim()) return;
+            setLink('');
+            setPlatform('Google');
             setAddOpen(false);
-            setGoogleLink('');
           }}
-          style={{ display: 'grid', gap: spacing[2], margin: 0, padding: 0 }}
+          style={{ display: 'grid', gap: spacing[5], margin: 0, padding: 0 }}
         >
           <label
             style={{
@@ -195,15 +187,54 @@ export default function GoogleReviewPage() {
               fontWeight: 600,
               color: theme['text-secondary'],
               fontFamily: typography.fonts.sans.family,
+              letterSpacing: '0.01em',
             }}
           >
-            Google link
+            Platform type
+            <select
+              {...APP_MODAL_FIELD_ATTR}
+              value={platform}
+              onChange={(e) => setPlatform(e.target.value)}
+              style={{
+                width: '100%',
+                height: inputTokens.height.md,
+                boxSizing: 'border-box',
+                padding: `0 ${spacing[3]}`,
+                borderRadius: radius.md,
+                border: `1px solid ${theme.border}`,
+                fontSize: typography.sizes.sm.fontSize,
+                fontFamily: typography.fonts.sans.family,
+                color: theme['text-primary'],
+                background: theme['bg-surface'],
+                cursor: 'pointer',
+                transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
+              }}
+            >
+              <option>Google</option>
+              <option>Instagram</option>
+              <option>Facebook</option>
+              <option>YouTube</option>
+              <option>LinkedIn</option>
+            </select>
+          </label>
+          <label
+            style={{
+              display: 'grid',
+              gap: spacing[2],
+              fontSize: typography.sizes.sm.fontSize,
+              fontWeight: 600,
+              color: theme['text-secondary'],
+              fontFamily: typography.fonts.sans.family,
+              letterSpacing: '0.01em',
+            }}
+          >
+            Link
             <input
               {...APP_MODAL_FIELD_ATTR}
               type="url"
-              value={googleLink}
-              onChange={(e) => setGoogleLink(e.target.value)}
-              placeholder="https://..."
+              value={link}
+              onChange={(e) => setLink(e.target.value)}
+              placeholder="https://…"
               required
               style={{
                 width: '100%',
@@ -216,6 +247,7 @@ export default function GoogleReviewPage() {
                 fontFamily: typography.fonts.sans.family,
                 color: theme['text-primary'],
                 background: theme['bg-surface'],
+                transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
               }}
             />
           </label>
@@ -288,6 +320,7 @@ export default function GoogleReviewPage() {
                 fontFamily: typography.fonts.sans.family,
                 color: theme['text-primary'],
                 minWidth: 160,
+                background: theme['bg-surface'],
               }}
             />
           </label>
@@ -344,8 +377,8 @@ export default function GoogleReviewPage() {
       </div>
 
       <style>{`
-        .ledger-table-body tr:nth-child(even) { background: ${theme['table-zebra']}; }
-        .ledger-table-body tr:hover { background: ${theme['table-row-hover']}; }
+        .promotions-table-body tr:nth-child(even) { background: ${theme['table-zebra']}; }
+        .promotions-table-body tr:hover { background: ${theme['table-row-hover']}; }
       `}</style>
       <div
         style={{
@@ -360,25 +393,21 @@ export default function GoogleReviewPage() {
               width: '100%',
               borderCollapse: 'collapse',
               fontFamily: typography.fonts.sans.family,
-              minWidth: 640,
+              minWidth: 480,
             }}
           >
             <thead>
               <tr>
                 <th style={{ ...thStyle, textAlign: 'center', width: 72 }}>Sno</th>
-                <th style={{ ...thStyle, textAlign: 'left', minWidth: 140 }}>
-                  Mobile / Type
-                </th>
-                <th style={{ ...thStyle, textAlign: 'left', minWidth: 200 }}>Links</th>
-                <th style={{ ...thStyle, textAlign: 'left', width: 120 }}>Upload Date</th>
-                <th style={{ ...thStyle, textAlign: 'center', width: 140 }}>Options</th>
+                <th style={{ ...thStyle, textAlign: 'left', minWidth: 120 }}>Platform</th>
+                <th style={{ ...thStyle, textAlign: 'left' }}>Link</th>
               </tr>
             </thead>
-            <tbody className="ledger-table-body">
+            <tbody className="promotions-table-body">
               {pageRows.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={5}
+                    colSpan={3}
                     style={{
                       ...tdStyle,
                       textAlign: 'center',
@@ -394,44 +423,15 @@ export default function GoogleReviewPage() {
                 pageRows.map((row) => (
                   <tr key={row.sno} style={{ height: '40px' }}>
                     <td style={{ ...tdStyle, textAlign: 'center' }}>{row.sno}</td>
-                    <td style={tdStyle}>{row.mobileType}</td>
+                    <td style={tdStyle}>{row.platform}</td>
                     <td
                       style={{
                         ...tdStyle,
                         whiteSpace: 'normal',
                         wordBreak: 'break-all',
-                        maxWidth: 360,
                       }}
                     >
-                      {row.links}
-                    </td>
-                    <td style={{ ...tdStyle, whiteSpace: 'nowrap' }}>{row.uploadDate}</td>
-                    <td style={{ ...tdStyle, textAlign: 'center' }}>
-                      <span
-                        style={{
-                          display: 'inline-flex',
-                          gap: spacing[2],
-                          justifyContent: 'center',
-                          flexWrap: 'wrap',
-                        }}
-                      >
-                        <button
-                          type="button"
-                          onClick={() => setPendingDelete(row)}
-                          style={{
-                            padding: `${spacing[1]} ${spacing[3]}`,
-                            borderRadius: radius.pill,
-                            border: `1px solid ${theme.error}`,
-                            background: theme['error-bg'],
-                            color: theme.error,
-                            fontSize: typography.sizes['2xs'].fontSize,
-                            fontWeight: 600,
-                            cursor: 'pointer',
-                          }}
-                        >
-                          Delete
-                        </button>
-                      </span>
+                      {row.link}
                     </td>
                   </tr>
                 ))
@@ -456,71 +456,6 @@ export default function GoogleReviewPage() {
           }
         />
       </div>
-
-      <AppModal
-        open={!!pendingDelete}
-        onClose={() => setPendingDelete(null)}
-        titleId="confirm-delete-google-review-title"
-        title="Delete Google review link"
-        maxWidthPx={460}
-        footer={
-          <>
-            <button
-              type="button"
-              onClick={() => setPendingDelete(null)}
-              style={{
-                height: buttonTokens.height.md,
-                padding: buttonTokens.padding.md,
-                borderRadius: radius.pill,
-                border: `1px solid ${theme.border}`,
-                background: theme['bg-surface'],
-                color: theme['text-primary'],
-                fontSize: typography.sizes.sm.fontSize,
-                fontWeight: 600,
-                fontFamily: typography.fonts.sans.family,
-                cursor: 'pointer',
-                boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
-              }}
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              onClick={() => setPendingDelete(null)}
-              style={{
-                height: buttonTokens.height.md,
-                padding: buttonTokens.padding.md,
-                borderRadius: radius.pill,
-                border: 'none',
-                background: theme.error,
-                color: theme['text-inverse'],
-                fontSize: typography.sizes.sm.fontSize,
-                fontWeight: 600,
-                fontFamily: typography.fonts.sans.family,
-                cursor: 'pointer',
-              }}
-            >
-              Delete
-            </button>
-          </>
-        }
-      >
-        {pendingDelete ? (
-          <p
-            style={{
-              margin: 0,
-              fontSize: typography.sizes.sm.fontSize,
-              lineHeight: 1.6,
-              fontFamily: typography.fonts.sans.family,
-              color: theme['text-secondary'],
-            }}
-          >
-            Are you sure you want to delete this Google review link for{' '}
-            <strong style={{ color: theme['text-primary'] }}>{pendingDelete.mobileType}</strong>? This action cannot
-            be undone.
-          </p>
-        ) : null}
-      </AppModal>
     </div>
   );
 }

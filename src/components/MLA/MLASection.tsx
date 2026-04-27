@@ -13,6 +13,7 @@ const sectionTitles: Record<string, string> = {
   testimonials: 'My Testimonials',
   feedbacks: 'My Feedbacks',
   'google-review': 'My Google Review',
+  promotions: 'My Promotions',
   'abc-ledger': 'My ABC Ledger',
 };
 

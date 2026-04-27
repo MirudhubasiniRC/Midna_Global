@@ -5,9 +5,12 @@ import {
   radius,
   typography,
   inputTokens,
+  buttonTokens,
+  modalTokens,
 } from '../../styles/theme';
 import Pagination from '../ui/Pagination';
 import TablePaginationFooter from '../ui/TablePaginationFooter';
+import AppModal, { APP_MODAL_FIELD_ATTR } from '../ui/AppModal';
 
 const theme = colors.light;
 
@@ -240,11 +243,12 @@ export default function ABCLedgerPage() {
         </label>
         <div
           style={{
-            display: 'flex',
+            display: 'none',
             alignItems: 'center',
             gap: spacing[2],
             flexShrink: 0,
             marginLeft: 'auto',
+            // Commented out per request: Show records per page control
           }}
         >
           <span
@@ -475,147 +479,192 @@ export default function ABCLedgerPage() {
         />
       </div>
 
-      {selectedLedger ? (
-        <div
-          style={{
-            position: 'fixed',
-            inset: 0,
-            background: 'rgba(0, 0, 0, 0.45)',
-            zIndex: 1000,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: spacing[5],
-          }}
-          onClick={() => setSelectedLedger(null)}
-        >
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-label="Add New Entry"
-            onClick={(e) => e.stopPropagation()}
+      <AppModal
+        open={!!selectedLedger}
+        onClose={() => setSelectedLedger(null)}
+        titleId="abc-ledger-add-entry-title"
+        ariaLabel="Add New Entry"
+        title="Add New Entry"
+        subtitle="Create a new ledger entry for the selected account."
+        size="2xl"
+        footer={
+          <button
+            type="submit"
+            form="abc-ledger-add-entry-form"
             style={{
-              width: 'min(920px, 100%)',
-              background: theme['bg-surface'],
-              borderRadius: radius.md,
-              border: `1px solid ${theme.border}`,
-              boxShadow: '0 12px 30px rgba(0, 0, 0, 0.18)',
-              overflow: 'hidden',
+              height: buttonTokens.height.md,
+              padding: buttonTokens.padding.md,
+              borderRadius: radius.pill,
+              border: 'none',
+              background: theme['btn-primary-bg'],
+              color: theme['btn-primary-text'],
+              fontSize: typography.sizes.sm.fontSize,
+              fontWeight: 600,
+              fontFamily: typography.fonts.sans.family,
+              cursor: 'pointer',
+              boxShadow: modalTokens.primaryActionBoxShadow,
             }}
           >
-            <div
+            Submit
+          </button>
+        }
+      >
+        {selectedLedger ? (
+          <form
+            id="abc-ledger-add-entry-form"
+            onSubmit={(e) => {
+              e.preventDefault();
+              setSelectedLedger(null);
+            }}
+            style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: spacing[3], margin: 0 }}
+          >
+            <label
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: spacing[4],
-                borderBottom: `1px solid ${theme.border}`,
+                display: 'grid',
+                gap: spacing[1],
+                fontSize: typography.sizes.xs.fontSize,
+                color: theme['text-secondary'],
               }}
             >
-              <h3
+              To
+              <input
+                type="text"
+                value={selectedLedger.ledgerName}
+                readOnly
                 style={{
-                  margin: 0,
-                  fontSize: typography.sizes.xl.fontSize,
-                  fontFamily: typography.fonts.heading.family,
-                  fontWeight: typography.fonts.heading.fontWeight,
+                  height: inputTokens.height.sm,
+                  padding: `${spacing[1]} ${spacing[2]}`,
+                  borderRadius: radius.md,
+                  border: `1px solid ${theme.border}`,
+                  fontSize: typography.sizes.sm.fontSize,
+                  fontFamily: typography.fonts.sans.family,
                   color: theme['text-primary'],
+                  background: theme['table-header-gray'],
                 }}
-              >
-                Add New Entry
-              </h3>
-              <button
-                type="button"
-                onClick={() => setSelectedLedger(null)}
+              />
+            </label>
+            <label
+              style={{
+                display: 'grid',
+                gap: spacing[1],
+                fontSize: typography.sizes.xs.fontSize,
+                color: theme['text-secondary'],
+              }}
+            >
+              From
+              <select
+                {...APP_MODAL_FIELD_ATTR}
                 style={{
-                  border: 'none',
-                  background: 'transparent',
-                  color: theme['text-muted'],
-                  fontSize: typography.sizes.lg.fontSize,
+                  height: inputTokens.height.sm,
+                  padding: `${spacing[1]} ${spacing[2]}`,
+                  borderRadius: radius.md,
+                  border: `1px solid ${theme.border}`,
+                  fontSize: typography.sizes.sm.fontSize,
+                  fontFamily: typography.fonts.sans.family,
                   cursor: 'pointer',
                 }}
-                aria-label="Close add entry modal"
               >
-                X
-              </button>
-            </div>
-
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                setSelectedLedger(null);
+                <option>Choose</option>
+                <option>Rathinaswamy A</option>
+                <option>MiDNA (H.O)</option>
+              </select>
+            </label>
+            <label
+              style={{
+                display: 'grid',
+                gap: spacing[1],
+                fontSize: typography.sizes.xs.fontSize,
+                color: theme['text-secondary'],
               }}
-              style={{ padding: spacing[4] }}
             >
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: spacing[3] }}>
-                <label style={{ display: 'grid', gap: spacing[1], fontSize: typography.sizes.xs.fontSize, color: theme['text-secondary'] }}>
-                  To
-                  <input
-                    type="text"
-                    value={selectedLedger.ledgerName}
-                    readOnly
-                    style={{
-                      height: inputTokens.height.sm,
-                      padding: `${spacing[1]} ${spacing[2]}`,
-                      borderRadius: radius.sm,
-                      border: `1px solid ${theme.border}`,
-                      fontSize: typography.sizes.sm.fontSize,
-                      fontFamily: typography.fonts.sans.family,
-                      color: theme['text-primary'],
-                      background: theme['table-header-gray'],
-                    }}
-                  />
-                </label>
-                <label style={{ display: 'grid', gap: spacing[1], fontSize: typography.sizes.xs.fontSize, color: theme['text-secondary'] }}>
-                  From
-                  <select style={{ height: inputTokens.height.sm, padding: `${spacing[1]} ${spacing[2]}`, borderRadius: radius.sm, border: `1px solid ${theme.border}`, fontSize: typography.sizes.sm.fontSize, fontFamily: typography.fonts.sans.family }}>
-                    <option>Choose</option>
-                    <option>Rathinaswamy A</option>
-                    <option>MiDNA (H.O)</option>
-                  </select>
-                </label>
-                <label style={{ display: 'grid', gap: spacing[1], fontSize: typography.sizes.xs.fontSize, color: theme['text-secondary'] }}>
-                  Journal Date
-                  <input type="date" style={{ height: inputTokens.height.sm, padding: `${spacing[1]} ${spacing[2]}`, borderRadius: radius.sm, border: `1px solid ${theme.border}`, fontSize: typography.sizes.sm.fontSize, fontFamily: typography.fonts.sans.family }} />
-                </label>
-                <label style={{ display: 'grid', gap: spacing[1], fontSize: typography.sizes.xs.fontSize, color: theme['text-secondary'] }}>
-                  Type
-                  <select style={{ height: inputTokens.height.sm, padding: `${spacing[1]} ${spacing[2]}`, borderRadius: radius.sm, border: `1px solid ${theme.border}`, fontSize: typography.sizes.sm.fontSize, fontFamily: typography.fonts.sans.family }}>
-                    <option>Choose</option>
-                    <option>Credit</option>
-                    <option>Debit</option>
-                  </select>
-                </label>
-                <label style={{ display: 'grid', gap: spacing[1], fontSize: typography.sizes.xs.fontSize, color: theme['text-secondary'] }}>
-                  Amount
-                  <input type="number" min={0} style={{ height: inputTokens.height.sm, padding: `${spacing[1]} ${spacing[2]}`, borderRadius: radius.sm, border: `1px solid ${theme.border}`, fontSize: typography.sizes.sm.fontSize, fontFamily: typography.fonts.sans.family }} />
-                </label>
-                <label style={{ display: 'grid', gap: spacing[1], fontSize: typography.sizes.xs.fontSize, color: theme['text-secondary'] }}>
-                  Remarks
-                  <input type="text" style={{ height: inputTokens.height.sm, padding: `${spacing[1]} ${spacing[2]}`, borderRadius: radius.sm, border: `1px solid ${theme.border}`, fontSize: typography.sizes.sm.fontSize, fontFamily: typography.fonts.sans.family }} />
-                </label>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'center', marginTop: spacing[4] }}>
-                <button
-                  type="submit"
-                  style={{
-                    padding: `${spacing[2]} ${spacing[4]}`,
-                    border: 'none',
-                    borderRadius: radius.sm,
-                    background: theme['btn-primary-bg'],
-                    color: theme['btn-primary-text'],
-                    fontSize: typography.sizes.sm.fontSize,
-                    fontFamily: typography.fonts.sans.family,
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                  }}
-                >
-                  Submit
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      ) : null}
+              Journal Date
+              <input
+                {...APP_MODAL_FIELD_ATTR}
+                type="date"
+                style={{
+                  height: inputTokens.height.sm,
+                  padding: `${spacing[1]} ${spacing[2]}`,
+                  borderRadius: radius.md,
+                  border: `1px solid ${theme.border}`,
+                  fontSize: typography.sizes.sm.fontSize,
+                  fontFamily: typography.fonts.sans.family,
+                }}
+              />
+            </label>
+            <label
+              style={{
+                display: 'grid',
+                gap: spacing[1],
+                fontSize: typography.sizes.xs.fontSize,
+                color: theme['text-secondary'],
+              }}
+            >
+              Type
+              <select
+                {...APP_MODAL_FIELD_ATTR}
+                style={{
+                  height: inputTokens.height.sm,
+                  padding: `${spacing[1]} ${spacing[2]}`,
+                  borderRadius: radius.md,
+                  border: `1px solid ${theme.border}`,
+                  fontSize: typography.sizes.sm.fontSize,
+                  fontFamily: typography.fonts.sans.family,
+                  cursor: 'pointer',
+                }}
+              >
+                <option>Choose</option>
+                <option>Credit</option>
+                <option>Debit</option>
+              </select>
+            </label>
+            <label
+              style={{
+                display: 'grid',
+                gap: spacing[1],
+                fontSize: typography.sizes.xs.fontSize,
+                color: theme['text-secondary'],
+              }}
+            >
+              Amount
+              <input
+                {...APP_MODAL_FIELD_ATTR}
+                type="number"
+                min={0}
+                style={{
+                  height: inputTokens.height.sm,
+                  padding: `${spacing[1]} ${spacing[2]}`,
+                  borderRadius: radius.md,
+                  border: `1px solid ${theme.border}`,
+                  fontSize: typography.sizes.sm.fontSize,
+                  fontFamily: typography.fonts.sans.family,
+                }}
+              />
+            </label>
+            <label
+              style={{
+                display: 'grid',
+                gap: spacing[1],
+                fontSize: typography.sizes.xs.fontSize,
+                color: theme['text-secondary'],
+              }}
+            >
+              Remarks
+              <input
+                {...APP_MODAL_FIELD_ATTR}
+                type="text"
+                style={{
+                  height: inputTokens.height.sm,
+                  padding: `${spacing[1]} ${spacing[2]}`,
+                  borderRadius: radius.md,
+                  border: `1px solid ${theme.border}`,
+                  fontSize: typography.sizes.sm.fontSize,
+                  fontFamily: typography.fonts.sans.family,
+                }}
+              />
+            </label>
+          </form>
+        ) : null}
+      </AppModal>
     </div>
   );
 }

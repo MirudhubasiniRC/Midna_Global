@@ -32,7 +32,7 @@ export default function ScansCard() {
             textAlign: 'left',
           }}
         >
-          Scan summary
+          MIS Processing (Head Office)
         </h2>
         <p
           style={{
@@ -44,7 +44,7 @@ export default function ScansCard() {
             lineHeight: 1.5,
           }}
         >
-          Today's scan counts and period progress
+          Today scan counts and period progress
         </p>
       </div>
       <style>{`

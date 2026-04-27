@@ -256,7 +256,7 @@ export default function FeedbackPage() {
         </label>
         <div
           style={{
-            display: 'flex',
+            display: 'none',
             alignItems: 'center',
             gap: spacing[2],
             flexShrink: 0,

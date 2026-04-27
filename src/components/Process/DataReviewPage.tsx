@@ -86,7 +86,7 @@ export default function DataReviewPage() {
               color: theme['text-primary'],
             }}
           >
-            Scans For QC Checking
+            Scans for Review
           </h2>
         </div>
 

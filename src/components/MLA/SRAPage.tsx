@@ -5,9 +5,13 @@ import {
   radius,
   typography,
   inputTokens,
+  buttonTokens,
+  modalTokens,
 } from '../../styles/theme';
 import Pagination from '../ui/Pagination';
 import TablePaginationFooter from '../ui/TablePaginationFooter';
+import AppModal from '../ui/AppModal';
+import FilterPillButton from '../ui/FilterPillButton';
 
 const theme = colors.light;
 
@@ -299,6 +303,8 @@ export default function SRAPage() {
 
       <div style={{ marginBottom: spacing[4] }}>
         <div
+          role="group"
+          aria-label="Filter by network tier"
           style={{
             display: 'flex',
             flexWrap: 'wrap',
@@ -309,29 +315,16 @@ export default function SRAPage() {
           {NETWORK_FILTERS.map((f) => {
             const active = f.id === 'ALL' ? activeNetwork === null : activeNetwork === f.id;
             return (
-              <button
+              <FilterPillButton
                 key={f.id}
-                type="button"
+                active={active}
                 onClick={() => {
                   setActiveNetwork(f.id === 'ALL' ? null : f.id);
                   setCurrentPage(1);
                 }}
-                style={{
-                  padding: `${spacing[2]} ${spacing[3]}`,
-                  borderRadius: radius.pill,
-                  border: `1px solid ${theme.primary}`,
-                  background: active ? theme.primary : theme['primary-soft'],
-                  color: active ? theme['text-inverse'] : theme.primary,
-                  fontSize: typography.sizes.sm.fontSize,
-                  fontWeight: 500,
-                  fontFamily: typography.fonts.sans.family,
-                  cursor: 'pointer',
-                  lineHeight: 1.2,
-                  transition: 'background 0.15s ease, color 0.15s ease, border-color 0.15s ease',
-                }}
               >
                 {f.label}
-              </button>
+              </FilterPillButton>
             );
           })}
         </div>
@@ -524,73 +517,78 @@ export default function SRAPage() {
         }
       />
 
-      {editingRow ? (
-        <div
-          style={{
-            position: 'fixed',
-            inset: 0,
-            background: 'rgba(0, 0, 0, 0.45)',
-            zIndex: 1000,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: spacing[5],
-          }}
-          onClick={() => setEditingRow(null)}
-        >
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-label="SLC Training Data"
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              width: 'min(980px, 100%)',
-              maxHeight: '88vh',
-              overflowY: 'auto',
-              background: theme['bg-surface'],
-              borderRadius: radius.md,
-              border: `1px solid ${theme.border}`,
-              boxShadow: '0 12px 30px rgba(0, 0, 0, 0.18)',
-            }}
-          >
-            <div
+      <AppModal
+        open={!!editingRow}
+        onClose={() => setEditingRow(null)}
+        titleId="sra-slc-training-title"
+        title="SLC Training Data"
+        subtitle="View or update trainer and billing details."
+        size="2xl"
+        maxWidthPx={980}
+        maxHeight="88vh"
+        footer={
+          <>
+            <button
+              type="button"
+              onClick={() => setEditingRow(null)}
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: spacing[4],
-                borderBottom: `1px solid ${theme.border}`,
+                height: buttonTokens.height.md,
+                padding: buttonTokens.padding.md,
+                borderRadius: radius.pill,
+                border: `1px solid ${theme.border}`,
+                background: theme['bg-surface'],
+                color: theme['text-primary'],
+                fontSize: typography.sizes.sm.fontSize,
+                fontWeight: 600,
+                fontFamily: typography.fonts.sans.family,
+                cursor: 'pointer',
               }}
             >
-              <h3
-                style={{
-                  margin: 0,
-                  fontSize: typography.sizes.xl.fontSize,
-                  fontFamily: typography.fonts.heading.family,
-                  fontWeight: typography.fonts.heading.fontWeight,
-                  color: theme['text-primary'],
-                }}
-              >
-                SLC Training Data
-              </h3>
-              <button
-                type="button"
-                onClick={() => setEditingRow(null)}
-                aria-label="Close edit modal"
-                style={{
-                  border: 'none',
-                  background: 'transparent',
-                  color: theme['text-muted'],
-                  fontSize: typography.sizes.lg.fontSize,
-                  cursor: 'pointer',
-                }}
-              >
-                X
-              </button>
-            </div>
-
-            <div style={{ padding: spacing[4] }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: spacing[3] }}>
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={() => setEditingRow(null)}
+              style={{
+                height: buttonTokens.height.md,
+                padding: buttonTokens.padding.md,
+                borderRadius: radius.pill,
+                border: 'none',
+                background: theme['btn-primary-bg'],
+                color: theme['btn-primary-text'],
+                fontSize: typography.sizes.sm.fontSize,
+                fontWeight: 600,
+                fontFamily: typography.fonts.sans.family,
+                cursor: 'pointer',
+                boxShadow: modalTokens.primaryActionBoxShadow,
+              }}
+            >
+              Save
+            </button>
+            <button
+              type="button"
+              onClick={() => setEditingRow(null)}
+              style={{
+                height: buttonTokens.height.md,
+                padding: buttonTokens.padding.md,
+                borderRadius: radius.pill,
+                border: 'none',
+                background: theme.error,
+                color: theme['text-inverse'],
+                fontSize: typography.sizes.sm.fontSize,
+                fontWeight: 600,
+                fontFamily: typography.fonts.sans.family,
+                cursor: 'pointer',
+              }}
+            >
+              Delete
+            </button>
+          </>
+        }
+      >
+        {editingRow ? (
+          <>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: spacing[3] }}>
                 <label
                   style={{
                     display: 'grid',
@@ -964,47 +962,9 @@ export default function SRAPage() {
                   </label>
                 ))}
               </div>
-
-              <div style={{ display: 'flex', justifyContent: 'center', gap: spacing[4], marginTop: spacing[4] }}>
-                <button
-                  type="button"
-                  onClick={() => setEditingRow(null)}
-                  style={{
-                    padding: `${spacing[2]} ${spacing[4]}`,
-                    border: 'none',
-                    borderRadius: radius.sm,
-                    background: theme['btn-primary-bg'],
-                    color: theme['btn-primary-text'],
-                    fontSize: typography.sizes.sm.fontSize,
-                    fontFamily: typography.fonts.sans.family,
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                  }}
-                >
-                  Save
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setEditingRow(null)}
-                  style={{
-                    padding: `${spacing[2]} ${spacing[4]}`,
-                    border: 'none',
-                    borderRadius: radius.sm,
-                    background: theme.error,
-                    color: theme['text-inverse'],
-                    fontSize: typography.sizes.sm.fontSize,
-                    fontFamily: typography.fonts.sans.family,
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                  }}
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      ) : null}
+          </>
+        ) : null}
+      </AppModal>
     </div>
   );
 }

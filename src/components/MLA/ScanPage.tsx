@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import { X } from 'lucide-react';
 import {
   colors,
   spacing,
@@ -7,6 +8,7 @@ import {
   tableTokens,
   buttonTokens,
 } from '../../styles/theme';
+import AppModal from '../ui/AppModal';
 
 const theme = colors.light;
 
@@ -26,9 +28,16 @@ export default function ScanPage() {
   const [showDeclaration, setShowDeclaration] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [selectedFileName, setSelectedFileName] = useState('No file chosen');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const hasFile = selectedFileName !== 'No file chosen';
+
+  const clearSelectedFile = () => {
+    if (fileInputRef.current) fileInputRef.current.value = '';
+    setSelectedFileName('No file chosen');
+  };
 
   const handleUpload = () => {
-    if (!declarationChecked) return;
+    if (!declarationChecked || !hasFile) return;
     setUploadProgress(0);
     const interval = setInterval(() => {
       setUploadProgress((p) => {
@@ -124,6 +133,7 @@ export default function ScanPage() {
               }}
             >
               <input
+                ref={fileInputRef}
                 type="file"
                 accept=".zip"
                 id="scan-upload"
@@ -149,9 +159,44 @@ export default function ScanPage() {
               >
                 Choose file
               </label>
-              <span style={{ fontSize: typography.sizes.sm.fontSize, color: theme['text-muted'] }}>
+              <span
+                style={{
+                  fontSize: typography.sizes.sm.fontSize,
+                  color: theme['text-muted'],
+                  flex: 1,
+                  minWidth: 0,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+                title={hasFile ? selectedFileName : undefined}
+              >
                 {selectedFileName}
               </span>
+              {hasFile ? (
+                <button
+                  type="button"
+                  onClick={clearSelectedFile}
+                  aria-label="Remove selected file"
+                  title="Remove file"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                    width: 32,
+                    height: 32,
+                    padding: 0,
+                    border: `1px solid ${theme.border}`,
+                    borderRadius: radius.sm,
+                    background: theme['bg-surface'],
+                    color: theme['text-secondary'],
+                    cursor: 'pointer',
+                  }}
+                >
+                  <X size={16} strokeWidth={2.25} />
+                </button>
+              ) : null}
             </div>
             <p
               style={{
@@ -167,7 +212,7 @@ export default function ScanPage() {
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: spacing[2],
+                gap: 0,
                 marginBottom: spacing[4],
                 fontSize: typography.sizes.sm.fontSize,
                 fontFamily: typography.fonts.sans.family,
@@ -179,40 +224,55 @@ export default function ScanPage() {
                 type="checkbox"
                 checked={declarationChecked}
                 onChange={(e) => setDeclarationChecked(e.target.checked)}
+                style={{ marginRight: spacing[2] }}
               />
-              I have read the{' '}
-              <button
-                type="button"
-                onClick={() => setShowDeclaration(true)}
+              <span
                 style={{
-                  border: 'none',
-                  background: 'transparent',
-                  color: theme.error,
-                  fontSize: typography.sizes.sm.fontSize,
-                  fontFamily: typography.fonts.sans.family,
-                  textDecoration: 'underline',
-                  cursor: 'pointer',
-                  padding: 0,
+                  display: 'inline-flex',
+                  flexWrap: 'wrap',
+                  alignItems: 'center',
+                  columnGap: 0,
+                  minWidth: 0,
                 }}
               >
-                Declaration
-              </button>
+                <span style={{ whiteSpace: 'pre' }}>I have read the </span>
+                <button
+                  type="button"
+                  onClick={() => setShowDeclaration(true)}
+                  style={{
+                    border: 'none',
+                    background: 'transparent',
+                    color: theme.error,
+                    fontSize: typography.sizes.sm.fontSize,
+                    fontFamily: typography.fonts.sans.family,
+                    textDecoration: 'underline',
+                    cursor: 'pointer',
+                    padding: 0,
+                    margin: 0,
+                    verticalAlign: 'baseline',
+                  }}
+                >
+                  Declaration
+                </button>
+              </span>
             </label>
             <button
               type="button"
               onClick={handleUpload}
-              disabled={!declarationChecked}
+              disabled={!declarationChecked || !hasFile}
               style={{
                 minHeight: buttonTokens.height.md,
                 padding: `${spacing[2]} ${spacing[5]}`,
-                background: declarationChecked ? theme['btn-primary-bg'] : theme['btn-disabled-bg'],
-                color: declarationChecked ? theme['btn-primary-text'] : theme['btn-disabled-text'],
+                background:
+                  declarationChecked && hasFile ? theme['btn-primary-bg'] : theme['btn-disabled-bg'],
+                color:
+                  declarationChecked && hasFile ? theme['btn-primary-text'] : theme['btn-disabled-text'],
                 border: 'none',
                 borderRadius: radius.sm,
                 fontSize: typography.sizes.sm.fontSize,
                 fontFamily: typography.fonts.sans.family,
                 fontWeight: 600,
-                cursor: declarationChecked ? 'pointer' : 'not-allowed',
+                cursor: declarationChecked && hasFile ? 'pointer' : 'not-allowed',
               }}
             >
               Upload
@@ -311,96 +371,38 @@ export default function ScanPage() {
         </div>
       </div>
 
-      {showDeclaration ? (
-        <div
+      <AppModal
+        open={showDeclaration}
+        onClose={() => setShowDeclaration(false)}
+        titleId="scan-declaration-title"
+        ariaLabel="Declaration"
+        title="Declaration"
+        subtitle="Please read and confirm you understand the following."
+        maxWidthPx={980}
+        maxHeight="85vh"
+      >
+        <ol
           style={{
-            position: 'fixed',
-            inset: 0,
-            background: 'rgba(0, 0, 0, 0.45)',
-            zIndex: 1000,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: spacing[5],
+            margin: 0,
+            padding: `0 0 0 ${spacing[6]}`,
+            display: 'grid',
+            gap: spacing[3],
+            color: theme['text-primary'],
+            fontFamily: typography.fonts.sans.family,
+            fontSize: typography.sizes.base.fontSize,
+            lineHeight: 1.5,
           }}
-          onClick={() => setShowDeclaration(false)}
         >
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-label="Declaration"
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              width: 'min(980px, 100%)',
-              maxHeight: '85vh',
-              overflowY: 'auto',
-              background: theme['bg-surface'],
-              borderRadius: radius.md,
-              border: `1px solid ${theme.border}`,
-              boxShadow: '0 12px 30px rgba(0, 0, 0, 0.18)',
-            }}
-          >
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: spacing[4],
-                borderBottom: `1px solid ${theme.border}`,
-              }}
-            >
-              <h3
-                style={{
-                  margin: 0,
-                  fontSize: typography.sizes.xl.fontSize,
-                  fontFamily: typography.fonts.heading.family,
-                  fontWeight: typography.fonts.heading.fontWeight,
-                  color: theme['text-primary'],
-                }}
-              >
-                Declaration
-              </h3>
-              <button
-                type="button"
-                onClick={() => setShowDeclaration(false)}
-                style={{
-                  border: 'none',
-                  background: 'transparent',
-                  color: theme['text-muted'],
-                  fontSize: typography.sizes.xl.fontSize,
-                  lineHeight: 1,
-                  cursor: 'pointer',
-                }}
-                aria-label="Close declaration"
-              >
-                ×
-              </button>
-            </div>
-
-            <ol
-              style={{
-                margin: 0,
-                padding: `${spacing[5]} ${spacing[6]} ${spacing[6]} ${spacing[8]}`,
-                display: 'grid',
-                gap: spacing[3],
-                color: theme['text-primary'],
-                fontFamily: typography.fonts.sans.family,
-                fontSize: typography.sizes.base.fontSize,
-                lineHeight: 1.5,
-              }}
-            >
-              <li>I have explained to the Client / Parent about the process of Fingerprint scanning and the scope of Genetic Brain Profiling Reports.</li>
-              <li>I have taken the due consent form signed and will retain it as long as it is needed.</li>
-              <li>I have inspected the finger prints carefully and found it meeting the guidelines.</li>
-              <li>I am aware that CW processing is available between 8 AM to 6 PM only.</li>
-              <li>Bulk scans if any will be uploaded after getting due consent from the Head Office.</li>
-              <li>I am aware that the fingerprints can be deleted from the webserver by me once the report is generated/counseled.</li>
-              <li>I take the full responsibility of housekeeping of my scans and archiving of reports.</li>
-              <li>I will comply with the guidelines for service delivery expected by MiDNA Global.</li>
-            </ol>
-          </div>
-        </div>
-      ) : null}
+          <li>I have explained to the Client / Parent about the process of Fingerprint scanning and the scope of Genetic Brain Profiling Reports.</li>
+          <li>I have taken the due consent form signed and will retain it as long as it is needed.</li>
+          <li>I have inspected the finger prints carefully and found it meeting the guidelines.</li>
+          <li>I am aware that CW processing is available between 8 AM to 6 PM only.</li>
+          <li>Bulk scans if any will be uploaded after getting due consent from the Head Office.</li>
+          <li>I am aware that the fingerprints can be deleted from the webserver by me once the report is generated/counseled.</li>
+          <li>I take the full responsibility of housekeeping of my scans and archiving of reports.</li>
+          <li>I will comply with the guidelines for service delivery expected by MiDNA Global.</li>
+        </ol>
+      </AppModal>
     </div>
   );
 }

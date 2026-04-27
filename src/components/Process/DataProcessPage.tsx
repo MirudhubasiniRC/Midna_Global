@@ -55,6 +55,7 @@ const sampleRecords: FingerprintRecord[] = [
 export default function DataProcessPage() {
   const [search, setSearch] = useState('');
   const [records, setRecords] = useState(sampleRecords);
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -71,6 +72,15 @@ export default function DataProcessPage() {
     setRecords((prev) =>
       prev.map((row) => (row.id === id ? { ...row, flagged: true } : row))
     );
+  };
+  const allSelected = filtered.length > 0 && filtered.every((row) => selectedIds.includes(row.id));
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedIds(filtered.map((row) => row.id));
+      return;
+    }
+    setSelectedIds([]);
   };
 
   return (
@@ -102,7 +112,7 @@ export default function DataProcessPage() {
               color: theme['text-primary'],
             }}
           >
-            Fingerprint Data Storage
+            Fin. Data download
           </h1>
           <label
             style={{
@@ -145,8 +155,22 @@ export default function DataProcessPage() {
               color: theme['text-primary'],
             }}
           >
-            Stored Fingerprint Reports
+            Data Download
           </h2>
+          <div style={{ display: 'flex', alignItems: 'center', gap: spacing[4] }}>
+            <label style={{ fontSize: typography.sizes.sm.fontSize }}>
+              <input
+                type="checkbox"
+                checked={allSelected}
+                onChange={(e) => handleSelectAll(e.target.checked)}
+                style={{ marginRight: spacing[1] }}
+              />
+              Select all
+            </label>
+            <span style={{ fontSize: typography.sizes.sm.fontSize, color: theme['text-secondary'] }}>
+              Custom selection enabled
+            </span>
+          </div>
         </div>
 
         <style>{`
@@ -163,6 +187,7 @@ export default function DataProcessPage() {
           >
             <thead>
               <tr>
+                <th style={{ ...thStyle, textAlign: 'center', minWidth: 60 }}>Select</th>
                 <th style={{ ...thStyle, textAlign: 'center', minWidth: 60 }}>Sno</th>
                 <th style={{ ...thStyle, textAlign: 'left', minWidth: 90 }}>Scan Id</th>
                 <th style={{ ...thStyle, textAlign: 'left', minWidth: 180 }}>Name</th>
@@ -176,7 +201,7 @@ export default function DataProcessPage() {
               {filtered.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={7}
+                    colSpan={8}
                     style={{
                       padding: spacing[8],
                       textAlign: 'center',
@@ -192,6 +217,17 @@ export default function DataProcessPage() {
               ) : (
                 filtered.map((row, index) => (
                   <tr key={row.id} style={{ height: 40 }}>
+                    <td style={{ ...tdStyle, textAlign: 'center' }}>
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.includes(row.id)}
+                        onChange={(e) => {
+                          setSelectedIds((prev) =>
+                            e.target.checked ? [...prev, row.id] : prev.filter((id) => id !== row.id)
+                          );
+                        }}
+                      />
+                    </td>
                     <td style={{ ...tdStyle, textAlign: 'center' }}>{index + 1}</td>
                     <td style={tdStyle}>
                       <span

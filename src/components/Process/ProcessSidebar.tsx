@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { LucideIcon } from 'lucide-react';
 import {
   ChartColumn,
+  Columns3,
   FileSearch,
   Settings2,
   Upload,
@@ -24,8 +25,9 @@ const processMenuItems: {
   end?: boolean;
 }[] = [
   { label: 'Process', Icon: ChartColumn, path: '/process', end: true },
+  { label: 'Pre-process', Icon: Columns3, path: '/process/pre-process' },
   { label: 'Data Review', Icon: FileSearch, path: '/process/data-review' },
-  { label: 'Data Process', Icon: Settings2, path: '/process/data-process' },
+  { label: 'Data Download', Icon: Settings2, path: '/process/data-process' },
   { label: 'Upload Report', Icon: Upload, path: '/process/upload-report' },
 ];
 

@@ -6,9 +6,7 @@ import {
   ChartColumn,
   BookMarked,
   FolderCode,
-  BookOpenCheck,
   BookUser,
-  UserStar,
   User,
   ShieldCheck,
   Laptop,
@@ -29,14 +27,14 @@ const ICON_SIZE = 18;
 const navItems = [
   { label: 'My Home', Icon: House, path: '/home' },
   { label: 'MLA', Icon: Users, path: '/mla' },
-  { label: 'Process', Icon: ChartColumn, path: '/process' },
-  { label: 'Resources', Icon: BookMarked, path: '/resources' },
-  { label: 'Softwares', Icon: FolderCode, path: '/softwares' },
-  { label: 'Live Coach', Icon: BookOpenCheck, path: '/home' },
   { label: 'Mentor', Icon: BookUser, path: '/mentor' },
+  { label: 'Process', Icon: ChartColumn, path: '/process' },
   { label: 'Admin', Icon: ShieldCheck, path: '/admin' },
   { label: 'Master', Icon: Laptop, path: '/master' },
-  { label: 'Expert', Icon: UserStar, path: '/home' },
+  { label: 'Resources', Icon: BookMarked, path: '/resources' },
+  { label: 'Softwares', Icon: FolderCode, path: '/softwares' },
+  // { label: 'Live Coach', Icon: BookOpenCheck, path: '/home' },
+  // { label: 'Expert', Icon: UserStar, path: '/home' },
 ];
 
 /** Only one nav item should read as “active” per route (many links still point to /home as placeholders). */
@@ -85,7 +83,7 @@ export default function TopBar() {
   const statusWrapRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    if (!showNotifications) return;
+    if (!showNotifications && !showProfileCard) return;
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
@@ -240,20 +238,11 @@ export default function TopBar() {
           }}
           ref={statusWrapRef}
         >
-          <div
-            onMouseEnter={() => {
-              setShowProfileCard(true);
-              setShowProfileActions(false);
-              setShowNotifications(false);
-            }}
-            onMouseLeave={() => {
-              if (!showProfileActions) setShowProfileCard(false);
-            }}
-            style={{ position: 'relative' }}
-          >
+          <div style={{ position: 'relative' }}>
             <button
               type="button"
               aria-label="Open profile details"
+              aria-expanded={showProfileCard}
               onClick={() => {
                 setShowProfileCard(true);
                 setShowProfileActions((prev) => !prev);
