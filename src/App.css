@@ -1,1 +1,109 @@
-/* App shell styles — add page layout CSS here when you build Midna pages */
+.app-frame {
+  min-height: 100vh;
+  padding: var(--layout-framePadding, 20px);
+  background: var(--color-bg-frame, #ffffff);
+  color: var(--color-text-primary, #1a1d21);
+  font-family: var(--font-sans-family, 'DM Sans', system-ui, sans-serif);
+  box-sizing: border-box;
+}
+
+/* White page holds three separate enclosed grey panels */
+.app-shell {
+  display: flex;
+  align-items: stretch;
+  gap: var(--layout-shellGap, 16px);
+  min-height: calc(100vh - (var(--layout-framePadding, 20px) * 2));
+  background: transparent;
+  box-sizing: border-box;
+}
+
+.panel {
+  background: var(--color-bg-canvas, #f0f1f3);
+  border: var(--layout-panelBorder, 1px solid #e4e6ea);
+  border-radius: var(--layout-panelRadius, 24px);
+  box-sizing: border-box;
+}
+
+.app-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--layout-shellGap, 16px);
+  background: transparent;
+}
+
+.app-content {
+  flex: 1;
+  padding: var(--layout-contentPadding, 20px) var(--layout-contentPaddingX, 20px);
+  overflow: auto;
+  min-height: 0;
+}
+
+.dash-card {
+  background: var(--color-bg-surface, #fff);
+  border: 1px solid var(--color-border, #e8eaed);
+  border-radius: var(--radius-lg, 20px);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-5, 20px);
+}
+
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  border: 1px solid var(--color-border, #e8eaed);
+  background: var(--color-bg-surface, #fff);
+  color: var(--color-text-secondary, #5b6470);
+  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+}
+
+.btn-icon:hover {
+  border-color: var(--color-primary, #ca317a);
+  color: var(--color-primary, #ca317a);
+  background: var(--color-primary-soft, #f9e8f0);
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.home-lower {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.9fr);
+  gap: 16px;
+  margin-top: 16px;
+}
+
+@media (max-width: 1100px) {
+  .kpi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .home-lower {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .app-frame {
+    padding: 10px;
+  }
+
+  .app-shell {
+    flex-direction: column;
+  }
+
+  .kpi-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .app-content {
+    padding: 14px;
+  }
+}

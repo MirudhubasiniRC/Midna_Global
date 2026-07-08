@@ -11,7 +11,7 @@
   line-height: 1.5;
   font-weight: 400;
   color: var(--color-text-primary, #1a1d21);
-  background-color: var(--color-bg-base, #f5f6f8);
+  background-color: var(--color-bg-frame, #ffffff);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -29,7 +29,7 @@ body,
 body {
   display: block;
   min-width: 320px;
-  background-color: var(--color-bg-base, #f5f6f8);
+  background-color: var(--color-bg-frame, #ffffff);
 }
 
 a {

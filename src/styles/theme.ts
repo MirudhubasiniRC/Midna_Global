@@ -3,6 +3,11 @@
  * Visual reference: Donezo-style modern dashboard shell
  * Brand primary: #CA317A (replaces Donezo green)
  *
+ * Three-layer backgrounds (Donezo exact):
+ *   1. bg-frame   — full outer white page
+ *   2. bg-canvas  — grey fill for the three enclosed panels (sidebar, top bar, main)
+ *   3. bg-surface — white component cards inside main
+ *
  * Use these tokens when building pages — colors, radius, shadow,
  * spacing, buttons, cards, sidebar, charts, and status chips.
  */
@@ -126,11 +131,26 @@ export const shadow = {
 
 // ─── Layout reference (Donezo shell) ──────────────────────────────────────────
 
+/**
+ * Donezo page shell:
+ * 1. Outer page — full white (`bg-frame`)
+ * 2. Three enclosed grey panels — sidebar | top bar | main content (`bg-canvas` + rounded border)
+ * 3. White component cards inside main content (`bg-surface`)
+ */
 export const layoutTokens = {
+  /** White outer page inset */
+  framePadding: spacing[5],
+  /** Gap between the three enclosed panels */
+  shellGap: spacing[4],
+  /** Shared rounding for the three grey panels */
+  panelRadius: '24px',
+  /** Soft border around each grey panel */
+  panelBorder: '1px solid #E4E6EA',
   sidebarWidth: '240px',
+  sidebarCollapsedWidth: '80px',
   topBarHeight: '72px',
   contentPadding: spacing[5],
-  contentPaddingX: spacing[6],
+  contentPaddingX: spacing[5],
   gridGap: spacing[4],
 } as const;
 
@@ -143,9 +163,9 @@ export const cardTokens = {
   shadow: 'card' as const,
 } as const;
 
-/** Sidebar active item: tinted bg + left brand bar + solid icon chip */
+/** Sidebar = enclosed grey panel on white page */
 export const sidebarTokens = {
-  background: 'bg-sidebar' as const,
+  background: 'bg-canvas' as const,
   itemRadius: radius.md,
   activeBackground: 'primary-soft' as const,
   activeBarWidth: '3px',
@@ -182,12 +202,21 @@ export const patternTokens = {
 
 export const colors = {
   light: {
-    // Page shell
-    'bg-base': '#F5F6F8',
+    /**
+     * Three-layer Donezo backgrounds:
+     * bg-frame   → full outer white page
+     * bg-canvas  → grey fill for enclosed sidebar / top bar / main panels
+     * bg-surface → white component cards (KPIs, notice, lists, etc.)
+     */
+    'bg-frame': '#FFFFFF',
+    'bg-canvas': '#F0F1F3',
+    'bg-base': '#F0F1F3',
     'bg-surface': '#FFFFFF',
-    'bg-muted': '#EEF0F3',
+    'bg-muted': '#E8EAED',
     'bg-hover': brandScale.soft,
-    'bg-sidebar': '#F7F8FA',
+    'bg-sidebar': '#F0F1F3',
+    'bg-topbar': '#F0F1F3',
+    'bg-main': '#F0F1F3',
 
     // Text
     'text-primary': '#1A1D21',
