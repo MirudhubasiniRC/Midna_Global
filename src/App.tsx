@@ -3,14 +3,17 @@ import './App.css';
 import { getThemeCssVars } from './styles/theme';
 import { Sidebar } from './components/Layout/Sidebar';
 import { TopBar } from './components/Layout/TopBar';
+import { MobileNavDrawer } from './components/Layout/MobileNavDrawer';
 import { DashboardKpis } from './components/Home/DashboardKpis';
 import { NoticeBoard } from './components/Home/NoticeBoard';
 import { TopPerformers } from './components/Home/TopPerformers';
 
-const MOBILE_QUERY = '(max-width: 720px)';
+/** Covers iPhone 14 Pro Max (430px) and similar phones / small tablets */
+const MOBILE_QUERY = '(max-width: 860px)';
 
 function App() {
   const [collapsed, setCollapsed] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(() =>
     typeof window !== 'undefined' ? window.matchMedia(MOBILE_QUERY).matches : false
   );
@@ -27,28 +30,37 @@ function App() {
     const onChange = () => {
       const mobile = media.matches;
       setIsMobile(mobile);
-      if (mobile) setCollapsed(true);
+      if (!mobile) setMobileMenuOpen(false);
     };
     onChange();
     media.addEventListener('change', onChange);
     return () => media.removeEventListener('change', onChange);
   }, []);
 
-  const handleToggle = () => {
-    // On mobile, keep a compact icon dock — expand only briefly if needed later
-    if (isMobile) {
-      setCollapsed(true);
-      return;
-    }
-    setCollapsed((v) => !v);
-  };
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMobileMenuOpen(false);
+    };
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', onKey);
+    return () => {
+      document.body.style.overflow = '';
+      window.removeEventListener('keydown', onKey);
+    };
+  }, [mobileMenuOpen]);
 
   return (
     <div className={`app-frame ${isMobile ? 'is-mobile' : ''}`}>
       <div className="app-shell">
-        <Sidebar collapsed={isMobile ? true : collapsed} onToggle={handleToggle} />
+        {!isMobile && (
+          <Sidebar collapsed={collapsed} onToggle={() => setCollapsed((v) => !v)} />
+        )}
         <div className="app-main">
-          <TopBar />
+          <TopBar
+            showMenuButton={isMobile}
+            onMenuClick={() => setMobileMenuOpen(true)}
+          />
           <main className="app-content panel">
             <DashboardKpis />
             <div className="home-lower">
@@ -58,6 +70,10 @@ function App() {
           </main>
         </div>
       </div>
+
+      {isMobile && (
+        <MobileNavDrawer open={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
+      )}
     </div>
   );
 }

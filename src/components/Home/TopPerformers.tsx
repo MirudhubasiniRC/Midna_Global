@@ -1,4 +1,4 @@
-import { brandScale, colors, radius, spacing } from '../../styles/theme';
+import { colors, radius, spacing } from '../../styles/theme';
 
 const theme = colors.light;
 
@@ -7,15 +7,52 @@ type Performer = {
   name: string;
   metric: string;
   detail: string;
-  initials: string;
+  avatar: string;
+  pastel: string;
 };
 
+/** Soft pastel wells behind memoji-style faces (Donezo look) */
 const performers: Performer[] = [
-  { rank: 1, name: 'Ananya Rao', metric: '48 scans', detail: 'Nest · South', initials: 'AR' },
-  { rank: 2, name: 'Rahul Mehta', metric: '41 scans', detail: 'Nest · West', initials: 'RM' },
-  { rank: 3, name: 'Priya Shah', metric: '37 scans', detail: 'Nest · North', initials: 'PS' },
-  { rank: 4, name: 'Vikram Iyer', metric: '33 scans', detail: 'Nest · East', initials: 'VI' },
-  { rank: 5, name: 'Sneha Patel', metric: '29 scans', detail: 'Nest · Central', initials: 'SP' },
+  {
+    rank: 1,
+    name: 'Ananya Rao',
+    metric: '48 scans',
+    detail: 'Nest · South',
+    avatar: 'https://api.dicebear.com/9.x/avataaars/svg?seed=Ananya&backgroundColor=transparent',
+    pastel: '#F8D7E8',
+  },
+  {
+    rank: 2,
+    name: 'Rahul Mehta',
+    metric: '41 scans',
+    detail: 'Nest · West',
+    avatar: 'https://api.dicebear.com/9.x/avataaars/svg?seed=Rahul&backgroundColor=transparent',
+    pastel: '#D8F0E2',
+  },
+  {
+    rank: 3,
+    name: 'Priya Shah',
+    metric: '37 scans',
+    detail: 'Nest · North',
+    avatar: 'https://api.dicebear.com/9.x/avataaars/svg?seed=Priya&backgroundColor=transparent',
+    pastel: '#DDE4F8',
+  },
+  {
+    rank: 4,
+    name: 'Vikram Iyer',
+    metric: '33 scans',
+    detail: 'Nest · East',
+    avatar: 'https://api.dicebear.com/9.x/avataaars/svg?seed=Vikram&backgroundColor=transparent',
+    pastel: '#F3EBDD',
+  },
+  {
+    rank: 5,
+    name: 'Sneha Patel',
+    metric: '29 scans',
+    detail: 'Nest · Central',
+    avatar: 'https://api.dicebear.com/9.x/avataaars/svg?seed=Sneha&backgroundColor=transparent',
+    pastel: '#E8D9F0',
+  },
 ];
 
 export function TopPerformers() {
@@ -79,22 +116,28 @@ export function TopPerformers() {
             </span>
             <div
               style={{
-                width: 40,
-                height: 40,
+                width: 44,
+                height: 44,
                 borderRadius: '50%',
-                background:
-                  person.rank === 1
-                    ? `linear-gradient(135deg, ${brandScale.base}, ${brandScale.dark})`
-                    : `linear-gradient(135deg, ${brandScale.light}, ${brandScale.mid})`,
-                color: '#fff',
+                background: person.pastel,
                 display: 'grid',
                 placeItems: 'center',
-                fontSize: 12,
-                fontWeight: 700,
                 flexShrink: 0,
+                overflow: 'hidden',
               }}
             >
-              {person.initials}
+              <img
+                src={person.avatar}
+                alt={person.name}
+                width={40}
+                height={40}
+                style={{
+                  width: 40,
+                  height: 40,
+                  objectFit: 'cover',
+                  display: 'block',
+                }}
+              />
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: 14, fontWeight: 600, color: theme['text-primary'] }}>{person.name}</div>

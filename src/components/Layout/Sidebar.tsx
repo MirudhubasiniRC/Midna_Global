@@ -1,34 +1,33 @@
 import { LuLayoutDashboard } from 'react-icons/lu';
 import {
-  brandScale,
   colors,
   layoutTokens,
-  shadow,
   sidebarTokens,
   spacing,
+  typography,
 } from '../../styles/theme';
 
 const theme = colors.light;
+
+export const navItems = [
+  {
+    id: 'dashboard',
+    label: 'Dashboard',
+    Icon: LuLayoutDashboard,
+  },
+] as const;
 
 type SidebarProps = {
   collapsed: boolean;
   onToggle: () => void;
 };
 
-const navItems = [
-  {
-    id: 'dashboard',
-    label: 'Dashboard',
-    Icon: LuLayoutDashboard,
-  },
-];
-
 export function Sidebar({ collapsed, onToggle }: SidebarProps) {
   const width = collapsed ? layoutTokens.sidebarCollapsedWidth : layoutTokens.sidebarWidth;
 
   return (
     <aside
-      className={`panel sidebar ${collapsed ? 'sidebar--collapsed' : 'sidebar--expanded'}`}
+      className={`panel sidebar sidebar-desktop ${collapsed ? 'sidebar--collapsed' : 'sidebar--expanded'}`}
       style={{
         width,
         flexShrink: 0,
@@ -43,54 +42,43 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
       <div
         className="sidebar-brand"
         style={{
+          position: 'relative',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: collapsed ? 'center' : 'space-between',
-          gap: 10,
+          justifyContent: 'center',
           padding: collapsed ? 0 : `0 ${spacing[2]}`,
           marginBottom: spacing[8],
+          minHeight: 40,
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
-          <div
-            className="sidebar-logo"
-            style={{
-              width: 36,
-              height: 36,
-              borderRadius: '50%',
-              background: `linear-gradient(135deg, ${brandScale.base}, ${brandScale.dark})`,
-              display: 'grid',
-              placeItems: 'center',
-              color: '#fff',
-              fontWeight: 700,
-              fontSize: 16,
-              boxShadow: shadow.soft,
-              flexShrink: 0,
-            }}
-          >
-            M
-          </div>
-          {!collapsed && (
-            <span
-              className="sidebar-brand-name"
-              style={{
-                fontSize: 22,
-                fontWeight: 700,
-                letterSpacing: '-0.03em',
-                color: theme['text-primary'],
-              }}
-            >
-              Midna
-            </span>
-          )}
-        </div>
+        <span
+          className="sidebar-logo"
+          style={{
+            fontFamily: typography.fonts.heading.family,
+            fontSize: collapsed ? 14 : 20,
+            fontWeight: 700,
+            letterSpacing: '0.08em',
+            color: theme['text-primary'],
+            userSelect: 'none',
+          }}
+        >
+          {collapsed ? 'M' : 'MIDNA'}
+        </span>
         {!collapsed && (
           <button
             type="button"
             className="btn-icon sidebar-collapse-btn"
             aria-label="Collapse sidebar"
             onClick={onToggle}
-            style={{ width: 32, height: 32 }}
+            style={{
+              position: 'absolute',
+              right: 0,
+              top: '50%',
+              transform: 'translateY(-50%)',
+              width: 32,
+              height: 32,
+              flexShrink: 0,
+            }}
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M15 6 9 12l6 6" />

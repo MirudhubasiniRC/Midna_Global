@@ -1,23 +1,38 @@
-import { colors, layoutTokens, shadow, spacing } from '../../styles/theme';
+import { colors, layoutTokens, shadow, spacing, typography } from '../../styles/theme';
 
 const theme = colors.light;
 
-export function TopBar() {
+type TopBarProps = {
+  showMenuButton?: boolean;
+  onMenuClick?: () => void;
+};
+
+export function TopBar({ showMenuButton = false, onMenuClick }: TopBarProps) {
   return (
     <header
       className="panel topbar"
       style={{
         display: 'flex',
         alignItems: 'center',
-        gap: spacing[4],
+        gap: spacing[3],
         minHeight: layoutTokens.topBarHeight,
         padding: `0 ${spacing[5]}`,
-        position: 'sticky',
-        top: 0,
-        zIndex: 20,
         flexShrink: 0,
       }}
     >
+      {showMenuButton && (
+        <button
+          type="button"
+          className="btn-icon topbar-menu-btn"
+          aria-label="Open menu"
+          onClick={onMenuClick}
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M4 7h16M4 12h16M4 17h16" />
+          </svg>
+        </button>
+      )}
+
       <div className="topbar-search">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={theme['text-muted']} strokeWidth="1.8">
           <circle cx="11" cy="11" r="7" />
@@ -71,9 +86,34 @@ export function TopBar() {
           >
             U
           </div>
-          <div className="topbar-profile-text" style={{ lineHeight: 1.25 }}>
-            <div style={{ fontSize: 13, fontWeight: 600, color: theme['text-primary'] }}>User</div>
-            <div style={{ fontSize: 12, color: theme['text-muted'] }}>user@midna.com</div>
+          <div
+            className="topbar-profile-text"
+            style={{
+              lineHeight: 1.3,
+              fontFamily: typography.fonts.sans.family,
+            }}
+          >
+            <div
+              style={{
+                fontSize: typography.sizes.sm.fontSize,
+                lineHeight: '18px',
+                fontWeight: 600,
+                color: theme['text-primary'],
+                letterSpacing: typography.fonts.heading.letterSpacing,
+              }}
+            >
+              User
+            </div>
+            <div
+              style={{
+                fontSize: typography.sizes.xs.fontSize,
+                lineHeight: typography.sizes.xs.lineHeight,
+                fontWeight: 400,
+                color: theme['text-muted'],
+              }}
+            >
+              user@midna.com
+            </div>
           </div>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={theme['text-muted']} strokeWidth="2">
             <path d="m6 9 6 6 6-6" />

@@ -50,19 +50,20 @@ export const typography = {
   } as const,
 
   fonts: {
+    /** Donezo uses Inter — clean geometric sans across UI */
     sans: {
-      family: '"DM Sans", "Segoe UI", system-ui, sans-serif',
+      family: '"Inter", "Segoe UI", system-ui, sans-serif',
       letterSpacing: '0',
       fontWeight: 400,
     },
     heading: {
-      family: '"DM Sans", "Segoe UI", system-ui, sans-serif',
-      letterSpacing: '-0.02em',
-      fontWeight: 600,
+      family: '"Inter", "Segoe UI", system-ui, sans-serif',
+      letterSpacing: '-0.025em',
+      fontWeight: 700,
     },
     mono: { family: 'Menlo, Consolas, monospace', letterSpacing: '0', fontWeight: 500 },
     emphasis: {
-      family: '"DM Sans", "Segoe UI", system-ui, sans-serif',
+      family: '"Inter", "Segoe UI", system-ui, sans-serif',
       letterSpacing: '0',
       fontWeight: 500,
     },
@@ -146,8 +147,8 @@ export const layoutTokens = {
   panelRadius: '24px',
   /** Soft border around each grey panel */
   panelBorder: '1px solid #E4E6EA',
-  sidebarWidth: '240px',
-  sidebarCollapsedWidth: '80px',
+  sidebarWidth: '212px',
+  sidebarCollapsedWidth: '76px',
   topBarHeight: '72px',
   contentPadding: spacing[5],
   contentPaddingX: spacing[5],
@@ -212,14 +213,14 @@ export const colors = {
      * bg-surface → white component cards (KPIs, notice, lists, etc.)
      */
     'bg-frame': '#FFFFFF',
-    'bg-canvas': '#F0F1F3',
-    'bg-base': '#F0F1F3',
+    'bg-canvas': '#F7F7F7',
+    'bg-base': '#F7F7F7',
     'bg-surface': '#FFFFFF',
-    'bg-muted': '#E8EAED',
+    'bg-muted': '#EEEEEE',
     'bg-hover': brandScale.soft,
-    'bg-sidebar': '#F0F1F3',
-    'bg-topbar': '#F0F1F3',
-    'bg-main': '#F0F1F3',
+    'bg-sidebar': '#F7F7F7',
+    'bg-topbar': '#F7F7F7',
+    'bg-main': '#F7F7F7',
 
     // Text
     'text-primary': '#1A1D21',

@@ -3,7 +3,7 @@
   padding: var(--layout-framePadding, 20px);
   background: var(--color-bg-frame, #ffffff);
   color: var(--color-text-primary, #1a1d21);
-  font-family: var(--font-sans-family, 'DM Sans', system-ui, sans-serif);
+  font-family: var(--font-sans-family, 'Inter', system-ui, sans-serif);
   box-sizing: border-box;
 }
 
@@ -13,12 +13,13 @@
   align-items: stretch;
   gap: var(--layout-shellGap, 16px);
   min-height: calc(100vh - (var(--layout-framePadding, 20px) * 2));
+  max-height: calc(100vh - (var(--layout-framePadding, 20px) * 2));
   background: transparent;
   box-sizing: border-box;
 }
 
 .panel {
-  background: var(--color-bg-canvas, #f0f1f3);
+  background: var(--color-bg-canvas, #f7f7f7);
   border: var(--layout-panelBorder, 1px solid #e4e6ea);
   border-radius: var(--layout-panelRadius, 24px);
   box-sizing: border-box;
@@ -39,16 +40,20 @@
 .app-main {
   flex: 1;
   min-width: 0;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   gap: var(--layout-shellGap, 16px);
   background: transparent;
+  overflow: auto;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
 }
 
 .app-content {
-  flex: 1;
+  flex: 0 0 auto;
   padding: var(--layout-contentPadding, 20px) var(--layout-contentPaddingX, 20px);
-  overflow: auto;
+  overflow: visible;
   min-height: 0;
 }
 
@@ -123,7 +128,7 @@
 .topbar-search kbd {
   font-size: 11px;
   color: var(--color-text-muted, #8b949e);
-  background: var(--color-bg-canvas, #f0f1f3);
+  background: var(--color-bg-canvas, #f7f7f7);
   border: 1px solid var(--color-border, #e8eaed);
   border-radius: 6px;
   padding: 2px 6px;
@@ -162,8 +167,8 @@
   }
 }
 
-/* Mobile: compact icon dock sidebar (not full-height) */
-@media (max-width: 720px) {
+/* Mobile / iPhone 14 Pro Max: hide desktop sidebar; menu opens from top bar */
+@media (max-width: 860px) {
   .app-frame {
     padding: 10px;
   }
@@ -173,32 +178,16 @@
     align-items: stretch;
     gap: 12px;
     min-height: auto;
+    max-height: none;
   }
 
-  .sidebar {
-    width: 72px !important;
-    align-self: flex-start !important;
-    padding: 12px 10px !important;
-    height: auto !important;
+  .sidebar-desktop {
+    display: none !important;
   }
 
-  .sidebar-brand {
-    margin-bottom: 10px !important;
-    justify-content: center !important;
-  }
-
-  .sidebar-expand-btn {
-    margin: 0 auto 10px !important;
-    width: 36px !important;
-    height: 36px !important;
-  }
-
-  .sidebar-nav {
-    flex: 0 0 auto !important;
-  }
-
-  .sidebar-nav-item {
-    padding: 8px !important;
+  .app-main {
+    overflow: visible;
+    max-height: none;
   }
 
   .topbar {
@@ -207,8 +196,13 @@
     flex-wrap: wrap;
   }
 
+  .topbar-menu-btn {
+    order: 0;
+    flex-shrink: 0;
+  }
+
   .topbar-search {
-    order: 2;
+    order: 3;
     flex: 1 1 100%;
     max-width: none;
     height: 40px;
@@ -239,5 +233,65 @@
 
   .app-content {
     padding: 14px;
+  }
+
+  .mobile-nav {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    pointer-events: none;
+  }
+
+  .mobile-nav.is-open {
+    pointer-events: auto;
+  }
+
+  .mobile-nav-backdrop {
+    position: absolute;
+    inset: 0;
+    border: none;
+    padding: 0;
+    margin: 0;
+    background: rgba(15, 23, 42, 0.4);
+    opacity: 0;
+    transition: opacity 0.22s ease;
+    cursor: pointer;
+  }
+
+  .mobile-nav.is-open .mobile-nav-backdrop {
+    opacity: 1;
+  }
+
+  .mobile-nav-panel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: min(300px, 86vw);
+    padding: 18px 16px 24px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 0 24px 24px 0;
+    transform: translateX(-105%);
+    transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+    box-shadow: 8px 0 32px rgba(15, 23, 42, 0.12);
+  }
+
+  .mobile-nav.is-open .mobile-nav-panel {
+    transform: translateX(0);
+  }
+
+  .mobile-nav-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+}
+
+@media (min-width: 861px) {
+  .mobile-nav {
+    display: none;
   }
 }
