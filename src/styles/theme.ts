@@ -1,9 +1,20 @@
 /**
- * Midna Global Design System
- * Typography, spacing, colors, and component tokens
+ * Midna Global Design System — Donezo-style shell with #CA317A brand
  */
 
-export type ThemeMode = 'light' | 'dark';
+export type ThemeMode = 'light';
+
+// ─── Brand scale (magenta) ────────────────────────────────────────────────────
+
+export const brandScale = {
+  dark: '#8B2154',
+  base: '#CA317A',
+  hover: '#A82866',
+  mid: '#E06A9E',
+  light: '#F0A8C8',
+  soft: '#F9E8F0',
+  muted: '#F3D0E0',
+} as const;
 
 // ─── Typography ───────────────────────────────────────────────────────────────
 
@@ -21,10 +32,22 @@ export const typography = {
   } as const,
 
   fonts: {
-    sans: { family: 'Inter, system-ui, sans-serif', letterSpacing: '0', fontWeight: 400 },
-    heading: { family: 'Inter, system-ui, sans-serif', letterSpacing: '-0.01em', fontWeight: 600 },
+    sans: {
+      family: '"DM Sans", "Segoe UI", system-ui, sans-serif',
+      letterSpacing: '0',
+      fontWeight: 400,
+    },
+    heading: {
+      family: '"DM Sans", "Segoe UI", system-ui, sans-serif',
+      letterSpacing: '-0.02em',
+      fontWeight: 600,
+    },
     mono: { family: 'Menlo, Consolas, monospace', letterSpacing: '0', fontWeight: 500 },
-    emphasis: { family: 'Inter', letterSpacing: '0', fontWeight: 500 },
+    emphasis: {
+      family: '"DM Sans", "Segoe UI", system-ui, sans-serif',
+      letterSpacing: '0',
+      fontWeight: 500,
+    },
   } as const,
 };
 
@@ -43,9 +66,11 @@ export const spacing = {
 } as const;
 
 export const radius = {
-  sm: '6px',
-  md: '10px',
-  lg: '14px',
+  sm: '8px',
+  md: '14px',
+  lg: '20px',
+  xl: '24px',
+  pill: '9999px',
 } as const;
 
 export const buttonTokens = {
@@ -74,43 +99,51 @@ export const tableTokens = {
   rowHeight: '48px',
 } as const;
 
-// ─── Colors (Light & Dark) ────────────────────────────────────────────────────
+export const shadow = {
+  card: '0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px rgba(15, 23, 42, 0.04)',
+  soft: '0 4px 14px rgba(202, 49, 122, 0.18)',
+  primary: '0 6px 18px rgba(202, 49, 122, 0.28)',
+} as const;
+
+// ─── Colors (Light) ───────────────────────────────────────────────────────────
 
 export const colors = {
   light: {
-    // Background
-    'bg-base': '#F8FAFC',
+    'bg-base': '#F5F6F8',
     'bg-surface': '#FFFFFF',
-    'bg-muted': '#F1F5F9',
-    'bg-hover': '#EEF2FF',
+    'bg-muted': '#EEF0F3',
+    'bg-hover': brandScale.soft,
+    'bg-sidebar': '#F7F8FA',
 
-    // Text
-    'text-primary': '#0F172A',
-    'text-secondary': '#475569',
-    'text-muted': '#64748B',
+    'text-primary': '#1A1D21',
+    'text-secondary': '#5B6470',
+    'text-muted': '#8B949E',
     'text-inverse': '#FFFFFF',
 
-    // Brand
-    primary: '#312E81',
-    'primary-hover': '#4338CA',
-    accent: '#0D9488',
-    'accent-soft': '#CCFBF1',
+    primary: brandScale.base,
+    'primary-hover': brandScale.hover,
+    'primary-soft': brandScale.soft,
+    'primary-muted': brandScale.muted,
+    'primary-mid': brandScale.mid,
+    'primary-dark': brandScale.dark,
+    'primary-light': brandScale.light,
 
-    // Buttons
-    'btn-primary-bg': '#312E81',
+    accent: brandScale.base,
+    'accent-soft': brandScale.soft,
+
+    'btn-primary-bg': brandScale.base,
     'btn-primary-text': '#FFFFFF',
-    'btn-primary-hover': '#4338CA',
-    'btn-secondary-bg': '#E0E7FF',
-    'btn-secondary-text': '#312E81',
+    'btn-primary-hover': brandScale.hover,
+    'btn-secondary-bg': '#FFFFFF',
+    'btn-secondary-text': brandScale.base,
+    'btn-secondary-border': brandScale.base,
     'btn-disabled-bg': '#E2E8F0',
     'btn-disabled-text': '#94A3B8',
 
-    // Tables
-    'table-header-bg': '#EEF2FF',
-    'table-row-hover': '#F9FAFB',
-    'table-border': '#E2E8F0',
+    'table-header-bg': brandScale.soft,
+    'table-row-hover': 'rgba(202, 49, 122, 0.04)',
+    'table-border': '#E5E7EB',
 
-    // Status
     success: '#16A34A',
     'success-bg': '#DCFCE7',
     error: '#DC2626',
@@ -120,79 +153,28 @@ export const colors = {
     info: '#0EA5E9',
     'info-bg': '#E0F2FE',
 
-    // Security
-    'secure-badge-bg': '#E0E7FF',
-    'secure-badge-text': '#312E81',
-    'focus-ring': '#6366F1',
+    'status-completed-bg': brandScale.soft,
+    'status-completed-text': brandScale.dark,
+    'status-progress-bg': '#FEF3C7',
+    'status-progress-text': '#92400E',
+    'status-pending-bg': '#FEE2E2',
+    'status-pending-text': '#991B1B',
 
-    // Borders
-    border: '#E5E7EB',
-    divider: '#E2E8F0',
-  } as const,
+    'secure-badge-bg': brandScale.soft,
+    'secure-badge-text': brandScale.dark,
+    'focus-ring': brandScale.base,
 
-  dark: {
-    // Background
-    'bg-base': '#0B1220',
-    'bg-surface': '#111827',
-    'bg-muted': '#1F2937',
-    'bg-hover': '#1E293B',
-
-    // Text
-    'text-primary': '#F8FAFC',
-    'text-secondary': '#CBD5E1',
-    'text-muted': '#94A3B8',
-    'text-inverse': '#0F172A',
-
-    // Brand
-    primary: '#6366F1',
-    'primary-hover': '#818CF8',
-    accent: '#14B8A6',
-    'accent-soft': '#134E4A',
-
-    // Buttons
-    'btn-primary-bg': '#6366F1',
-    'btn-primary-text': '#0B1220',
-    'btn-primary-hover': '#818CF8',
-    'btn-secondary-bg': '#1E293B',
-    'btn-secondary-text': '#E0E7FF',
-    'btn-disabled-bg': '#334155',
-    'btn-disabled-text': '#64748B',
-
-    // Tables
-    'table-header-bg': '#1E293B',
-    'table-row-hover': '#1F2937',
-    'table-border': '#334155',
-
-    // Status
-    success: '#22C55E',
-    'success-bg': '#14532D',
-    error: '#EF4444',
-    'error-bg': '#7F1D1D',
-    warning: '#F59E0B',
-    'warning-bg': '#78350F',
-    info: '#38BDF8',
-    'info-bg': '#0C4A6E',
-
-    // Security
-    'secure-badge-bg': '#312E81',
-    'secure-badge-text': '#E0E7FF',
-    'focus-ring': '#818CF8',
-
-    // Borders
-    border: '#334155',
-    divider: '#1F2937',
+    border: '#E8EAED',
+    divider: '#EEF0F3',
   } as const,
 };
 
-// ─── Theme Helper ─────────────────────────────────────────────────────────────
-
-export const getTheme = (mode: ThemeMode) => colors[mode];
+export const getTheme = (mode: ThemeMode = 'light') => colors[mode];
 
 /**
  * Generate CSS custom properties for the given theme mode.
- * Usage: Apply the returned object to document.documentElement.style or use in a styled component.
  */
-export const getThemeCssVars = (mode: ThemeMode): Record<string, string> => {
+export const getThemeCssVars = (mode: ThemeMode = 'light'): Record<string, string> => {
   const theme = colors[mode];
   const vars: Record<string, string> = {};
 
@@ -204,6 +186,12 @@ export const getThemeCssVars = (mode: ThemeMode): Record<string, string> => {
   }
   for (const [key, value] of Object.entries(radius)) {
     vars[`--radius-${key}`] = value;
+  }
+  for (const [key, value] of Object.entries(shadow)) {
+    vars[`--shadow-${key}`] = value;
+  }
+  for (const [key, value] of Object.entries(brandScale)) {
+    vars[`--brand-${key}`] = value;
   }
   for (const [key, value] of Object.entries(buttonTokens.height)) {
     vars[`--btn-height-${key}`] = value;
@@ -217,7 +205,6 @@ export const getThemeCssVars = (mode: ThemeMode): Record<string, string> => {
   vars['--input-padding'] = inputTokens.padding;
   vars['--table-row-height'] = tableTokens.rowHeight;
 
-  // Typography
   for (const [key, val] of Object.entries(typography.sizes)) {
     vars[`--text-${key}-font-size`] = val.fontSize;
     vars[`--text-${key}-line-height`] = val.lineHeight;
