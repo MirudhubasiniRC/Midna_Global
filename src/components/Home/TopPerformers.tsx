@@ -1,4 +1,4 @@
-import { colors, radius, spacing } from '../../styles/theme';
+import { colors, layoutTokens, radius, spacing } from '../../styles/theme';
 
 const theme = colors.light;
 
@@ -57,7 +57,7 @@ const performers: Performer[] = [
 
 export function TopPerformers() {
   return (
-    <section className="dash-card" style={{ display: 'flex', flexDirection: 'column', minHeight: 280 }}>
+    <section className="dash-card" style={{ display: 'flex', flexDirection: 'column', height: layoutTokens.homeLowerCardHeight }}>
       <div
         style={{
           display: 'flex',
@@ -86,7 +86,7 @@ export function TopPerformers() {
         </span>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 10, flex: 1 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10, flex: '1 1 auto', minHeight: 0 }}>
         {performers.map((person) => (
           <div
             key={person.rank}

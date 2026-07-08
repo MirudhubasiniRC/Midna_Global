@@ -42,31 +42,75 @@ export const typography = {
     xs: { fontSize: '12px', lineHeight: '18px', fontWeight: 400 },
     sm: { fontSize: '14px', lineHeight: '20px', fontWeight: 400 },
     base: { fontSize: '16px', lineHeight: '24px', fontWeight: 400 },
-    lg: { fontSize: '18px', lineHeight: '28px', fontWeight: 500 },
+    lg: { fontSize: '18px', lineHeight: '26px', fontWeight: 600 },
     xl: { fontSize: '20px', lineHeight: '28px', fontWeight: 600 },
-    '2xl': { fontSize: '24px', lineHeight: '32px', fontWeight: 600 },
-    '3xl': { fontSize: '30px', lineHeight: '38px', fontWeight: 700 },
+    '2xl': { fontSize: '24px', lineHeight: '32px', fontWeight: 700 },
+    '3xl': { fontSize: '32px', lineHeight: '40px', fontWeight: 700 },
     '4xl': { fontSize: '36px', lineHeight: '44px', fontWeight: 700 },
   } as const,
 
   fonts: {
-    /** Donezo uses Inter — clean geometric sans across UI */
+    /**
+     * SF Pro Display — Apple's system font. It can't be self-hosted or
+     * pulled from a CDN (Apple restricts distribution to Apple platforms),
+     * so `-apple-system` / `BlinkMacSystemFont` resolve to it natively on
+     * macOS & iOS Safari/Chrome. Inter is the closest metric fallback for
+     * everyone else (Windows, Android, Linux).
+     */
     sans: {
-      family: '"Inter", "Segoe UI", system-ui, sans-serif',
+      family: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", system-ui, sans-serif',
       letterSpacing: '0',
       fontWeight: 400,
     },
     heading: {
-      family: '"Inter", "Segoe UI", system-ui, sans-serif',
+      family: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", system-ui, sans-serif',
       letterSpacing: '-0.025em',
       fontWeight: 700,
     },
     mono: { family: 'Menlo, Consolas, monospace', letterSpacing: '0', fontWeight: 500 },
     emphasis: {
-      family: '"Inter", "Segoe UI", system-ui, sans-serif',
+      family: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", system-ui, sans-serif',
       letterSpacing: '0',
       fontWeight: 500,
     },
+  } as const,
+
+  /**
+   * Semantic text roles mapped 1:1 to the Donezo reference dashboard.
+   * Prefer these over raw `sizes` in components so copy stays visually
+   * consistent with the template (e.g. `typography.roles.pageTitle`).
+   */
+  roles: {
+    /** Sidebar wordmark — "Donezo" */
+    logo: { fontSize: '20px', lineHeight: '28px', fontWeight: 700, letterSpacing: '-0.02em' },
+    /** Page heading — "Dashboard" */
+    pageTitle: { fontSize: '32px', lineHeight: '40px', fontWeight: 700, letterSpacing: '-0.02em' },
+    /** Page description under the heading */
+    pageSubtitle: { fontSize: '14px', lineHeight: '20px', fontWeight: 400 },
+    /** Panel/card headers — "Project Analytics", "Reminders", "Team Collaboration" */
+    sectionTitle: { fontSize: '18px', lineHeight: '26px', fontWeight: 600, letterSpacing: '0' },
+    /** KPI card labels — "Total Projects", "Ended Projects" */
+    cardLabel: { fontSize: '14px', lineHeight: '20px', fontWeight: 500 },
+    /** Big KPI numerals — "24", "10", "12" */
+    kpiValue: { fontSize: '36px', lineHeight: '44px', fontWeight: 700, letterSpacing: '-0.02em' },
+    /** KPI footnote — "Increased from last month" */
+    kpiHint: { fontSize: '12px', lineHeight: '18px', fontWeight: 400 },
+    /** Sidebar nav group label — "MENU", "GENERAL" */
+    navGroupLabel: { fontSize: '11px', lineHeight: '16px', fontWeight: 600, letterSpacing: '0.06em' },
+    /** Sidebar nav link */
+    navItem: { fontSize: '14px', lineHeight: '20px', fontWeight: 500 },
+    /** Primary row text — names, task titles, list items */
+    body: { fontSize: '14px', lineHeight: '20px', fontWeight: 500 },
+    /** Secondary row text — "Working on...", due dates */
+    bodyMuted: { fontSize: '13px', lineHeight: '18px', fontWeight: 400 },
+    /** Top bar user name */
+    userName: { fontSize: '14px', lineHeight: '20px', fontWeight: 600 },
+    /** Top bar user email */
+    userMeta: { fontSize: '12px', lineHeight: '18px', fontWeight: 400 },
+    /** Button label */
+    button: { fontSize: '14px', lineHeight: '20px', fontWeight: 600 },
+    /** Large ring/gauge stat — "41%" */
+    statValue: { fontSize: '30px', lineHeight: '38px', fontWeight: 700, letterSpacing: '-0.02em' },
   } as const,
 };
 
@@ -150,14 +194,17 @@ export const layoutTokens = {
   sidebarWidth: '212px',
   sidebarCollapsedWidth: '76px',
   topBarHeight: '72px',
-  contentPadding: spacing[5],
-  contentPaddingX: spacing[5],
-  gridGap: spacing[4],
+  contentPadding: spacing[6],
+  contentPaddingX: spacing[6],
+  /** Gap between dashboard cards (KPI row, panel grid) */
+  gridGap: spacing[5],
+  /** Shared fixed height for the Notice board / Top performers row, so both cards line up and the taller one scrolls internally */
+  homeLowerCardHeight: '480px',
 } as const;
 
 /** White surface cards used across the dashboard grid */
 export const cardTokens = {
-  padding: spacing[5],
+  padding: spacing[6],
   radius: radius.lg,
   border: '1px solid',
   background: 'bg-surface' as const,
@@ -190,6 +237,34 @@ export const chartTokens = {
   muted: brandScale.muted,
   soft: brandScale.soft,
 } as const;
+
+/**
+ * Notice/severity accents — red / orange / yellow, desaturated enough to
+ * sit quietly on white surfaces rather than read as an alarm. Drives the
+ * Notice Board icon chip, headline color, and left accent per item.
+ */
+export const severityTokens = {
+  high: {
+    icon: '#DC2626',
+    text: '#B42318',
+    bg: '#FDF2F2',
+    border: '#F6D3D3',
+  },
+  medium: {
+    icon: '#EA580C',
+    text: '#B45309',
+    bg: '#FDF5EC',
+    border: '#F3DFC0',
+  },
+  low: {
+    icon: '#CA8A04',
+    text: '#946800',
+    bg: '#FDFBEA',
+    border: '#EFE4AC',
+  },
+} as const;
+
+export type SeverityLevel = keyof typeof severityTokens;
 
 /**
  * Patterned dark panels (promo card, time tracker):
@@ -313,6 +388,11 @@ export const getThemeCssVars = (mode: ThemeMode = 'light'): Record<string, strin
   for (const [key, value] of Object.entries(chartTokens)) {
     vars[`--chart-${key}`] = value;
   }
+  for (const [level, tokens] of Object.entries(severityTokens)) {
+    for (const [key, value] of Object.entries(tokens)) {
+      vars[`--severity-${level}-${key}`] = value;
+    }
+  }
   for (const [key, value] of Object.entries(buttonTokens.height)) {
     vars[`--btn-height-${key}`] = value;
   }
@@ -335,6 +415,12 @@ export const getThemeCssVars = (mode: ThemeMode = 'light'): Record<string, strin
     vars[`--font-${key}-family`] = val.family;
     vars[`--font-${key}-letter-spacing`] = val.letterSpacing;
     vars[`--font-${key}-weight`] = String(val.fontWeight);
+  }
+  for (const [key, val] of Object.entries(typography.roles)) {
+    vars[`--role-${key}-font-size`] = val.fontSize;
+    vars[`--role-${key}-line-height`] = val.lineHeight;
+    vars[`--role-${key}-font-weight`] = String(val.fontWeight);
+    vars[`--role-${key}-letter-spacing`] = 'letterSpacing' in val ? val.letterSpacing : '0';
   }
 
   return vars;
