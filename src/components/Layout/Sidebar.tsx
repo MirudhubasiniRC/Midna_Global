@@ -1,8 +1,8 @@
+import { LuLayoutDashboard } from 'react-icons/lu';
 import {
   brandScale,
   colors,
   layoutTokens,
-  radius,
   shadow,
   sidebarTokens,
   spacing,
@@ -19,14 +19,7 @@ const navItems = [
   {
     id: 'dashboard',
     label: 'Dashboard',
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-        <rect x="3" y="3" width="7" height="7" rx="1.5" />
-        <rect x="14" y="3" width="7" height="7" rx="1.5" />
-        <rect x="3" y="14" width="7" height="7" rx="1.5" />
-        <rect x="14" y="14" width="7" height="7" rx="1.5" />
-      </svg>
-    ),
+    Icon: LuLayoutDashboard,
   },
 ];
 
@@ -35,7 +28,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
 
   return (
     <aside
-      className="panel"
+      className={`panel sidebar ${collapsed ? 'sidebar--collapsed' : 'sidebar--expanded'}`}
       style={{
         width,
         flexShrink: 0,
@@ -44,9 +37,11 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
         padding: collapsed ? `${spacing[5]} ${spacing[2]}` : `${spacing[5]} ${spacing[4]}`,
         alignSelf: 'stretch',
         transition: 'width 0.2s ease, padding 0.2s ease',
+        overflow: 'visible',
       }}
     >
       <div
+        className="sidebar-brand"
         style={{
           display: 'flex',
           alignItems: 'center',
@@ -58,6 +53,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
           <div
+            className="sidebar-logo"
             style={{
               width: 36,
               height: 36,
@@ -76,6 +72,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
           </div>
           {!collapsed && (
             <span
+              className="sidebar-brand-name"
               style={{
                 fontSize: 22,
                 fontWeight: 700,
@@ -90,7 +87,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
         {!collapsed && (
           <button
             type="button"
-            className="btn-icon"
+            className="btn-icon sidebar-collapse-btn"
             aria-label="Collapse sidebar"
             onClick={onToggle}
             style={{ width: 32, height: 32 }}
@@ -105,7 +102,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
       {collapsed && (
         <button
           type="button"
-          className="btn-icon"
+          className="btn-icon sidebar-expand-btn"
           aria-label="Expand sidebar"
           onClick={onToggle}
           style={{ width: 40, height: 40, margin: `0 auto ${spacing[5]}` }}
@@ -118,6 +115,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
 
       {!collapsed && (
         <p
+          className="sidebar-menu-label"
           style={{
             fontSize: 11,
             fontWeight: 600,
@@ -132,59 +130,84 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
         </p>
       )}
 
-      <nav style={{ display: 'flex', flexDirection: 'column', gap: 4, flex: 1 }}>
-        {navItems.map((item) => (
-          <button
-            key={item.id}
-            type="button"
-            title={collapsed ? item.label : undefined}
-            style={{
-              position: 'relative',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: collapsed ? 'center' : 'flex-start',
-              gap: 12,
-              width: '100%',
-              padding: collapsed ? 10 : '10px 12px',
-              border: 'none',
-              borderRadius: sidebarTokens.itemRadius,
-              background: theme['primary-soft'],
-              color: theme.primary,
-              fontSize: 14,
-              fontWeight: 600,
-              textAlign: 'left',
-            }}
-          >
-            {!collapsed && (
-              <span
-                style={{
-                  position: 'absolute',
-                  left: 0,
-                  top: 8,
-                  bottom: 8,
-                  width: sidebarTokens.activeBarWidth,
-                  borderRadius: radius.pill,
-                  background: theme.primary,
-                }}
-              />
-            )}
-            <span
+      <nav
+        className="sidebar-nav"
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 4,
+          flex: 1,
+        }}
+      >
+        {navItems.map((item) => {
+          const active = item.id === 'dashboard';
+          const { Icon } = item;
+          return (
+            <button
+              key={item.id}
+              type="button"
+              className={`sidebar-nav-item${active ? ' is-active' : ''}`}
+              title={collapsed ? item.label : undefined}
               style={{
-                width: sidebarTokens.iconChipSize,
-                height: sidebarTokens.iconChipSize,
-                borderRadius: sidebarTokens.iconChipRadius,
-                display: 'grid',
-                placeItems: 'center',
-                background: theme.primary,
-                color: '#fff',
-                flexShrink: 0,
+                position: 'relative',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: collapsed ? 'center' : 'flex-start',
+                gap: 14,
+                width: '100%',
+                minHeight: 44,
+                padding: collapsed ? '12px 8px' : '12px 14px 12px 18px',
+                border: 'none',
+                borderRadius: sidebarTokens.itemRadius,
+                background: 'transparent',
+                color: active ? theme['text-primary'] : theme['text-muted'],
+                fontSize: 15,
+                fontWeight: active ? 700 : 500,
+                letterSpacing: '-0.01em',
+                textAlign: 'left',
+                cursor: 'pointer',
+                transition: 'color 0.15s ease',
+                overflow: 'visible',
               }}
             >
-              {item.icon}
-            </span>
-            {!collapsed && <span>{item.label}</span>}
-          </button>
-        ))}
+              {active && (
+                <span
+                  className="sidebar-active-bar"
+                  style={{
+                    position: 'absolute',
+                    left: 0,
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    width: 5,
+                    height: 28,
+                    borderRadius: '0 999px 999px 0',
+                    background: theme.primary,
+                  }}
+                />
+              )}
+              <span
+                className="sidebar-nav-icon"
+                style={{
+                  width: 22,
+                  height: 22,
+                  display: 'grid',
+                  placeItems: 'center',
+                  background: 'transparent',
+                  color: active ? theme.primary : theme['text-muted'],
+                  flexShrink: 0,
+                }}
+              >
+                <Icon
+                  size={20}
+                  fill={active ? 'currentColor' : 'none'}
+                  stroke="currentColor"
+                  strokeWidth={active ? 1.25 : 1.8}
+                />
+              </span>
+              {!collapsed && <span className="sidebar-nav-label">{item.label}</span>}
+            </button>
+          );
+        })}
       </nav>
     </aside>
   );

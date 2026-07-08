@@ -163,15 +163,18 @@ export const cardTokens = {
   shadow: 'card' as const,
 } as const;
 
-/** Sidebar = enclosed grey panel on white page */
+/**
+ * Sidebar = enclosed grey panel on white page.
+ * Active item (Donezo): left brand bar + brand icon + bold black label (no filled pill).
+ */
 export const sidebarTokens = {
   background: 'bg-canvas' as const,
   itemRadius: radius.md,
-  activeBackground: 'primary-soft' as const,
-  activeBarWidth: '3px',
+  activeBackground: 'transparent' as const,
+  activeBarWidth: '5px',
   activeBarColor: 'primary' as const,
-  iconChipSize: '32px',
-  iconChipRadius: '10px',
+  iconChipSize: '22px',
+  iconChipRadius: '0',
 } as const;
 
 /**

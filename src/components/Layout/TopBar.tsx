@@ -5,11 +5,10 @@ const theme = colors.light;
 export function TopBar() {
   return (
     <header
-      className="panel"
+      className="panel topbar"
       style={{
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'flex-end',
         gap: spacing[4],
         minHeight: layoutTokens.topBarHeight,
         padding: `0 ${spacing[5]}`,
@@ -19,7 +18,16 @@ export function TopBar() {
         flexShrink: 0,
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+      <div className="topbar-search">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={theme['text-muted']} strokeWidth="1.8">
+          <circle cx="11" cy="11" r="7" />
+          <path d="M20 20l-3-3" />
+        </svg>
+        <input type="search" placeholder="Search…" aria-label="Search" />
+        <kbd>⌘F</kbd>
+      </div>
+
+      <div className="topbar-actions" style={{ display: 'flex', alignItems: 'center', gap: 10, marginLeft: 'auto' }}>
         <button type="button" className="btn-icon" aria-label="Messages">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
             <path d="M4 6h16v12H4z" />
@@ -46,16 +54,7 @@ export function TopBar() {
           />
         </button>
 
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 10,
-            marginLeft: 6,
-            paddingLeft: 12,
-            borderLeft: `1px solid ${theme.border}`,
-          }}
-        >
+        <div className="topbar-profile">
           <div
             style={{
               width: 40,
@@ -67,11 +66,12 @@ export function TopBar() {
               placeItems: 'center',
               fontWeight: 700,
               fontSize: 14,
+              flexShrink: 0,
             }}
           >
             U
           </div>
-          <div style={{ lineHeight: 1.25 }}>
+          <div className="topbar-profile-text" style={{ lineHeight: 1.25 }}>
             <div style={{ fontSize: 13, fontWeight: 600, color: theme['text-primary'] }}>User</div>
             <div style={{ fontSize: 12, color: theme['text-muted'] }}>user@midna.com</div>
           </div>
