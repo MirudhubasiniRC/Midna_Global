@@ -1,43 +1,76 @@
-import { useEffect } from 'react';
-import './App.css';
-import { getThemeCssVars } from './styles/theme';
-import { Sidebar } from './components/Layout/Sidebar';
-import { TopBar } from './components/Layout/TopBar';
-import { DashboardKpis } from './components/Dashboard/DashboardKpis';
-import { ProjectAnalytics } from './components/Dashboard/ProjectAnalytics';
-import { Reminders } from './components/Dashboard/Reminders';
-import { ProjectList } from './components/Dashboard/ProjectList';
-import { TeamCollaboration } from './components/Dashboard/TeamCollaboration';
-import { ProjectProgress } from './components/Dashboard/ProjectProgress';
-import { TimeTracker } from './components/Dashboard/TimeTracker';
+import { useEffect } from 'react'
+import './App.css'
+import { colors, getThemeCssVars, radius, spacing, typography } from './styles/theme'
 
 function App() {
   useEffect(() => {
-    const vars = getThemeCssVars('light');
+    const vars = getThemeCssVars('light')
     Object.entries(vars).forEach(([key, value]) => {
-      document.documentElement.style.setProperty(key, value);
-    });
-  }, []);
+      document.documentElement.style.setProperty(key, value)
+    })
+  }, [])
+
+  const theme = colors.light
 
   return (
-    <div className="app-shell">
-      <Sidebar />
-      <div className="app-main">
-        <TopBar />
-        <main className="app-content">
-          <div className="dashboard-grid">
-            <DashboardKpis />
-            <ProjectAnalytics />
-            <Reminders />
-            <ProjectList />
-            <TeamCollaboration />
-            <ProjectProgress />
-            <TimeTracker />
-          </div>
-        </main>
+    <div
+      style={{
+        minHeight: '100vh',
+        display: 'grid',
+        placeItems: 'center',
+        padding: spacing[6],
+        background: theme['bg-base'],
+        color: theme['text-primary'],
+        fontFamily: typography.fonts.sans.family,
+      }}
+    >
+      <div
+        style={{
+          maxWidth: 420,
+          width: '100%',
+          padding: spacing[6],
+          borderRadius: radius.lg,
+          background: theme['bg-surface'],
+          border: `1px solid ${theme.border}`,
+          boxShadow: 'var(--shadow-card)',
+        }}
+      >
+        <p
+          style={{
+            margin: 0,
+            marginBottom: spacing[2],
+            fontSize: typography.sizes.sm.fontSize,
+            fontWeight: 600,
+            color: theme.primary,
+          }}
+        >
+          Midna design system
+        </p>
+        <h1
+          style={{
+            margin: 0,
+            marginBottom: spacing[3],
+            fontSize: typography.sizes['2xl'].fontSize,
+            fontFamily: typography.fonts.heading.family,
+            letterSpacing: typography.fonts.heading.letterSpacing,
+          }}
+        >
+          Donezo tokens ready
+        </h1>
+        <p
+          style={{
+            margin: 0,
+            color: theme['text-secondary'],
+            fontSize: typography.sizes.sm.fontSize,
+            lineHeight: typography.sizes.sm.lineHeight,
+          }}
+        >
+          Theme lives in <code>src/styles/theme.ts</code>. Build pages from those tokens —
+          primary is <strong>#CA317A</strong>.
+        </p>
       </div>
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
