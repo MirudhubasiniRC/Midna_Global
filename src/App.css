@@ -185,8 +185,11 @@
 }
 
 .sidebar-nav-item:hover:not(.is-active) {
-  background: var(--color-bg-muted, #f2f4f7);
   color: var(--color-text-primary, #1d2939);
+}
+
+.sidebar-nav-item:hover:not(.is-active) .sidebar-nav-icon {
+  color: var(--color-text-secondary, #667085);
 }
 
 /* Left accent bar + colored icon + bold label — no fill, reads as "selected" without a heavy block */
