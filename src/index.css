@@ -10,7 +10,7 @@
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', 'Segoe UI', system-ui, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-  color: var(--color-text-primary, #1a1d21);
+  color: var(--color-text-primary, #1d2939);
   background-color: var(--color-bg-frame, #ffffff);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -23,6 +23,7 @@ body,
 #root {
   margin: 0;
   min-height: 100vh;
+  min-height: 100dvh;
   width: 100%;
 }
 

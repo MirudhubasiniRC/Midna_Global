@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { colors, layoutTokens, radius, severityTokens, spacing, type SeverityLevel } from '../../styles/theme';
 
 const theme = colors.light;
@@ -10,6 +11,8 @@ type Notice = {
   author: string;
   datetime: string;
   initials: string;
+  /** Other people who've already acknowledged this notice */
+  seenCount: number;
 };
 
 const notices: Notice[] = [
@@ -21,6 +24,7 @@ const notices: Notice[] = [
     author: 'HR Team',
     datetime: 'Jan 14th, 2021 · 10:30 AM',
     initials: 'HR',
+    seenCount: 18,
   },
   {
     id: '2',
@@ -30,6 +34,7 @@ const notices: Notice[] = [
     author: 'Ops Team',
     datetime: 'Mar 2nd, 2026 · 09:15 AM',
     initials: 'OT',
+    seenCount: 6,
   },
   {
     id: '3',
@@ -39,6 +44,7 @@ const notices: Notice[] = [
     author: 'Accounts',
     datetime: 'Jul 1st, 2026 · 11:00 AM',
     initials: 'AC',
+    seenCount: 11,
   },
 ];
 
@@ -66,9 +72,15 @@ const severityIcon: Record<SeverityLevel, React.ReactNode> = {
 };
 
 export function NoticeBoard() {
+  const [acknowledged, setAcknowledged] = useState<Record<string, boolean>>({});
+
+  const toggleAcknowledged = (id: string) => {
+    setAcknowledged((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
+
   return (
     <section
-      className="dash-card"
+      className="dash-card notice-board-card notice-board-pulse"
       style={{
         display: 'flex',
         flexDirection: 'column',
@@ -80,11 +92,42 @@ export function NoticeBoard() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          marginBottom: spacing[4],
+          marginBottom: spacing[5],
           flexShrink: 0,
         }}
       >
-        <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, letterSpacing: '-0.02em' }}>Notice board</h2>
+        <h2
+          style={{
+            margin: 0,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            fontSize: 22,
+            fontWeight: 700,
+            letterSpacing: '-0.01em',
+            color: theme['text-primary'],
+          }}
+        >
+          <span
+            className="notice-board-blink"
+            style={{
+              width: 30,
+              height: 30,
+              borderRadius: '50%',
+              border: `2px solid ${theme.primary}`,
+              color: theme.primary,
+              display: 'grid',
+              placeItems: 'center',
+              flexShrink: 0,
+            }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="12" y1="7" x2="12" y2="13" />
+              <line x1="12" y1="17" x2="12.01" y2="17" />
+            </svg>
+          </span>
+          Notice board
+        </h2>
         <span style={{ fontSize: 12, color: theme['text-muted'] }}>
           {notices.length} notice{notices.length === 1 ? '' : 's'}
         </span>
@@ -118,9 +161,9 @@ export function NoticeBoard() {
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
                 <span
                   style={{
-                    width: 24,
-                    height: 24,
-                    borderRadius: '50%',
+                    width: 22,
+                    height: 22,
+                    borderRadius: radius.sm,
                     display: 'grid',
                     placeItems: 'center',
                     flexShrink: 0,
@@ -135,7 +178,7 @@ export function NoticeBoard() {
                   <h3
                     style={{
                       margin: 0,
-                      fontSize: 14,
+                      fontSize: 16,
                       fontWeight: 700,
                       color: tone.text,
                     }}
@@ -145,7 +188,7 @@ export function NoticeBoard() {
                   <p
                     style={{
                       margin: '6px 0 0',
-                      fontSize: 13,
+                      fontSize: 14,
                       lineHeight: 1.55,
                       color: theme['text-secondary'],
                     }}
@@ -156,8 +199,8 @@ export function NoticeBoard() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 12 }}>
                     <div
                       style={{
-                        width: 24,
-                        height: 24,
+                        width: 22,
+                        height: 22,
                         borderRadius: '50%',
                         background: theme['bg-surface'],
                         color: theme['text-secondary'],
@@ -172,6 +215,35 @@ export function NoticeBoard() {
                     </div>
                     <span style={{ fontSize: 12, fontWeight: 600, color: theme['text-primary'] }}>{notice.author}</span>
                     <span style={{ fontSize: 12, color: theme['text-muted'] }}>· {notice.datetime}</span>
+
+                    <button
+                      type="button"
+                      onClick={() => toggleAcknowledged(notice.id)}
+                      aria-pressed={!!acknowledged[notice.id]}
+                      className="notice-ack-btn"
+                      style={{
+                        marginLeft: 'auto',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 5,
+                        flexShrink: 0,
+                        padding: '4px 10px',
+                        borderRadius: radius.pill,
+                        border: acknowledged[notice.id] ? 'none' : `1px solid ${theme.border}`,
+                        background: acknowledged[notice.id] ? theme.success : theme['bg-surface'],
+                        color: acknowledged[notice.id] ? '#fff' : theme['text-secondary'],
+                        fontSize: 11,
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M20 6 9 17l-5-5" />
+                      </svg>
+                      {acknowledged[notice.id]
+                        ? `Read · ${notice.seenCount + 1}`
+                        : `Mark as read · ${notice.seenCount}`}
+                    </button>
                   </div>
                 </div>
               </div>

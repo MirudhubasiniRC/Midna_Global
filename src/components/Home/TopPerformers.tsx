@@ -63,14 +63,14 @@ export function TopPerformers() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          marginBottom: spacing[4],
+          marginBottom: spacing[5],
         }}
       >
         <div>
-          <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, letterSpacing: '-0.02em' }}>
+          <h2 style={{ margin: 0, fontSize: 22, fontWeight: 700, letterSpacing: '-0.01em', color: theme['text-primary'] }}>
             Top performer of 5
           </h2>
-          <p style={{ margin: '4px 0 0', fontSize: 12, color: theme['text-muted'] }}>Leading scanners this period</p>
+          <p style={{ margin: '4px 0 0', fontSize: 13, color: theme['text-muted'] }}>Leading scanners this period</p>
         </div>
         <span
           style={{
@@ -86,22 +86,13 @@ export function TopPerformers() {
         </span>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 10, flex: '1 1 auto', minHeight: 0 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 4, flex: '1 1 auto', minHeight: 0 }}>
         {performers.map((person) => (
-          <div
-            key={person.rank}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 12,
-              padding: '10px 8px',
-              borderRadius: radius.md,
-            }}
-          >
+          <div key={person.rank} className="performer-row">
             <span
               style={{
-                width: 24,
-                height: 24,
+                width: 22,
+                height: 22,
                 borderRadius: '50%',
                 display: 'grid',
                 placeItems: 'center',
@@ -140,22 +131,28 @@ export function TopPerformers() {
               />
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 14, fontWeight: 600, color: theme['text-primary'] }}>{person.name}</div>
-              <div style={{ fontSize: 12, color: theme['text-muted'] }}>{person.detail}</div>
+              <div style={{ fontSize: 15, fontWeight: 600, color: theme['text-primary'] }}>{person.name}</div>
+              <div style={{ fontSize: 12, color: theme['text-muted'], marginTop: 1 }}>{person.detail}</div>
             </div>
-            <div
-              style={{
-                fontSize: 12,
-                fontWeight: 700,
-                color: theme.primary,
-                background: theme['primary-soft'],
-                borderRadius: radius.pill,
-                padding: '4px 10px',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {person.metric}
-            </div>
+            {person.rank === 1 ? (
+              <div
+                style={{
+                  fontSize: 13,
+                  fontWeight: 700,
+                  color: theme.primary,
+                  background: theme['primary-soft'],
+                  borderRadius: radius.pill,
+                  padding: '4px 10px',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {person.metric}
+              </div>
+            ) : (
+              <div style={{ fontSize: 14, fontWeight: 700, color: theme['text-primary'], whiteSpace: 'nowrap' }}>
+                {person.metric}
+              </div>
+            )}
           </div>
         ))}
       </div>

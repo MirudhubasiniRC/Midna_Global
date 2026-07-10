@@ -84,17 +84,23 @@ export const typography = {
     /** Sidebar wordmark — "Donezo" */
     logo: { fontSize: '20px', lineHeight: '28px', fontWeight: 700, letterSpacing: '-0.02em' },
     /** Page heading — "Dashboard" */
-    pageTitle: { fontSize: '32px', lineHeight: '40px', fontWeight: 700, letterSpacing: '-0.02em' },
+    pageTitle: { fontSize: '36px', lineHeight: '44px', fontWeight: 700, letterSpacing: '-0.02em' },
     /** Page description under the heading */
     pageSubtitle: { fontSize: '14px', lineHeight: '20px', fontWeight: 400 },
-    /** Panel/card headers — "Project Analytics", "Reminders", "Team Collaboration" */
-    sectionTitle: { fontSize: '18px', lineHeight: '26px', fontWeight: 600, letterSpacing: '0' },
+    /** Panel/card headers — "Notice board", "Top performer of 5" */
+    sectionTitle: { fontSize: '22px', lineHeight: '30px', fontWeight: 700, letterSpacing: '-0.01em' },
+    /** Nested card/row titles — notice headline, performer name */
+    cardTitle: { fontSize: '16px', lineHeight: '24px', fontWeight: 600, letterSpacing: '0' },
+    /** Body copy — notice text, descriptions */
+    description: { fontSize: '14px', lineHeight: '20px', fontWeight: 400 },
     /** KPI card labels — "Total Projects", "Ended Projects" */
-    cardLabel: { fontSize: '14px', lineHeight: '20px', fontWeight: 500 },
+    cardLabel: { fontSize: '13px', lineHeight: '18px', fontWeight: 500 },
     /** Big KPI numerals — "24", "10", "12" */
-    kpiValue: { fontSize: '36px', lineHeight: '44px', fontWeight: 700, letterSpacing: '-0.02em' },
+    kpiValue: { fontSize: '32px', lineHeight: '38px', fontWeight: 700, letterSpacing: '-0.02em' },
     /** KPI footnote — "Increased from last month" */
     kpiHint: { fontSize: '12px', lineHeight: '18px', fontWeight: 400 },
+    /** Generic helper/meta text — dates, counts, fine print */
+    helperText: { fontSize: '12px', lineHeight: '18px', fontWeight: 400 },
     /** Sidebar nav group label — "MENU", "GENERAL" */
     navGroupLabel: { fontSize: '11px', lineHeight: '16px', fontWeight: 600, letterSpacing: '0.06em' },
     /** Sidebar nav link */
@@ -128,12 +134,12 @@ export const spacing = {
   12: '48px',
 } as const;
 
-/** Donezo-soft rounding — prefer md/lg/xl on cards and controls */
+/** Premium-SaaS rounding — lg is the standard card radius (12-14px) */
 export const radius = {
   sm: '8px',
-  md: '14px',
-  lg: '20px',
-  xl: '24px',
+  md: '12px',
+  lg: '14px',
+  xl: '20px',
   pill: '9999px',
 } as const;
 
@@ -166,12 +172,14 @@ export const tableTokens = {
 } as const;
 
 export const shadow = {
-  /** Default white card elevation */
-  card: '0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px rgba(15, 23, 42, 0.04)',
+  /** Default white card elevation — soft, low-contrast, premium-SaaS */
+  card: '0 6px 18px rgba(16, 24, 40, 0.05)',
+  /** Slightly raised — hover states on cards */
+  cardHover: '0 10px 24px rgba(16, 24, 40, 0.08)',
   /** Soft brand glow (icons, small accents) */
-  soft: '0 4px 14px rgba(202, 49, 122, 0.18)',
-  /** Primary CTA / hero KPI glow */
-  primary: '0 6px 18px rgba(202, 49, 122, 0.28)',
+  soft: '0 4px 14px rgba(202, 49, 122, 0.14)',
+  /** Primary CTA glow — used sparingly */
+  primary: '0 4px 14px rgba(202, 49, 122, 0.20)',
 } as const;
 
 // ─── Layout reference (Donezo shell) ──────────────────────────────────────────
@@ -183,21 +191,20 @@ export const shadow = {
  * 3. White component cards inside main content (`bg-surface`)
  */
 export const layoutTokens = {
-  /** White outer page inset */
-  framePadding: spacing[5],
-  /** Gap between the three enclosed panels */
-  shellGap: spacing[4],
-  /** Shared rounding for the three grey panels */
-  panelRadius: '24px',
-  /** Soft border around each grey panel */
-  panelBorder: '1px solid #E4E6EA',
+  /** App bleeds to the viewport edge — no outer inset */
+  framePadding: '0px',
+  /** Sidebar/topbar sit flush against the content — no gap between them */
+  shellGap: '0px',
+  /** Shared rounding for the three panels */
+  panelRadius: '20px',
+  /** Soft border around each panel */
+  panelBorder: '1px solid #EAECF0',
   sidebarWidth: '212px',
   sidebarCollapsedWidth: '76px',
-  topBarHeight: '72px',
   contentPadding: spacing[6],
   contentPaddingX: spacing[6],
-  /** Gap between dashboard cards (KPI row, panel grid) */
-  gridGap: spacing[5],
+  /** Gap between dashboard cards (KPI row, panel grid) — generous, premium whitespace */
+  gridGap: spacing[6],
   /** Shared fixed height for the Notice board / Top performers row, so both cards line up and the taller one scrolls internally */
   homeLowerCardHeight: '480px',
 } as const;
@@ -244,23 +251,26 @@ export const chartTokens = {
  * Notice Board icon chip, headline color, and left accent per item.
  */
 export const severityTokens = {
+  /** Red — urgent */
   high: {
-    icon: '#DC2626',
-    text: '#B42318',
-    bg: '#FDF2F2',
-    border: '#F6D3D3',
+    icon: '#DE6B6B',
+    text: '#A93E3E',
+    bg: '#FBEEEE',
+    border: '#F0D6D6',
   },
+  /** Orangy-yellow — caution */
   medium: {
-    icon: '#EA580C',
-    text: '#B45309',
-    bg: '#FDF5EC',
-    border: '#F3DFC0',
+    icon: '#DDA43C',
+    text: '#8A5D14',
+    bg: '#FBF4E5',
+    border: '#EFDDB9',
   },
+  /** Green — informational */
   low: {
-    icon: '#CA8A04',
-    text: '#946800',
-    bg: '#FDFBEA',
-    border: '#EFE4AC',
+    icon: '#57A67D',
+    text: '#336B4F',
+    bg: '#EEF6F1',
+    border: '#D5E9DD',
   },
 } as const;
 
@@ -282,25 +292,22 @@ export const patternTokens = {
 export const colors = {
   light: {
     /**
-     * Three-layer Donezo backgrounds:
-     * bg-frame   → full outer white page
-     * bg-canvas  → grey fill for enclosed sidebar / top bar / main panels
-     * bg-surface → white component cards (KPIs, notice, lists, etc.)
+     * Flat neutral page (Linear/Stripe/Notion style):
+     * bg-frame / bg-canvas → same neutral #F8F9FC, so the sidebar/topbar/main
+     *                        panels read as one continuous surface, not boxes
+     * bg-surface           → white component cards (KPIs, notice, lists, etc.)
+     * Structure/hierarchy comes from the white cards + shadow, not panel fills.
      */
-    'bg-frame': '#FFFFFF',
-    'bg-canvas': '#F7F7F7',
-    'bg-base': '#F7F7F7',
+    'bg-frame': '#F8F9FC',
+    'bg-canvas': '#F8F9FC',
     'bg-surface': '#FFFFFF',
-    'bg-muted': '#EEEEEE',
-    'bg-hover': brandScale.soft,
-    'bg-sidebar': '#F7F7F7',
-    'bg-topbar': '#F7F7F7',
-    'bg-main': '#F7F7F7',
+    'bg-muted': '#F2F4F7',
+    'bg-hover': '#F2F4F7',
 
     // Text
-    'text-primary': '#1A1D21',
-    'text-secondary': '#5B6470',
-    'text-muted': '#8B949E',
+    'text-primary': '#1D2939',
+    'text-secondary': '#667085',
+    'text-muted': '#98A2B3',
     'text-inverse': '#FFFFFF',
 
     // Brand
@@ -326,9 +333,9 @@ export const colors = {
     'btn-disabled-text': '#94A3B8',
 
     // Tables
-    'table-header-bg': brandScale.soft,
-    'table-row-hover': 'rgba(202, 49, 122, 0.04)',
-    'table-border': '#E5E7EB',
+    'table-header-bg': '#F8F9FC',
+    'table-row-hover': '#F8F9FC',
+    'table-border': '#EAECF0',
 
     // Semantic (keep — not brand green)
     success: '#16A34A',
@@ -352,10 +359,24 @@ export const colors = {
     'secure-badge-text': brandScale.dark,
     'focus-ring': brandScale.base,
 
-    border: '#E8EAED',
-    divider: '#EEF0F3',
+    border: '#EAECF0',
+    divider: '#EAECF0',
   } as const,
 };
+
+/**
+ * Supporting metric colors — used sparingly on KPI icon chips / trend
+ * badges, never as a full card fill. One hue per metric, not a rainbow.
+ */
+export const metricColors = {
+  blue: { icon: '#2E90FA', text: '#175CD3', bg: '#EFF8FF' },
+  green: { icon: '#12B76A', text: '#027A48', bg: '#ECFDF3' },
+  amber: { icon: '#F79009', text: '#B54708', bg: '#FFFAEB' },
+  purple: { icon: '#9E77ED', text: '#6941C6', bg: '#F9F5FF' },
+  pink: { icon: brandScale.base, text: brandScale.dark, bg: brandScale.soft },
+} as const;
+
+export type MetricColor = keyof typeof metricColors;
 
 export const getTheme = (mode: ThemeMode = 'light') => colors[mode];
 
@@ -387,6 +408,11 @@ export const getThemeCssVars = (mode: ThemeMode = 'light'): Record<string, strin
   }
   for (const [key, value] of Object.entries(chartTokens)) {
     vars[`--chart-${key}`] = value;
+  }
+  for (const [name, tones] of Object.entries(metricColors)) {
+    for (const [key, value] of Object.entries(tones)) {
+      vars[`--metric-${name}-${key}`] = value;
+    }
   }
   for (const [level, tokens] of Object.entries(severityTokens)) {
     for (const [key, value] of Object.entries(tokens)) {

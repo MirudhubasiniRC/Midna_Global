@@ -1,29 +1,25 @@
-import { LuLayoutDashboard } from 'react-icons/lu';
 import {
   colors,
   layoutTokens,
   sidebarTokens,
   spacing,
-  typography,
 } from '../../styles/theme';
+import { navItems, type AppView } from './navItems';
+import logo from '../../assets/high-resolution-color-logo.png';
 
 const theme = colors.light;
-
-export const navItems = [
-  {
-    id: 'dashboard',
-    label: 'Dashboard',
-    Icon: LuLayoutDashboard,
-  },
-] as const;
 
 type SidebarProps = {
   collapsed: boolean;
   onToggle: () => void;
+  activeView: AppView;
+  onNavigate: (view: AppView) => void;
+  onLogout?: () => void;
 };
 
-export function Sidebar({ collapsed, onToggle }: SidebarProps) {
+export function Sidebar({ collapsed, onToggle, activeView, onNavigate, onLogout }: SidebarProps) {
   const width = collapsed ? layoutTokens.sidebarCollapsedWidth : layoutTokens.sidebarWidth;
+  const profileActive = activeView === 'profile';
 
   return (
     <aside
@@ -42,28 +38,40 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
       <div
         className="sidebar-brand"
         style={{
-          position: 'relative',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
+          gap: spacing[2],
           padding: collapsed ? 0 : `0 ${spacing[2]}`,
-          marginBottom: spacing[8],
+          marginBottom: spacing[6],
           minHeight: 40,
         }}
       >
-        <span
-          className="sidebar-logo"
+        <div
           style={{
-            fontFamily: typography.fonts.heading.family,
-            fontSize: collapsed ? 14 : 20,
-            fontWeight: 700,
-            letterSpacing: '0.08em',
-            color: theme['text-primary'],
-            userSelect: 'none',
+            height: 36,
+            width: collapsed ? 36 : 88,
+            overflow: 'hidden',
+            display: 'flex',
+            alignItems: 'center',
+            flexShrink: 0,
           }}
         >
-          {collapsed ? 'M' : 'MIDNA'}
-        </span>
+          <img
+            src={logo}
+            alt="Midna"
+            className="sidebar-logo"
+            style={{
+              height: 36,
+              width: 88,
+              maxWidth: 88,
+              objectFit: 'cover',
+              objectPosition: 'center',
+              flexShrink: 0,
+              userSelect: 'none',
+            }}
+          />
+        </div>
         {!collapsed && (
           <button
             type="button"
@@ -71,13 +79,9 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
             aria-label="Collapse sidebar"
             onClick={onToggle}
             style={{
-              position: 'absolute',
-              right: 0,
-              top: '50%',
-              transform: 'translateY(-50%)',
+              flexShrink: 0,
               width: 32,
               height: 32,
-              flexShrink: 0,
             }}
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -128,12 +132,13 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
         }}
       >
         {navItems.map((item) => {
-          const active = item.id === 'dashboard';
+          const active = item.id === activeView;
           const { Icon } = item;
           return (
             <button
               key={item.id}
               type="button"
+              onClick={() => onNavigate(item.id)}
               className={`sidebar-nav-item${active ? ' is-active' : ''}`}
               title={collapsed ? item.label : undefined}
               style={{
@@ -143,36 +148,19 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
                 justifyContent: collapsed ? 'center' : 'flex-start',
                 gap: 14,
                 width: '100%',
-                minHeight: 44,
-                padding: collapsed ? '12px 8px' : '12px 14px 12px 18px',
+                minHeight: 40,
+                padding: collapsed ? '10px 8px' : '10px 14px',
                 border: 'none',
                 borderRadius: sidebarTokens.itemRadius,
-                background: 'transparent',
-                color: active ? theme['text-primary'] : theme['text-muted'],
-                fontSize: 15,
-                fontWeight: active ? 700 : 500,
+                color: active ? theme['text-primary'] : theme['text-secondary'],
+                fontSize: 14,
+                fontWeight: active ? 600 : 500,
                 letterSpacing: '-0.01em',
                 textAlign: 'left',
                 cursor: 'pointer',
-                transition: 'color 0.15s ease',
                 overflow: 'visible',
               }}
             >
-              {active && (
-                <span
-                  className="sidebar-active-bar"
-                  style={{
-                    position: 'absolute',
-                    left: 0,
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    width: 5,
-                    height: 28,
-                    borderRadius: '0 999px 999px 0',
-                    background: theme.primary,
-                  }}
-                />
-              )}
               <span
                 className="sidebar-nav-icon"
                 style={{
@@ -197,6 +185,114 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
           );
         })}
       </nav>
+
+      <div
+        style={{
+          borderTop: `1px solid ${theme.divider}`,
+          paddingTop: spacing[3],
+          marginTop: spacing[3],
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 4,
+        }}
+      >
+        <button
+          type="button"
+          onClick={() => onNavigate('profile')}
+          className={`sidebar-profile-item${profileActive ? ' is-active' : ''}`}
+          title={collapsed ? 'My Profile' : undefined}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: collapsed ? 'center' : 'flex-start',
+            gap: 10,
+            width: '100%',
+            padding: collapsed ? '8px' : '10px 12px',
+            borderRadius: sidebarTokens.itemRadius,
+            textAlign: 'left',
+            cursor: 'pointer',
+          }}
+        >
+          <span
+            style={{
+              width: 34,
+              height: 34,
+              borderRadius: '50%',
+              background: `linear-gradient(135deg, ${theme.primary}, ${theme['primary-dark']})`,
+              color: '#fff',
+              display: 'grid',
+              placeItems: 'center',
+              fontWeight: 700,
+              fontSize: 14,
+              flexShrink: 0,
+            }}
+          >
+            U
+          </span>
+          {!collapsed && (
+            <span style={{ lineHeight: 1.35, minWidth: 0 }}>
+              <span
+                style={{
+                  display: 'block',
+                  fontSize: 15,
+                  fontWeight: 700,
+                  color: theme['text-primary'],
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+              >
+                User
+              </span>
+              <span
+                style={{
+                  display: 'block',
+                  fontSize: 13,
+                  color: theme['text-secondary'],
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+              >
+                user@midna.com
+              </span>
+            </span>
+          )}
+        </button>
+
+        <button
+          type="button"
+          onClick={onLogout}
+          className="sidebar-logout-item"
+          title={collapsed ? 'Log out' : undefined}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: collapsed ? 'center' : 'flex-start',
+            gap: 14,
+            width: '100%',
+            padding: collapsed ? '10px 8px' : '10px 14px',
+            border: 'none',
+            borderRadius: sidebarTokens.itemRadius,
+            background: 'transparent',
+            color: theme['text-secondary'],
+            fontSize: 14,
+            fontWeight: 500,
+            letterSpacing: '-0.01em',
+            textAlign: 'left',
+            cursor: 'pointer',
+          }}
+        >
+          <span style={{ width: 22, height: 22, display: 'grid', placeItems: 'center', flexShrink: 0 }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <path d="M16 17l5-5-5-5" />
+              <path d="M21 12H9" />
+            </svg>
+          </span>
+          {!collapsed && <span>Log out</span>}
+        </button>
+      </div>
     </aside>
   );
 }

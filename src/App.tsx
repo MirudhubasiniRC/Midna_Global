@@ -2,11 +2,12 @@ import { useEffect, useState } from 'react';
 import './App.css';
 import { getThemeCssVars } from './styles/theme';
 import { Sidebar } from './components/Layout/Sidebar';
-import { TopBar } from './components/Layout/TopBar';
 import { MobileNavDrawer } from './components/Layout/MobileNavDrawer';
+import type { AppView } from './components/Layout/navItems';
 import { DashboardKpis } from './components/Home/DashboardKpis';
 import { NoticeBoard } from './components/Home/NoticeBoard';
 import { TopPerformers } from './components/Home/TopPerformers';
+import { ProfilePage } from './components/Profile/ProfilePage';
 
 /** Covers iPhone 14 Pro Max (430px) and similar phones / small tablets */
 const MOBILE_QUERY = '(max-width: 860px)';
@@ -14,6 +15,7 @@ const MOBILE_QUERY = '(max-width: 860px)';
 function App() {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [view, setView] = useState<AppView>('dashboard');
   const [isMobile, setIsMobile] = useState(() =>
     typeof window !== 'undefined' ? window.matchMedia(MOBILE_QUERY).matches : false
   );
@@ -50,29 +52,45 @@ function App() {
     };
   }, [mobileMenuOpen]);
 
+  const handleLogout = () => setView('dashboard');
+
   return (
     <div className={`app-frame ${isMobile ? 'is-mobile' : ''}`}>
       <div className="app-shell">
         {!isMobile && (
-          <Sidebar collapsed={collapsed} onToggle={() => setCollapsed((v) => !v)} />
+          <Sidebar
+            collapsed={collapsed}
+            onToggle={() => setCollapsed((v) => !v)}
+            activeView={view}
+            onNavigate={setView}
+            onLogout={handleLogout}
+          />
         )}
         <div className="app-main">
-          <TopBar
-            showMenuButton={isMobile}
-            onMenuClick={() => setMobileMenuOpen(true)}
-          />
           <main className="app-content panel">
-            <DashboardKpis />
-            <div className="home-lower">
-              <NoticeBoard />
-              <TopPerformers />
-            </div>
+            {view === 'profile' ? (
+              <ProfilePage onBack={() => setView('dashboard')} />
+            ) : (
+              <>
+                <DashboardKpis onOpenMobileMenu={() => setMobileMenuOpen(true)} />
+                <div className="home-lower">
+                  <NoticeBoard />
+                  <TopPerformers />
+                </div>
+              </>
+            )}
           </main>
         </div>
       </div>
 
       {isMobile && (
-        <MobileNavDrawer open={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
+        <MobileNavDrawer
+          open={mobileMenuOpen}
+          onClose={() => setMobileMenuOpen(false)}
+          activeView={view}
+          onNavigate={setView}
+          onLogout={handleLogout}
+        />
       )}
     </div>
   );
