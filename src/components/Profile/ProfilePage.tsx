@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { buttonTokens, colors, metricColors, radius, severityTokens, spacing, typography } from '../../styles/theme';
 import { EditProfileModal } from './EditProfileModal';
+import { AvatarCropModal } from './AvatarCropModal';
 
 const theme = colors.light;
 
@@ -102,6 +103,26 @@ function DetailSection({ title, children }: DetailSectionProps) {
 
 export function ProfilePage({ onBack }: ProfilePageProps) {
   const [editOpen, setEditOpen] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [pendingImage, setPendingImage] = useState<string | null>(null);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setPendingImage(URL.createObjectURL(file));
+    e.target.value = '';
+  };
+
+  const closeCropModal = () => {
+    if (pendingImage) URL.revokeObjectURL(pendingImage);
+    setPendingImage(null);
+  };
+
+  const handleCropSave = (dataUrl: string) => {
+    setAvatarUrl(dataUrl);
+    closeCropModal();
+  };
 
   return (
     <section>
@@ -131,38 +152,86 @@ export function ProfilePage({ onBack }: ProfilePageProps) {
       </div>
 
       {/* Hero card */}
-      <div className="dash-card" style={{ marginBottom: spacing[5] }}>
+      <div className="dash-card" style={{ marginBottom: spacing[5], padding: spacing[8] }}>
         <div
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: spacing[5],
+            gap: spacing[6],
             flexWrap: 'wrap',
           }}
         >
-          <div
-            style={{
-              width: 64,
-              height: 64,
-              borderRadius: '50%',
-              background: theme['primary-soft'],
-              color: theme.primary,
-              display: 'grid',
-              placeItems: 'center',
-              flexShrink: 0,
-            }}
-          >
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="8" r="4" />
-              <path d="M4 20c1.5-4 5-6 8-6s6.5 2 8 6" />
-            </svg>
+          <div style={{ position: 'relative', flexShrink: 0 }}>
+            <button
+              type="button"
+              onClick={() => avatarInputRef.current?.click()}
+              aria-label="Upload profile picture"
+              style={{
+                width: 128,
+                height: 128,
+                borderRadius: '50%',
+                background: avatarUrl ? 'transparent' : theme['primary-soft'],
+                color: theme.primary,
+                display: 'grid',
+                placeItems: 'center',
+                border: 'none',
+                padding: 0,
+                cursor: 'pointer',
+                overflow: 'hidden',
+              }}
+            >
+              {avatarUrl ? (
+                <img
+                  src={avatarUrl}
+                  alt="Profile"
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+              ) : (
+                <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="8" r="4" />
+                  <path d="M4 20c1.5-4 5-6 8-6s6.5 2 8 6" />
+                </svg>
+              )}
+            </button>
+            <button
+              type="button"
+              onClick={() => avatarInputRef.current?.click()}
+              aria-label="Change profile picture"
+              style={{
+                position: 'absolute',
+                bottom: 0,
+                right: 0,
+                width: 38,
+                height: 38,
+                borderRadius: '50%',
+                background: theme.primary,
+                color: '#fff',
+                border: `3px solid ${theme['bg-surface']}`,
+                display: 'grid',
+                placeItems: 'center',
+                cursor: 'pointer',
+                boxShadow: '0 4px 10px rgba(22, 26, 46, 0.18)',
+              }}
+            >
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2Z" />
+                <circle cx="12" cy="13" r="4" />
+              </svg>
+            </button>
+            <input
+              ref={avatarInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleAvatarChange}
+              style={{ display: 'none' }}
+            />
           </div>
 
           <div style={{ flex: 1, minWidth: 220 }}>
-            <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: theme['text-primary'], letterSpacing: '-0.02em' }}>
+            <h2 style={{ margin: 0, fontSize: 26, fontWeight: 700, color: theme['text-primary'], letterSpacing: '-0.02em' }}>
               MiDNA (H.O)
             </h2>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginTop: 8 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginTop: 12 }}>
               <Pill label={`${currentTier} member`} color={tier.color} bg={tier.bg} emoji={tier.emoji} />
               <Pill label="Certified – Admin" color={theme.primary} bg={theme['primary-soft']} />
             </div>
@@ -294,6 +363,10 @@ export function ProfilePage({ onBack }: ProfilePageProps) {
       </div>
 
       <EditProfileModal open={editOpen} onClose={() => setEditOpen(false)} />
+
+      {pendingImage && (
+        <AvatarCropModal imageSrc={pendingImage} onCancel={closeCropModal} onSave={handleCropSave} />
+      )}
     </section>
   );
 }
