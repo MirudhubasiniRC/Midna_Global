@@ -8,9 +8,59 @@ import { DashboardKpis } from './components/Home/DashboardKpis';
 import { NoticeBoard } from './components/Home/NoticeBoard';
 import { TopPerformers } from './components/Home/TopPerformers';
 import { ProfilePage } from './components/Profile/ProfilePage';
+import { PlaceholderPage } from './components/Placeholder/PlaceholderPage';
 
 /** Covers iPhone 14 Pro Max (430px) and similar phones / small tablets */
 const MOBILE_QUERY = '(max-width: 860px)';
+
+type PlaceholderViewId = Exclude<AppView, 'dashboard' | 'profile'>;
+
+/** Stub copy for the sections not yet built out — refine per-page as each is implemented */
+const placeholderPages: Record<PlaceholderViewId, { title: string; subtitle: string; actions?: string[] }> = {
+  'scans-mla': {
+    title: 'My Scans (MLA)',
+    subtitle: 'Upload scans and manage client data for MLA-side operations.',
+    actions: ['Scan Upload', 'Add Client Data', 'Export', 'Delete'],
+  },
+  'scans-ho': {
+    title: 'My Scans (H.O)',
+    subtitle: 'Preprocess, verify, and manage scan data at the Head Office.',
+    actions: ['Preprocess', 'Verify', 'Data Download', 'Report Upload'],
+  },
+  ledger: {
+    title: 'My Ledger',
+    subtitle: 'Track credits and debits across auto and manual entries.',
+    actions: ['Credits · Auto', 'Credits · Manual', 'Debits · Auto', 'Debits · Manual'],
+  },
+  reports: {
+    title: 'My Reports',
+    subtitle: 'Download, edit, and manage report data and CAB entries.',
+    actions: ['Download', 'Edit Data', 'Upgrade', 'CAB', 'Delete Scan'],
+  },
+  trainees: {
+    title: 'My Trainees',
+    subtitle: 'Add, edit, and manage trainee records.',
+    actions: ['Add', 'Edit', 'Delete'],
+  },
+  'mis-cab': {
+    title: 'MIS · CAB',
+    subtitle: 'Manage CAB debit and delete actions.',
+    actions: ['Debit', 'Delete'],
+  },
+  'mis-communications': {
+    title: 'MIS · Communications',
+    subtitle: 'Manage communications sent across the network.',
+  },
+  'mis-network': {
+    title: 'MIS · Network Performance',
+    subtitle: 'Track performance across the network.',
+  },
+  'mis-scans': {
+    title: 'MIS · Scans',
+    subtitle: 'Search scan data by MLA or by duration.',
+    actions: ['Search by MLA', 'Search by Duration'],
+  },
+};
 
 function App() {
   const [collapsed, setCollapsed] = useState(false);
@@ -70,7 +120,7 @@ function App() {
           <main className="app-content panel">
             {view === 'profile' ? (
               <ProfilePage onBack={() => setView('dashboard')} />
-            ) : (
+            ) : view === 'dashboard' ? (
               <>
                 <DashboardKpis onOpenMobileMenu={() => setMobileMenuOpen(true)} />
                 <div className="home-lower">
@@ -78,6 +128,11 @@ function App() {
                   <TopPerformers />
                 </div>
               </>
+            ) : (
+              <PlaceholderPage
+                {...placeholderPages[view]}
+                onOpenMobileMenu={() => setMobileMenuOpen(true)}
+              />
             )}
           </main>
         </div>

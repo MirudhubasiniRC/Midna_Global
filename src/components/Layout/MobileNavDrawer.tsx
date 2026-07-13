@@ -1,3 +1,4 @@
+import { Fragment } from 'react';
 import { colors, sidebarTokens, spacing } from '../../styles/theme';
 import { navItems, type AppView } from './navItems';
 import logo from '../../assets/high-resolution-color-logo.png';
@@ -39,67 +40,80 @@ export function MobileNavDrawer({ open, onClose, activeView, onNavigate, onLogou
           </button>
         </div>
 
-        <p
+        <nav
           style={{
-            fontSize: 11,
-            fontWeight: 600,
-            color: theme['text-muted'],
-            letterSpacing: '0.06em',
-            textTransform: 'uppercase',
-            padding: `0 ${spacing[1]}`,
-            marginBottom: spacing[3],
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 4,
+            flex: '1 1 auto',
+            minHeight: 0,
+            overflowY: 'auto',
           }}
         >
-          Menu
-        </p>
-
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-          {navItems.map((item) => {
+          {navItems.map((item, index) => {
             const active = item.id === activeView;
             const { Icon } = item;
+            const isNewSection = index === 0 || navItems[index - 1].section !== item.section;
             return (
-              <button
-                key={item.id}
-                type="button"
-                className={`sidebar-nav-item${active ? ' is-active' : ''}`}
-                onClick={() => go(item.id)}
-                style={{
-                  position: 'relative',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 14,
-                  width: '100%',
-                  minHeight: 44,
-                  padding: '10px 14px',
-                  border: 'none',
-                  borderRadius: sidebarTokens.itemRadius,
-                  color: active ? theme['text-primary'] : theme['text-secondary'],
-                  fontSize: 15,
-                  fontWeight: active ? 600 : 500,
-                  letterSpacing: '-0.01em',
-                  textAlign: 'left',
-                  cursor: 'pointer',
-                }}
-              >
-                <span
-                  className="sidebar-nav-icon"
+              <Fragment key={item.id}>
+                {isNewSection && (
+                  <p
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 600,
+                      color: theme['text-muted'],
+                      letterSpacing: '0.06em',
+                      textTransform: 'uppercase',
+                      padding: `0 ${spacing[1]}`,
+                      margin: index === 0 ? `0 0 ${spacing[3]}` : `${spacing[4]} 0 ${spacing[3]}`,
+                    }}
+                  >
+                    {item.section}
+                  </p>
+                )}
+                <button
+                  type="button"
+                  className={`sidebar-nav-item${active ? ' is-active' : ''}`}
+                  onClick={() => go(item.id)}
                   style={{
-                    width: 22,
-                    height: 22,
-                    display: 'grid',
-                    placeItems: 'center',
-                    color: active ? theme.primary : theme['text-muted'],
+                    position: 'relative',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 14,
+                    width: '100%',
+                    minHeight: 44,
+                    padding: '10px 14px',
+                    border: 'none',
+                    borderRadius: sidebarTokens.itemRadius,
+                    color: active ? theme['text-primary'] : theme['text-secondary'],
+                    fontSize: 15,
+                    fontWeight: active ? 600 : 500,
+                    letterSpacing: '-0.01em',
+                    textAlign: 'left',
+                    cursor: 'pointer',
+                    flexShrink: 0,
                   }}
                 >
-                  <Icon
-                    size={20}
-                    fill={active ? 'currentColor' : 'none'}
-                    stroke="currentColor"
-                    strokeWidth={active ? 1.25 : 1.8}
-                  />
-                </span>
-                <span className="sidebar-nav-label">{item.label}</span>
-              </button>
+                  <span
+                    className="sidebar-nav-icon"
+                    style={{
+                      width: 22,
+                      height: 22,
+                      display: 'grid',
+                      placeItems: 'center',
+                      color: active ? theme.primary : theme['text-muted'],
+                    }}
+                  >
+                    <Icon
+                      size={20}
+                      fill={active ? 'currentColor' : 'none'}
+                      stroke="currentColor"
+                      strokeWidth={active ? 1.25 : 1.8}
+                    />
+                  </span>
+                  <span className="sidebar-nav-label">{item.label}</span>
+                </button>
+              </Fragment>
             );
           })}
         </nav>

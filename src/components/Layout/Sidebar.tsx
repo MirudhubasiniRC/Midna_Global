@@ -1,3 +1,4 @@
+import { Fragment } from 'react';
 import {
   colors,
   layoutTokens,
@@ -105,23 +106,6 @@ export function Sidebar({ collapsed, onToggle, activeView, onNavigate, onLogout 
         </button>
       )}
 
-      {!collapsed && (
-        <p
-          className="sidebar-menu-label"
-          style={{
-            fontSize: 11,
-            fontWeight: 600,
-            color: theme['text-muted'],
-            letterSpacing: '0.06em',
-            textTransform: 'uppercase',
-            padding: `0 ${spacing[3]}`,
-            marginBottom: spacing[3],
-          }}
-        >
-          Menu
-        </p>
-      )}
-
       <nav
         className="sidebar-nav"
         style={{
@@ -129,59 +113,80 @@ export function Sidebar({ collapsed, onToggle, activeView, onNavigate, onLogout 
           flexDirection: 'column',
           gap: 4,
           flex: 1,
+          minHeight: 0,
+          overflowY: 'auto',
         }}
       >
-        {navItems.map((item) => {
+        {navItems.map((item, index) => {
           const active = item.id === activeView;
           const { Icon } = item;
+          const isNewSection = index === 0 || navItems[index - 1].section !== item.section;
           return (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => onNavigate(item.id)}
-              className={`sidebar-nav-item${active ? ' is-active' : ''}`}
-              title={collapsed ? item.label : undefined}
-              style={{
-                position: 'relative',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: collapsed ? 'center' : 'flex-start',
-                gap: 14,
-                width: '100%',
-                minHeight: 40,
-                padding: collapsed ? '10px 8px' : '10px 14px',
-                border: 'none',
-                borderRadius: sidebarTokens.itemRadius,
-                color: active ? theme['text-primary'] : theme['text-secondary'],
-                fontSize: 14,
-                fontWeight: active ? 600 : 500,
-                letterSpacing: '-0.01em',
-                textAlign: 'left',
-                cursor: 'pointer',
-                overflow: 'visible',
-              }}
-            >
-              <span
-                className="sidebar-nav-icon"
+            <Fragment key={item.id}>
+              {isNewSection && !collapsed && (
+                <p
+                  className="sidebar-menu-label"
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 600,
+                    color: theme['text-muted'],
+                    letterSpacing: '0.06em',
+                    textTransform: 'uppercase',
+                    padding: `0 ${spacing[3]}`,
+                    margin: index === 0 ? `0 0 ${spacing[3]}` : `${spacing[4]} 0 ${spacing[3]}`,
+                  }}
+                >
+                  {item.section}
+                </p>
+              )}
+              <button
+                type="button"
+                onClick={() => onNavigate(item.id)}
+                className={`sidebar-nav-item${active ? ' is-active' : ''}`}
+                title={collapsed ? item.label : undefined}
                 style={{
-                  width: 22,
-                  height: 22,
-                  display: 'grid',
-                  placeItems: 'center',
-                  background: 'transparent',
-                  color: active ? theme.primary : theme['text-muted'],
+                  position: 'relative',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: collapsed ? 'center' : 'flex-start',
+                  gap: 14,
+                  width: '100%',
+                  minHeight: 40,
+                  padding: collapsed ? '10px 8px' : '10px 14px',
+                  border: 'none',
+                  borderRadius: sidebarTokens.itemRadius,
+                  color: active ? theme['text-primary'] : theme['text-secondary'],
+                  fontSize: 14,
+                  fontWeight: active ? 600 : 500,
+                  letterSpacing: '-0.01em',
+                  textAlign: 'left',
+                  cursor: 'pointer',
+                  overflow: 'visible',
                   flexShrink: 0,
                 }}
               >
-                <Icon
-                  size={20}
-                  fill={active ? 'currentColor' : 'none'}
-                  stroke="currentColor"
-                  strokeWidth={active ? 1.25 : 1.8}
-                />
-              </span>
-              {!collapsed && <span className="sidebar-nav-label">{item.label}</span>}
-            </button>
+                <span
+                  className="sidebar-nav-icon"
+                  style={{
+                    width: 22,
+                    height: 22,
+                    display: 'grid',
+                    placeItems: 'center',
+                    background: 'transparent',
+                    color: active ? theme.primary : theme['text-muted'],
+                    flexShrink: 0,
+                  }}
+                >
+                  <Icon
+                    size={20}
+                    fill={active ? 'currentColor' : 'none'}
+                    stroke="currentColor"
+                    strokeWidth={active ? 1.25 : 1.8}
+                  />
+                </span>
+                {!collapsed && <span className="sidebar-nav-label">{item.label}</span>}
+              </button>
+            </Fragment>
           );
         })}
       </nav>

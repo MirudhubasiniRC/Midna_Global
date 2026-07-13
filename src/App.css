@@ -42,6 +42,7 @@
 }
 
 .sidebar-nav-item {
+  background: transparent;
   overflow: visible;
   transition: background 0.15s ease, color 0.15s ease;
 }
@@ -200,7 +201,7 @@
 .sidebar-nav-item.is-active::before {
   content: '';
   position: absolute;
-  left: -2px;
+  left: 0;
   top: 50%;
   transform: translateY(-50%);
   width: 4px;
@@ -359,6 +360,7 @@
   padding: 18px 16px 24px;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
   background: var(--color-bg-surface, #fff);
   border-radius: 0 var(--radius-xl, 20px) var(--radius-xl, 20px) 0;
   transform: translateX(-105%);
