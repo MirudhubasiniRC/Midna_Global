@@ -4,7 +4,7 @@
   padding: var(--layout-framePadding, 0px);
   background: var(--color-bg-frame, #ffffff);
   color: var(--color-text-primary, #1d2939);
-  font-family: var(--font-sans-family, 'Inter', system-ui, sans-serif);
+  font-family: var(--font-sans-family, 'Inter Variable', 'Inter', system-ui, sans-serif);
   box-sizing: border-box;
 }
 
@@ -24,27 +24,63 @@
 
 .panel {
   background: var(--color-bg-canvas, #f8f9fc);
-  border: var(--layout-panelBorder, 1px solid #eaecf0);
+  border: var(--layout-panelBorder, 1px solid #e6e9f6);
   border-radius: var(--layout-panelRadius, 24px);
+  /*
+   * The border color is intentionally close to the page background (same
+   * continuous-surface look), so it never reads on its own. Two shadow
+   * layers do the actual work: a 1px all-around ring for a crisp, equally
+   * visible edge on every side (top included — a directional drop shadow
+   * alone is always weakest at the top), plus a soft diffused shadow for depth.
+   */
+  box-shadow: 0 0 0 1px rgba(22, 26, 46, 0.09), 0 1px 2px rgba(22, 26, 46, 0.04), 0 16px 40px rgba(22, 26, 46, 0.08);
   box-sizing: border-box;
 }
 
 /*
- * Sidebar reads as flush white "chrome" against the grey content canvas —
- * no border, no radius, no gap. Differentiated by fill color alone, not a
- * separately enclosed rounded component.
+ * Sidebar is a white panel with a thin right border, flush against the
+ * page (background/border set inline in Sidebar.tsx). It's collapsible
+ * (width toggles in Sidebar.tsx); the active nav item gets a raised
+ * white pill of its own, with a shadow, to stand out even on the white fill.
  */
 .sidebar {
-  background: var(--color-bg-surface, #fff);
   border: none;
-  border-radius: 0;
-  overflow: visible;
 }
 
 .sidebar-nav-item {
-  background: transparent;
   overflow: visible;
   transition: background 0.15s ease, color 0.15s ease;
+}
+
+/* Custom tooltip (collapsed rail only) — reveals on hover via CSS, no native title-attribute delay */
+.sidebar-tooltip {
+  position: absolute;
+  left: calc(100% + 12px);
+  top: 50%;
+  transform: translateY(-50%) translateX(-4px);
+  background: #14161f;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  padding: 6px 10px;
+  border-radius: 8px;
+  box-shadow: 0 8px 20px rgba(10, 12, 28, 0.3);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.1s ease, transform 0.1s ease;
+  z-index: 20;
+}
+
+.sidebar-nav-item:hover .sidebar-tooltip {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+}
+
+.sidebar-nav-item:hover:not(.is-active) {
+  background: var(--color-bg-hover, #f1f3fc);
+  color: var(--color-text-primary, #161a2e);
 }
 
 .app-main {
@@ -53,7 +89,9 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--layout-shellGap, 0px);
+  /* Frame-colored inset on top/right/bottom so the content panel's rounded edge
+     reads as a floating card on every side, not just wherever leftover space happens to be */
+  padding: var(--layout-shellGapTop, 32px) var(--layout-shellGap, 20px) var(--layout-shellGap, 20px) 0;
   background: transparent;
   overflow: auto;
   scroll-behavior: smooth;
@@ -62,17 +100,9 @@
 
 .app-content {
   flex: 0 0 auto;
-  padding: var(--layout-contentPadding, 20px) var(--layout-contentPaddingX, 20px);
+  padding: var(--layout-contentPaddingTop, 40px) var(--layout-contentPaddingX, 20px) var(--layout-contentPadding, 20px);
   overflow: visible;
   min-height: 0;
-}
-
-/* Flush against the sidebar's left edge on desktop — round only the right corners */
-@media (min-width: 861px) {
-  .app-content {
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-  }
 }
 
 .dash-card {
@@ -88,17 +118,24 @@
   justify-content: center;
   width: 36px;
   height: 36px;
-  border-radius: 12px;
-  border: 1px solid var(--color-border, #eaecf0);
+  border-radius: 50%;
+  border: 1px solid var(--color-border, #e6e9f6);
   background: var(--color-bg-surface, #fff);
   color: var(--color-text-secondary, #667085);
-  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+  box-shadow: var(--shadow-card, 0 10px 28px rgba(22, 26, 46, 0.06));
+  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .btn-icon:hover {
-  border-color: var(--color-primary, #ca317a);
-  color: var(--color-primary, #ca317a);
-  background: var(--color-primary-soft, #f9e8f0);
+  border-color: var(--color-primary, #4f6af0);
+  color: var(--color-primary, #4f6af0);
+  background: var(--color-primary-soft, #eaeeff);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-cardHover, 0 16px 36px rgba(22, 26, 46, 0.1));
+}
+
+.btn-icon:active {
+  transform: translateY(0);
 }
 
 .sidebar-logout-item {
@@ -112,7 +149,7 @@
 
 .notice-scroll {
   scrollbar-width: thin;
-  scrollbar-color: var(--color-border, #eaecf0) transparent;
+  scrollbar-color: var(--color-border, #e6e9f6) transparent;
 }
 
 .notice-scroll::-webkit-scrollbar {
@@ -124,7 +161,7 @@
 }
 
 .notice-scroll::-webkit-scrollbar-thumb {
-  background: var(--color-border, #eaecf0);
+  background: var(--color-border, #e6e9f6);
   border-radius: 999px;
 }
 
@@ -139,13 +176,13 @@
 
 @keyframes notice-pulse-ring {
   0% {
-    box-shadow: var(--shadow-card), 0 0 0 0 rgba(202, 49, 122, 0.55);
+    box-shadow: var(--shadow-card), 0 0 0 0 rgba(79, 106, 240, 0.5);
   }
   70% {
-    box-shadow: var(--shadow-card), 0 0 0 10px rgba(202, 49, 122, 0);
+    box-shadow: var(--shadow-card), 0 0 0 10px rgba(79, 106, 240, 0);
   }
   100% {
-    box-shadow: var(--shadow-card), 0 0 0 0 rgba(202, 49, 122, 0);
+    box-shadow: var(--shadow-card), 0 0 0 0 rgba(79, 106, 240, 0);
   }
 }
 
@@ -177,23 +214,19 @@
 }
 
 .notice-ack-btn[aria-pressed='false']:hover {
-  border-color: var(--color-primary, #ca317a);
-  color: var(--color-primary, #ca317a);
+  border-color: var(--color-primary, #4f6af0);
+  color: var(--color-primary, #4f6af0);
 }
 
 .notice-ack-btn:active {
   transform: scale(0.95);
 }
 
-.sidebar-nav-item:hover:not(.is-active) {
-  color: var(--color-text-primary, #1d2939);
-}
-
-.sidebar-nav-item:hover:not(.is-active) .sidebar-nav-icon {
-  color: var(--color-text-secondary, #667085);
-}
-
-/* Left accent bar + colored icon + bold label — no fill, reads as "selected" without a heavy block */
+/*
+ * No background fill — selection reads via a left accent bar plus a
+ * colored icon, using a lighter brand tint (not the full-saturation base)
+ * so it's a quiet indicator, not a loud block.
+ */
 .sidebar-nav-item.is-active {
   background: transparent;
 }
@@ -207,36 +240,17 @@
   width: 4px;
   height: 60%;
   border-radius: 0 999px 999px 0;
-  background: var(--color-primary, #ca317a);
+  background: var(--brand-mid, #7c93ff);
+  box-shadow: 0 0 8px rgba(124, 147, 255, 0.6);
 }
 
 .sidebar-nav-item.is-active .sidebar-nav-label {
-  color: var(--color-text-primary, #1d2939);
+  color: var(--color-text-primary, #161a2e);
   font-weight: 700;
 }
 
 .sidebar-nav-item.is-active .sidebar-nav-icon {
-  color: var(--color-primary, #ca317a);
-}
-
-/*
- * Bordered "card" instead of a flat grey fill — the border + hover ring
- * signal it's clickable without looking like a permanently-selected item.
- */
-.sidebar-profile-item {
-  background: transparent;
-  border: 1px solid var(--color-border, #eaecf0);
-  transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
-}
-
-.sidebar-profile-item:hover {
-  border-color: var(--color-primary, #ca317a);
-  box-shadow: 0 0 0 3px var(--color-primary-soft, #f9e8f0);
-}
-
-.sidebar-profile-item.is-active {
-  border-color: var(--color-primary, #ca317a);
-  background: var(--color-primary-soft, #f9e8f0);
+  color: var(--brand-mid, #7c93ff);
 }
 
 .performer-row {
@@ -303,6 +317,7 @@
   }
 
   .app-main {
+    padding: 0;
     overflow: visible;
     max-height: none;
   }
@@ -362,10 +377,10 @@
   flex-direction: column;
   overflow: hidden;
   background: var(--color-bg-surface, #fff);
-  border-radius: 0 var(--radius-xl, 20px) var(--radius-xl, 20px) 0;
+  border-radius: 0 var(--radius-xl, 28px) var(--radius-xl, 28px) 0;
   transform: translateX(-105%);
   transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
-  box-shadow: 0 20px 48px rgba(16, 24, 40, 0.18);
+  box-shadow: 0 20px 48px rgba(16, 24, 40, 0.22);
 }
 
 .mobile-nav.is-open .mobile-nav-panel {
@@ -439,7 +454,7 @@
   gap: 16px;
   padding: 24px 28px;
   background: var(--color-bg-surface, #fff);
-  border-bottom: 1px solid var(--color-divider, #eaecf0);
+  border-bottom: 1px solid var(--color-divider, #e6e9f6);
   flex-shrink: 0;
 }
 
@@ -467,7 +482,7 @@
   justify-content: flex-end;
   gap: 10px;
   padding: 18px 28px;
-  border-top: 1px solid var(--color-divider, #eaecf0);
+  border-top: 1px solid var(--color-divider, #e6e9f6);
   flex-shrink: 0;
 }
 
@@ -502,7 +517,7 @@
   height: var(--input-height-md, 44px);
   padding: var(--input-padding, 12px 16px);
   border-radius: var(--radius-md, 14px);
-  border: 1px solid var(--color-border, #eaecf0);
+  border: 1px solid var(--color-border, #e6e9f6);
   background: var(--color-bg-surface, #fff);
   color: var(--color-text-primary, #1d2939);
   font-size: 14px;
@@ -515,8 +530,8 @@
 .form-select:focus,
 .form-textarea:focus {
   outline: none;
-  border-color: var(--color-primary, #ca317a);
-  box-shadow: 0 0 0 3px var(--color-primary-soft, #f9e8f0);
+  border-color: var(--color-primary, #4f6af0);
+  box-shadow: 0 0 0 3px var(--color-primary-soft, #eaeeff);
 }
 
 .form-textarea {
@@ -548,37 +563,59 @@
 }
 
 .btn-pill-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   height: var(--btn-height-md, 40px);
   padding: var(--btn-padding-md, 10px 16px);
   border-radius: var(--radius-pill, 9999px);
   border: none;
-  background: var(--color-btn-primary-bg, #ca317a);
+  background: var(--color-btn-primary-bg, #4f6af0);
   color: var(--color-btn-primary-text, #fff);
   font-size: 14px;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
-  transition: background 0.15s ease;
+  box-shadow: var(--shadow-primary, 0 6px 20px rgba(79, 106, 240, 0.24));
+  transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .btn-pill-primary:hover {
-  background: var(--color-btn-primary-hover, #a82866);
+  background: var(--color-btn-primary-hover, #3b54de);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(79, 106, 240, 0.3);
+}
+
+.btn-pill-primary:active {
+  transform: translateY(0);
 }
 
 .btn-pill-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   height: var(--btn-height-md, 40px);
   padding: var(--btn-padding-md, 10px 16px);
   border-radius: var(--radius-pill, 9999px);
-  border: 1px solid var(--color-btn-secondary-border, #ca317a);
+  border: 1px solid var(--color-btn-secondary-border, #e6e9f6);
   background: var(--color-btn-secondary-bg, #fff);
-  color: var(--color-btn-secondary-text, #ca317a);
+  color: var(--color-btn-secondary-text, #161a2e);
   font-size: 14px;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
-  transition: background 0.15s ease;
+  box-shadow: var(--shadow-card, 0 10px 28px rgba(22, 26, 46, 0.06));
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .btn-pill-secondary:hover {
-  background: var(--color-primary-soft, #f9e8f0);
+  border-color: var(--color-primary, #4f6af0);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-cardHover, 0 16px 36px rgba(22, 26, 46, 0.1));
+}
+
+.btn-pill-secondary:active {
+  transform: translateY(0);
 }

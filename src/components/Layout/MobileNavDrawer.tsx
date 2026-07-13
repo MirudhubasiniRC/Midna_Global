@@ -14,8 +14,6 @@ type MobileNavDrawerProps = {
 };
 
 export function MobileNavDrawer({ open, onClose, activeView, onNavigate, onLogout }: MobileNavDrawerProps) {
-  const profileActive = activeView === 'profile';
-
   const go = (view: AppView) => {
     onNavigate(view);
     onClose();
@@ -85,9 +83,9 @@ export function MobileNavDrawer({ open, onClose, activeView, onNavigate, onLogou
                     padding: '10px 14px',
                     border: 'none',
                     borderRadius: sidebarTokens.itemRadius,
-                    color: active ? theme['text-primary'] : theme['text-secondary'],
+                    color: active ? theme['text-primary'] : '#565C78',
                     fontSize: 15,
-                    fontWeight: active ? 600 : 500,
+                    fontWeight: active ? 700 : 500,
                     letterSpacing: '-0.01em',
                     textAlign: 'left',
                     cursor: 'pointer',
@@ -101,15 +99,10 @@ export function MobileNavDrawer({ open, onClose, activeView, onNavigate, onLogou
                       height: 22,
                       display: 'grid',
                       placeItems: 'center',
-                      color: active ? theme.primary : theme['text-muted'],
+                      color: 'inherit',
                     }}
                   >
-                    <Icon
-                      size={20}
-                      fill={active ? 'currentColor' : 'none'}
-                      stroke="currentColor"
-                      strokeWidth={active ? 1.25 : 1.8}
-                    />
+                    <Icon size={20} fill="none" stroke="currentColor" strokeWidth={1.7} />
                   </span>
                   <span className="sidebar-nav-label">{item.label}</span>
                 </button>
@@ -130,71 +123,11 @@ export function MobileNavDrawer({ open, onClose, activeView, onNavigate, onLogou
         >
           <button
             type="button"
-            onClick={() => go('profile')}
-            className={`sidebar-profile-item${profileActive ? ' is-active' : ''}`}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 10,
-              width: '100%',
-              padding: '10px 12px',
-              borderRadius: sidebarTokens.itemRadius,
-              textAlign: 'left',
-              cursor: 'pointer',
-            }}
-          >
-            <span
-              style={{
-                width: 34,
-                height: 34,
-                borderRadius: '50%',
-                background: `linear-gradient(135deg, ${theme.primary}, ${theme['primary-dark']})`,
-                color: '#fff',
-                display: 'grid',
-                placeItems: 'center',
-                fontWeight: 700,
-                fontSize: 14,
-                flexShrink: 0,
-              }}
-            >
-              U
-            </span>
-            <span style={{ lineHeight: 1.35, minWidth: 0 }}>
-              <span
-                style={{
-                  display: 'block',
-                  fontSize: 15,
-                  fontWeight: 700,
-                  color: theme['text-primary'],
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                }}
-              >
-                User
-              </span>
-              <span
-                style={{
-                  display: 'block',
-                  fontSize: 13,
-                  color: theme['text-secondary'],
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                }}
-              >
-                user@midna.com
-              </span>
-            </span>
-          </button>
-
-          <button
-            type="button"
             onClick={() => {
               onLogout?.();
               onClose();
             }}
-            className="sidebar-logout-item"
+            className="sidebar-nav-item sidebar-logout-item"
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -204,7 +137,7 @@ export function MobileNavDrawer({ open, onClose, activeView, onNavigate, onLogou
               border: 'none',
               borderRadius: sidebarTokens.itemRadius,
               background: 'transparent',
-              color: theme['text-secondary'],
+              color: '#565C78',
               fontSize: 15,
               fontWeight: 500,
               letterSpacing: '-0.01em',

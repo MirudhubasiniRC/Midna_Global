@@ -1,5 +1,6 @@
 import { colors, radius, spacing, typography } from '../../styles/theme';
 import { NotificationButton } from '../Layout/NotificationButton';
+import { ProfileAvatarButton } from '../Layout/ProfileAvatarButton';
 
 const theme = colors.light;
 
@@ -8,9 +9,10 @@ type PlaceholderPageProps = {
   subtitle: string;
   actions?: string[];
   onOpenMobileMenu?: () => void;
+  onOpenProfile?: () => void;
 };
 
-export function PlaceholderPage({ title, subtitle, actions = [], onOpenMobileMenu }: PlaceholderPageProps) {
+export function PlaceholderPage({ title, subtitle, actions = [], onOpenMobileMenu, onOpenProfile }: PlaceholderPageProps) {
   return (
     <section>
       <div
@@ -51,6 +53,7 @@ export function PlaceholderPage({ title, subtitle, actions = [], onOpenMobileMen
             </svg>
           </button>
           <NotificationButton />
+          <ProfileAvatarButton onClick={onOpenProfile} />
         </div>
       </div>
 

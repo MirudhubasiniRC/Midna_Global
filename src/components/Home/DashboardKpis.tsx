@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { colors, metricColors, radius, shadow, spacing, typography, type MetricColor } from '../../styles/theme';
 import { NotificationButton } from '../Layout/NotificationButton';
+import { ProfileAvatarButton } from '../Layout/ProfileAvatarButton';
+import type { AppView } from '../Layout/navItems';
 
 const theme = colors.light;
 
@@ -11,6 +13,8 @@ type Kpi = {
   hint: string;
   color: MetricColor;
   icon: React.ReactNode;
+  /** When set, the card renders as a colorful featured tile and navigates here on click */
+  linkTo?: AppView;
 };
 
 const kpis: Kpi[] = [
@@ -27,6 +31,7 @@ const kpis: Kpi[] = [
         <path d="M8 2v4M16 2v4" />
       </svg>
     ),
+    linkTo: 'scans-mla',
   },
   {
     id: 'scans-total',
@@ -46,7 +51,7 @@ const kpis: Kpi[] = [
     label: 'My Billing this Year',
     value: '–',
     hint: 'Current year billing',
-    color: 'amber',
+    color: 'purple',
     icon: (
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
         <rect x="3" y="6" width="18" height="13" rx="2.5" />
@@ -54,6 +59,7 @@ const kpis: Kpi[] = [
         <circle cx="16" cy="14.5" r="1.6" />
       </svg>
     ),
+    linkTo: 'ledger',
   },
   {
     id: 'billing-total',
@@ -72,10 +78,13 @@ const kpis: Kpi[] = [
 
 type DashboardKpisProps = {
   onOpenMobileMenu?: () => void;
+  onOpenProfile?: () => void;
+  onNavigate?: (view: AppView) => void;
 };
 
-export function DashboardKpis({ onOpenMobileMenu }: DashboardKpisProps) {
+export function DashboardKpis({ onOpenMobileMenu, onOpenProfile, onNavigate }: DashboardKpisProps) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [focusedId, setFocusedId] = useState<string | null>(null);
 
   return (
     <section>
@@ -119,28 +128,54 @@ export function DashboardKpis({ onOpenMobileMenu }: DashboardKpisProps) {
             </svg>
           </button>
           <NotificationButton />
+          <ProfileAvatarButton onClick={onOpenProfile} />
         </div>
       </div>
 
       <div className="kpi-grid">
         {kpis.map((kpi) => {
           const hovered = hoveredId === kpi.id;
+          const focused = focusedId === kpi.id;
           const tone = metricColors[kpi.color];
+          const featured = Boolean(kpi.linkTo);
+          const showColor = featured && (hovered || focused);
+          const gradient = `linear-gradient(135deg, ${tone.icon} 0%, ${tone.text} 100%)`;
+
           return (
             <article
               key={kpi.id}
               onMouseEnter={() => setHoveredId(kpi.id)}
               onMouseLeave={() => setHoveredId(null)}
+              onFocus={featured ? () => setFocusedId(kpi.id) : undefined}
+              onBlur={featured ? () => setFocusedId(null) : undefined}
+              onClick={featured ? () => onNavigate?.(kpi.linkTo!) : undefined}
+              onKeyDown={
+                featured
+                  ? (e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        onNavigate?.(kpi.linkTo!);
+                      }
+                    }
+                  : undefined
+              }
+              role={featured ? 'button' : undefined}
+              tabIndex={featured ? 0 : undefined}
               style={{
                 borderRadius: radius.lg,
                 padding: spacing[5],
                 display: 'flex',
                 flexDirection: 'column',
                 gap: spacing[4],
-                cursor: 'default',
-                transition: 'box-shadow 0.2s ease, transform 0.2s ease',
-                background: theme['bg-surface'],
-                boxShadow: hovered ? shadow.cardHover : shadow.card,
+                cursor: featured ? 'pointer' : 'default',
+                outline: 'none',
+                transition: 'background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease',
+                background: showColor ? gradient : theme['bg-surface'],
+                boxShadow: showColor
+                  ? `0 20px 40px ${tone.icon}4d`
+                  : hovered
+                    ? shadow.cardHover
+                    : shadow.card,
                 transform: hovered ? 'translateY(-2px)' : 'none',
               }}
             >
@@ -149,7 +184,8 @@ export function DashboardKpis({ onOpenMobileMenu }: DashboardKpisProps) {
                   style={{
                     fontSize: typography.roles.cardLabel.fontSize,
                     fontWeight: typography.roles.cardLabel.fontWeight,
-                    color: theme['text-secondary'],
+                    color: showColor ? 'rgba(255, 255, 255, 0.85)' : theme['text-secondary'],
+                    transition: 'color 0.2s ease',
                   }}
                 >
                   {kpi.label}
@@ -158,15 +194,23 @@ export function DashboardKpis({ onOpenMobileMenu }: DashboardKpisProps) {
                   style={{
                     width: 32,
                     height: 32,
-                    borderRadius: radius.sm,
-                    background: tone.bg,
-                    color: tone.icon,
+                    borderRadius: showColor ? radius.pill : radius.sm,
+                    background: showColor ? 'rgba(255, 255, 255, 0.2)' : tone.bg,
+                    color: showColor ? '#ffffff' : tone.icon,
                     display: 'grid',
                     placeItems: 'center',
                     flexShrink: 0,
+                    transition: 'background 0.2s ease, color 0.2s ease, border-radius 0.2s ease',
                   }}
                 >
-                  {kpi.icon}
+                  {showColor ? (
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M7 17 17 7" />
+                      <path d="M7 7h10v10" />
+                    </svg>
+                  ) : (
+                    kpi.icon
+                  )}
                 </span>
               </div>
 
@@ -177,7 +221,8 @@ export function DashboardKpis({ onOpenMobileMenu }: DashboardKpisProps) {
                     fontWeight: typography.roles.kpiValue.fontWeight,
                     letterSpacing: typography.roles.kpiValue.letterSpacing,
                     lineHeight: typography.roles.kpiValue.lineHeight,
-                    color: theme['text-primary'],
+                    color: showColor ? '#ffffff' : theme['text-primary'],
+                    transition: 'color 0.2s ease',
                   }}
                 >
                   {kpi.value}
@@ -186,7 +231,8 @@ export function DashboardKpis({ onOpenMobileMenu }: DashboardKpisProps) {
                   style={{
                     fontSize: typography.roles.helperText.fontSize,
                     marginTop: 6,
-                    color: theme['text-muted'],
+                    color: showColor ? 'rgba(255, 255, 255, 0.75)' : theme['text-muted'],
+                    transition: 'color 0.2s ease',
                   }}
                 >
                   {kpi.hint}

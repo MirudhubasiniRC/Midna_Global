@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { buttonTokens, colors, radius, spacing } from '../../styles/theme';
+import { buttonTokens, colors, metricColors, radius, severityTokens, spacing, typography } from '../../styles/theme';
 import { EditProfileModal } from './EditProfileModal';
 
 const theme = colors.light;
@@ -8,45 +8,97 @@ type ProfilePageProps = {
   onBack: () => void;
 };
 
-type MetaRow = {
-  label: string;
-  value: string;
-  icon: React.ReactNode;
+/** Subscription tiers — billing % pulled from the plan reference table */
+type SubscriptionTier = 'Gold' | 'Diamond' | 'Platinum' | 'Ultima';
+
+const subscriptionTiers: Record<SubscriptionTier, { emoji: string; color: string; bg: string; billing: string }> = {
+  Gold: { emoji: '🥇', color: severityTokens.medium.text, bg: severityTokens.medium.bg, billing: '30%' },
+  Diamond: { emoji: '💎', color: metricColors.blue.text, bg: metricColors.blue.bg, billing: '25%' },
+  Platinum: { emoji: '🏆', color: '#475467', bg: theme['bg-muted'], billing: '20%' },
+  Ultima: { emoji: '👑', color: metricColors.purple.text, bg: metricColors.purple.bg, billing: '16%' },
 };
 
-const metaRows: MetaRow[] = [
-  {
-    label: 'Your MID',
-    value: 'M10048',
-    icon: (
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="3" y="5" width="18" height="14" rx="2" />
-        <path d="M3 9h18" />
-        <path d="M7 14h4" />
-      </svg>
-    ),
-  },
-  {
-    label: 'Your Mentor',
-    value: 'Rathinaswamy A · 9597770205',
-    icon: (
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="8" r="4" />
-        <path d="M4 20c1.5-4 5-6 8-6s6.5 2 8 6" />
-      </svg>
-    ),
-  },
-  {
-    label: 'Your Billing',
-    value: '40% · SRC — YES',
-    icon: (
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="2" y="6" width="20" height="14" rx="2.5" />
-        <path d="M2 11h20" />
-      </svg>
-    ),
-  },
-];
+/** No backend yet — this is the member's current tier, swap when subscriptions are wired up */
+const currentTier: SubscriptionTier = 'Diamond';
+const tier = subscriptionTiers[currentTier];
+
+type PillProps = {
+  label: string;
+  color: string;
+  bg: string;
+  emoji?: string;
+};
+
+function Pill({ label, color, bg, emoji }: PillProps) {
+  return (
+    <span
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 6,
+        fontSize: 12,
+        fontWeight: 700,
+        color,
+        background: bg,
+        borderRadius: radius.pill,
+        padding: '5px 12px',
+        whiteSpace: 'nowrap',
+      }}
+    >
+      {emoji && <span aria-hidden="true">{emoji}</span>}
+      {label}
+    </span>
+  );
+}
+
+type DetailFieldProps = {
+  label: string;
+  value: React.ReactNode;
+};
+
+function DetailField({ label, value }: DetailFieldProps) {
+  return (
+    <div>
+      <div
+        style={{
+          fontSize: 11,
+          fontWeight: 600,
+          color: theme['text-muted'],
+          letterSpacing: '0.04em',
+          textTransform: 'uppercase',
+        }}
+      >
+        {label}
+      </div>
+      <div style={{ fontSize: 14, fontWeight: 600, color: theme['text-primary'], marginTop: 4 }}>{value}</div>
+    </div>
+  );
+}
+
+type DetailSectionProps = {
+  title: string;
+  children: React.ReactNode;
+};
+
+function DetailSection({ title, children }: DetailSectionProps) {
+  return (
+    <div className="dash-card" style={{ marginBottom: spacing[5] }}>
+      <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, letterSpacing: '-0.01em', color: theme['text-primary'] }}>
+        {title}
+      </h2>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+          gap: spacing[4],
+          marginTop: spacing[4],
+        }}
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
 
 export function ProfilePage({ onBack }: ProfilePageProps) {
   const [editOpen, setEditOpen] = useState(false);
@@ -60,10 +112,19 @@ export function ProfilePage({ onBack }: ProfilePageProps) {
           </svg>
         </button>
         <div>
-          <h1 style={{ margin: 0, fontSize: 28, fontWeight: 700, letterSpacing: '-0.03em', color: theme['text-primary'] }}>
+          <h1
+            style={{
+              margin: 0,
+              fontSize: typography.roles.pageTitle.fontSize,
+              lineHeight: typography.roles.pageTitle.lineHeight,
+              fontWeight: typography.roles.pageTitle.fontWeight,
+              letterSpacing: typography.roles.pageTitle.letterSpacing,
+              color: theme['text-primary'],
+            }}
+          >
             My Profile
           </h1>
-          <p style={{ margin: '4px 0 0', fontSize: 13, color: theme['text-muted'] }}>
+          <p style={{ margin: '6px 0 0', fontSize: 14, color: theme['text-secondary'] }}>
             Manage your certification, mentorship, and billing details.
           </p>
         </div>
@@ -98,107 +159,78 @@ export function ProfilePage({ onBack }: ProfilePageProps) {
           </div>
 
           <div style={{ flex: 1, minWidth: 220 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-              <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: theme['text-primary'], letterSpacing: '-0.02em' }}>
-                MiDNA (H.O)
-              </h2>
-              <span
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 5,
-                  fontSize: 12,
-                  fontWeight: 600,
-                  color: theme.primary,
-                  background: theme['primary-soft'],
-                  borderRadius: radius.pill,
-                  padding: '4px 10px 4px 8px',
-                }}
-              >
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M9 12l2 2 4-4" />
-                  <circle cx="12" cy="12" r="9" />
-                </svg>
-                Certified – Admin
-              </span>
+            <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: theme['text-primary'], letterSpacing: '-0.02em' }}>
+              MiDNA (H.O)
+            </h2>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginTop: 8 }}>
+              <Pill label={`${currentTier} member`} color={tier.color} bg={tier.bg} emoji={tier.emoji} />
+              <Pill label="Certified – Admin" color={theme.primary} bg={theme['primary-soft']} />
             </div>
           </div>
 
           <div style={{ display: 'flex', gap: 10 }}>
             <button
               type="button"
+              className="btn-pill-primary"
               onClick={() => setEditOpen(true)}
-              style={{
-                height: buttonTokens.height.sm,
-                padding: buttonTokens.padding.sm,
-                borderRadius: radius.pill,
-                border: 'none',
-                background: theme['btn-primary-bg'],
-                color: theme['btn-primary-text'],
-                fontSize: 13,
-                fontWeight: 600,
-                cursor: 'pointer',
-              }}
+              style={{ height: buttonTokens.height.sm, padding: buttonTokens.padding.sm, fontSize: 13 }}
             >
               Edit profile
             </button>
             <button
               type="button"
-              style={{
-                height: buttonTokens.height.sm,
-                padding: buttonTokens.padding.sm,
-                borderRadius: radius.pill,
-                border: `1px solid ${theme['btn-secondary-border']}`,
-                background: theme['btn-secondary-bg'],
-                color: theme['btn-secondary-text'],
-                fontSize: 13,
-                fontWeight: 600,
-                cursor: 'pointer',
-              }}
+              className="btn-pill-secondary"
+              style={{ height: buttonTokens.height.sm, padding: buttonTokens.padding.sm, fontSize: 13 }}
             >
               Change password
             </button>
           </div>
         </div>
-
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-            gap: spacing[3],
-            marginTop: spacing[5],
-            paddingTop: spacing[5],
-            borderTop: `1px solid ${theme.divider}`,
-          }}
-        >
-          {metaRows.map((row) => (
-            <div key={row.label} style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
-              <span
-                style={{
-                  width: 30,
-                  height: 30,
-                  borderRadius: radius.sm,
-                  background: theme['bg-canvas'],
-                  color: theme.primary,
-                  display: 'grid',
-                  placeItems: 'center',
-                  flexShrink: 0,
-                }}
-              >
-                {row.icon}
-              </span>
-              <div>
-                <div style={{ fontSize: 11, fontWeight: 600, color: theme['text-muted'], letterSpacing: '0.04em' }}>
-                  {row.label}
-                </div>
-                <div style={{ fontSize: 14, fontWeight: 600, color: theme['text-primary'], marginTop: 2 }}>
-                  {row.value}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
       </div>
+
+      <DetailSection title="Personal Details">
+        <DetailField label="Name" value="Arun Prakash" />
+        <DetailField label="Mobile 1" value="+91 98765 43210" />
+        <DetailField label="Mobile 2" value="+91 90000 11223" />
+        <DetailField label="Date of Birth" value="14 Feb 1990" />
+        <DetailField label="Country" value="India" />
+        <DetailField label="State" value="Tamil Nadu" />
+        <DetailField label="Pincode" value="600028" />
+        <DetailField label="Address" value="No. 12, Anna Nagar, Chennai" />
+      </DetailSection>
+
+      <DetailSection title="Membership & Billing">
+        <DetailField label="Midna ID (MID)" value="M10048" />
+        <DetailField label="Date of Joining" value="03 Jan 2022" />
+        <DetailField label="Subscription" value={<Pill label={currentTier} color={tier.color} bg={tier.bg} emoji={tier.emoji} />} />
+        <DetailField label="Expiry Date" value="02 Jan 2027" />
+        <DetailField label="Billing" value={`${tier.billing} commission`} />
+        <DetailField label="Opening Balance" value="₹8,200" />
+      </DetailSection>
+
+      <DetailSection title="Professional Details">
+        <DetailField label="UID" value="MDN-UID-08812" />
+        <DetailField label="Services" value="Genetic Counseling, Sample Collection, Report Review" />
+        <DetailField
+          label="Availability"
+          value={<Pill label="Full Time" color={metricColors.blue.text} bg={metricColors.blue.bg} />}
+        />
+        <DetailField label="Certified" value={<Pill label="Yes" color={theme.success} bg={theme['success-bg']} />} />
+        <DetailField label="Certification Date" value="18 Mar 2022" />
+      </DetailSection>
+
+      <DetailSection title="Visibility & Admin">
+        <DetailField label="MRP Visibility" value={<Pill label="Show" color={theme.success} bg={theme['success-bg']} />} />
+        <DetailField
+          label="Branding"
+          value={<Pill label="CBA" color={metricColors.purple.text} bg={metricColors.purple.bg} />}
+        />
+        <DetailField label="MIS Training" value={<Pill label="Completed" color={theme.success} bg={theme['success-bg']} />} />
+        <DetailField label="Mentored By" value="Rathinaswamy A · 9597770205" />
+        <DetailField label="Admin By" value="Priya Shah" />
+        <DetailField label="Status" value={<Pill label="Active" color={theme.success} bg={theme['success-bg']} />} />
+        <DetailField label="Remarks" value={<span style={{ fontWeight: 400, color: theme['text-muted'], fontStyle: 'italic' }}>No remarks</span>} />
+      </DetailSection>
 
       {/* Certifications card */}
       <div className="dash-card">
@@ -213,20 +245,8 @@ export function ProfilePage({ onBack }: ProfilePageProps) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: spacing[4], flexWrap: 'wrap' }}>
           <button
             type="button"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 8,
-              height: buttonTokens.height.sm,
-              padding: buttonTokens.padding.sm,
-              borderRadius: radius.pill,
-              border: `1px solid ${theme['btn-secondary-border']}`,
-              background: theme['btn-secondary-bg'],
-              color: theme['btn-secondary-text'],
-              fontSize: 13,
-              fontWeight: 600,
-              cursor: 'pointer',
-            }}
+            className="btn-pill-secondary"
+            style={{ height: buttonTokens.height.sm, padding: buttonTokens.padding.sm, fontSize: 13 }}
           >
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12 16V4" />

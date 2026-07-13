@@ -1,11 +1,11 @@
 /**
  * Midna Global Design System
- * Visual reference: Donezo-style modern dashboard shell
- * Brand primary: #CA317A (replaces Donezo green)
+ * Visual reference: Orbix Studio fintech dashboard (blue/indigo, soft lavender)
+ * Brand primary: #4F6AF0
  *
- * Three-layer backgrounds (Donezo exact):
- *   1. bg-frame   — full outer white page
- *   2. bg-canvas  — grey fill for the three enclosed panels (sidebar, top bar, main)
+ * Three-layer backgrounds:
+ *   1. bg-frame   — full outer lavender-grey page
+ *   2. bg-canvas  — same lavender-grey fill behind the content panel
  *   3. bg-surface — white component cards inside main
  *
  * Use these tokens when building pages — colors, radius, shadow,
@@ -14,24 +14,24 @@
 
 export type ThemeMode = 'light';
 
-// ─── Brand scale (magenta, Donezo green → #CA317A) ────────────────────────────
+// ─── Brand scale (indigo/blue → #4F6AF0) ───────────────────────────────────────
 
 /** Monochrome brand ladder for fills, charts, gradients, patterns */
 export const brandScale = {
   /** Deep accent — hero gradients, gauge "completed", dark pattern cards */
-  dark: '#8B2154',
+  dark: '#333F97',
   /** Primary brand — buttons, active nav, solid accents */
-  base: '#CA317A',
+  base: '#4F6AF0',
   /** Hover / pressed */
-  hover: '#A82866',
+  hover: '#3B54DE',
   /** Mid tint — secondary chart bars, avatars */
-  mid: '#E06A9E',
+  mid: '#7C93FF',
   /** Light tint — soft chart bars, highlights */
-  light: '#F0A8C8',
+  light: '#AFC0FF',
   /** Soft wash — active nav bg, icon chips, completed badges */
-  soft: '#F9E8F0',
+  soft: '#EAEEFF',
   /** Muted tint — striped chart segments, muted fills */
-  muted: '#F3D0E0',
+  muted: '#D3DBFF',
 } as const;
 
 // ─── Typography ───────────────────────────────────────────────────────────────
@@ -51,25 +51,25 @@ export const typography = {
 
   fonts: {
     /**
-     * SF Pro Display — Apple's system font. It can't be self-hosted or
-     * pulled from a CDN (Apple restricts distribution to Apple platforms),
-     * so `-apple-system` / `BlinkMacSystemFont` resolve to it natively on
-     * macOS & iOS Safari/Chrome. Inter is the closest metric fallback for
-     * everyone else (Windows, Android, Linux).
+     * Inter, self-hosted via @fontsource-variable/inter (imported in
+     * main.tsx) — bundled with the app instead of pulled from a CDN link,
+     * so it always loads regardless of network/ad-block conditions. The
+     * package registers the family as "Inter Variable", not "Inter".
+     * Matches the Orbix reference's rounded geometric look.
      */
     sans: {
-      family: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", system-ui, sans-serif',
+      family: '"Inter Variable", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif',
       letterSpacing: '0',
       fontWeight: 400,
     },
     heading: {
-      family: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", system-ui, sans-serif',
+      family: '"Inter Variable", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif',
       letterSpacing: '-0.025em',
       fontWeight: 700,
     },
     mono: { family: 'Menlo, Consolas, monospace', letterSpacing: '0', fontWeight: 500 },
     emphasis: {
-      family: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", system-ui, sans-serif',
+      family: '"Inter Variable", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif',
       letterSpacing: '0',
       fontWeight: 500,
     },
@@ -134,12 +134,12 @@ export const spacing = {
   12: '48px',
 } as const;
 
-/** Premium-SaaS rounding — lg is the standard card radius (12-14px) */
+/** Fintech-soft rounding — lg is the standard card radius (20px) */
 export const radius = {
-  sm: '8px',
-  md: '12px',
-  lg: '14px',
-  xl: '20px',
+  sm: '10px',
+  md: '14px',
+  lg: '20px',
+  xl: '28px',
   pill: '9999px',
 } as const;
 
@@ -172,35 +172,41 @@ export const tableTokens = {
 } as const;
 
 export const shadow = {
-  /** Default white card elevation — soft, low-contrast, premium-SaaS */
-  card: '0 6px 18px rgba(16, 24, 40, 0.05)',
+  /** Default white card elevation — soft, diffused, fintech-calm */
+  card: '0 10px 28px rgba(22, 26, 46, 0.06)',
   /** Slightly raised — hover states on cards */
-  cardHover: '0 10px 24px rgba(16, 24, 40, 0.08)',
+  cardHover: '0 16px 36px rgba(22, 26, 46, 0.10)',
   /** Soft brand glow (icons, small accents) */
-  soft: '0 4px 14px rgba(202, 49, 122, 0.14)',
+  soft: '0 6px 18px rgba(79, 106, 240, 0.16)',
   /** Primary CTA glow — used sparingly */
-  primary: '0 4px 14px rgba(202, 49, 122, 0.20)',
+  primary: '0 6px 20px rgba(79, 106, 240, 0.24)',
 } as const;
 
-// ─── Layout reference (Donezo shell) ──────────────────────────────────────────
+// ─── Layout reference ───────────────────────────────────────────────────────
 
 /**
- * Donezo page shell:
- * 1. Outer page — full white (`bg-frame`)
- * 2. Three enclosed grey panels — sidebar | top bar | main content (`bg-canvas` + rounded border)
+ * Page shell:
+ * 1. Outer page — soft lavender-grey (`bg-frame`)
+ * 2. Light, collapsible nav rail flush against the left edge (`sidebarTokens`)
  * 3. White component cards inside main content (`bg-surface`)
  */
 export const layoutTokens = {
   /** App bleeds to the viewport edge — no outer inset */
   framePadding: '0px',
-  /** Sidebar/topbar sit flush against the content — no gap between them */
-  shellGap: '0px',
-  /** Shared rounding for the three panels */
-  panelRadius: '20px',
+  /** Gap between the sidebar and the content panel, and the content panel's outer right/bottom inset */
+  shellGap: '20px',
+  /** Outer top inset — a bit more than shellGap so both the sidebar and content panel sit a little lower, clear of the viewport edge */
+  shellGapTop: '32px',
+  /** Shared rounding for the content panel */
+  panelRadius: '24px',
   /** Soft border around each panel */
-  panelBorder: '1px solid #EAECF0',
-  sidebarWidth: '212px',
+  panelBorder: '1px solid #E6E9F6',
+  /** Expanded width — icons + labels */
+  sidebarWidth: '216px',
+  /** Collapsed width — icons only */
   sidebarCollapsedWidth: '76px',
+  /** Extra breathing room above the page title, so it doesn't sit flush against the viewport edge */
+  contentPaddingTop: spacing[10],
   contentPadding: spacing[6],
   contentPaddingX: spacing[6],
   /** Gap between dashboard cards (KPI row, panel grid) — generous, premium whitespace */
@@ -219,17 +225,13 @@ export const cardTokens = {
 } as const;
 
 /**
- * Sidebar = enclosed grey panel on white page.
- * Active item (Donezo): left brand bar + brand icon + bold black label (no filled pill).
+ * Sidebar = light, collapsible nav rail. A touch whiter than the page's
+ * bg-canvas (not full bg-surface white — that read as too much contrast),
+ * just enough to lift it slightly off the page.
  */
 export const sidebarTokens = {
-  background: 'bg-canvas' as const,
+  background: '#F8F9FD',
   itemRadius: radius.md,
-  activeBackground: 'transparent' as const,
-  activeBarWidth: '5px',
-  activeBarColor: 'primary' as const,
-  iconChipSize: '22px',
-  iconChipRadius: '0',
 } as const;
 
 /**
@@ -292,22 +294,22 @@ export const patternTokens = {
 export const colors = {
   light: {
     /**
-     * Flat neutral page (Linear/Stripe/Notion style):
-     * bg-frame / bg-canvas → same neutral #F8F9FC, so the sidebar/topbar/main
-     *                        panels read as one continuous surface, not boxes
+     * Soft lavender-grey page (Orbix Studio fintech style):
+     * bg-frame / bg-canvas → same cool lavender #EEF1FA, so the content
+     *                        panel reads as one continuous surface
      * bg-surface           → white component cards (KPIs, notice, lists, etc.)
-     * Structure/hierarchy comes from the white cards + shadow, not panel fills.
+     * Structure/hierarchy comes from the white cards + soft shadow, not panel fills.
      */
-    'bg-frame': '#F8F9FC',
-    'bg-canvas': '#F8F9FC',
+    'bg-frame': '#EEF1FA',
+    'bg-canvas': '#EEF1FA',
     'bg-surface': '#FFFFFF',
-    'bg-muted': '#F2F4F7',
-    'bg-hover': '#F2F4F7',
+    'bg-muted': '#F1F3FC',
+    'bg-hover': '#F1F3FC',
 
     // Text
-    'text-primary': '#1D2939',
-    'text-secondary': '#667085',
-    'text-muted': '#98A2B3',
+    'text-primary': '#161A2E',
+    'text-secondary': '#767B99',
+    'text-muted': '#9EA3BE',
     'text-inverse': '#FFFFFF',
 
     // Brand
@@ -327,15 +329,15 @@ export const colors = {
     'btn-primary-text': '#FFFFFF',
     'btn-primary-hover': brandScale.hover,
     'btn-secondary-bg': '#FFFFFF',
-    'btn-secondary-text': brandScale.base,
-    'btn-secondary-border': brandScale.base,
+    'btn-secondary-text': '#161A2E',
+    'btn-secondary-border': '#E6E9F6',
     'btn-disabled-bg': '#E2E8F0',
     'btn-disabled-text': '#94A3B8',
 
     // Tables
-    'table-header-bg': '#F8F9FC',
-    'table-row-hover': '#F8F9FC',
-    'table-border': '#EAECF0',
+    'table-header-bg': '#EEF1FA',
+    'table-row-hover': '#EEF1FA',
+    'table-border': '#E6E9F6',
 
     // Semantic (keep — not brand green)
     success: '#16A34A',
@@ -359,8 +361,8 @@ export const colors = {
     'secure-badge-text': brandScale.dark,
     'focus-ring': brandScale.base,
 
-    border: '#EAECF0',
-    divider: '#EAECF0',
+    border: '#E6E9F6',
+    divider: '#E6E9F6',
   } as const,
 };
 
@@ -373,7 +375,7 @@ export const metricColors = {
   green: { icon: '#12B76A', text: '#027A48', bg: '#ECFDF3' },
   amber: { icon: '#F79009', text: '#B54708', bg: '#FFFAEB' },
   purple: { icon: '#9E77ED', text: '#6941C6', bg: '#F9F5FF' },
-  pink: { icon: brandScale.base, text: brandScale.dark, bg: brandScale.soft },
+  indigo: { icon: brandScale.base, text: brandScale.dark, bg: brandScale.soft },
 } as const;
 
 export type MetricColor = keyof typeof metricColors;
@@ -418,6 +420,9 @@ export const getThemeCssVars = (mode: ThemeMode = 'light'): Record<string, strin
     for (const [key, value] of Object.entries(tokens)) {
       vars[`--severity-${level}-${key}`] = value;
     }
+  }
+  for (const [key, value] of Object.entries(sidebarTokens)) {
+    vars[`--sidebar-${key}`] = value;
   }
   for (const [key, value] of Object.entries(buttonTokens.height)) {
     vars[`--btn-height-${key}`] = value;

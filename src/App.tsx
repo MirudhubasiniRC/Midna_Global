@@ -122,7 +122,11 @@ function App() {
               <ProfilePage onBack={() => setView('dashboard')} />
             ) : view === 'dashboard' ? (
               <>
-                <DashboardKpis onOpenMobileMenu={() => setMobileMenuOpen(true)} />
+                <DashboardKpis
+                  onOpenMobileMenu={() => setMobileMenuOpen(true)}
+                  onOpenProfile={() => setView('profile')}
+                  onNavigate={setView}
+                />
                 <div className="home-lower">
                   <NoticeBoard />
                   <TopPerformers />
@@ -132,6 +136,7 @@ function App() {
               <PlaceholderPage
                 {...placeholderPages[view]}
                 onOpenMobileMenu={() => setMobileMenuOpen(true)}
+                onOpenProfile={() => setView('profile')}
               />
             )}
           </main>
