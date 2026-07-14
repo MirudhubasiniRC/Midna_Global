@@ -26,11 +26,11 @@ export function Sidebar({ collapsed, onToggle, activeView, onNavigate, onLogout 
         flexDirection: 'column',
         padding: collapsed
           ? `${spacing[3]} ${spacing[2]} ${spacing[5]}`
-          : `${spacing[3]} ${spacing[3]} ${spacing[5]}`,
+          : `${spacing[6]} ${spacing[3]} ${spacing[4]}`,
         alignSelf: 'stretch',
         background: sidebarTokens.background,
         transition: 'width 0.2s ease, padding 0.2s ease',
-        overflow: 'visible',
+        overflow: collapsed ? 'visible' : 'hidden',
       }}
     >
       <div
@@ -40,8 +40,9 @@ export function Sidebar({ collapsed, onToggle, activeView, onNavigate, onLogout 
           justifyContent: collapsed ? 'center' : 'space-between',
           gap: spacing[2],
           padding: collapsed ? 0 : `0 ${spacing[2]}`,
-          marginBottom: spacing[6],
-          minHeight: 44,
+          marginBottom: collapsed ? spacing[2] : spacing[6],
+          minHeight: collapsed ? 44 : 42,
+          flexShrink: 0,
         }}
       >
         <div
@@ -90,7 +91,7 @@ export function Sidebar({ collapsed, onToggle, activeView, onNavigate, onLogout 
           className="btn-icon"
           aria-label="Expand sidebar"
           onClick={onToggle}
-          style={{ width: 44, height: 44, margin: `0 auto ${spacing[5]}` }}
+          style={{ width: 44, height: 44, margin: `0 auto ${spacing[8]}` }}
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
             <rect x="3" y="3" width="18" height="18" rx="3" />
@@ -103,13 +104,15 @@ export function Sidebar({ collapsed, onToggle, activeView, onNavigate, onLogout 
         style={{
           display: 'flex',
           flexDirection: 'column',
-          gap: collapsed ? 10 : 6,
+          /* Collapsed: fixed gaps. Expanded: distribute items evenly — no scroll, no dead zone. */
+          gap: collapsed ? 16 : 4,
           flex: 1,
           minHeight: 0,
-          marginTop: collapsed ? 0 : spacing[2],
-          overflowY: 'auto',
+          marginTop: collapsed ? 0 : 0,
+          overflowY: collapsed ? 'auto' : 'hidden',
           overflowX: 'visible',
           alignItems: collapsed ? 'center' : 'stretch',
+          justifyContent: collapsed ? 'flex-start' : 'space-between',
         }}
       >
         {navItems.map((item, index) => {
@@ -121,40 +124,38 @@ export function Sidebar({ collapsed, onToggle, activeView, onNavigate, onLogout 
               {isNewSection && !collapsed && (
                 <p
                   style={{
-                    fontSize: 11,
+                    fontSize: 10,
                     fontWeight: 600,
                     color: theme['text-muted'],
                     letterSpacing: '0.06em',
                     textTransform: 'uppercase',
                     padding: `0 ${spacing[3]}`,
-                    margin: `${spacing[4]} 0 ${spacing[2]}`,
+                    margin: '0 0 0',
+                    flexShrink: 0,
                   }}
                 >
                   {item.section}
                 </p>
               )}
-              {isNewSection && collapsed && (
-                <div style={{ width: 22, height: 1, background: theme.divider, margin: `${spacing[2]} 0` }} />
-              )}
               <button
                 type="button"
                 onClick={() => onNavigate(item.id)}
-                className={`sidebar-nav-item${active ? ' is-active' : ''}`}
+                className={`sidebar-nav-item${active ? ' is-active' : ''}${collapsed ? '' : ' is-expanded'}`}
                 aria-label={item.label}
                 style={{
                   position: 'relative',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: collapsed ? 'center' : 'flex-start',
-                  gap: 12,
+                  gap: collapsed ? 12 : 10,
                   width: collapsed ? 'auto' : '100%',
-                  minHeight: 44,
-                  padding: collapsed ? 0 : '6px 10px',
+                  minHeight: collapsed ? 44 : 40,
+                  padding: collapsed ? 0 : '4px 8px',
                   border: 'none',
                   borderRadius: sidebarTokens.itemRadius,
                   background: 'transparent',
                   color: active ? theme['text-primary'] : theme['text-secondary'],
-                  fontSize: 14,
+                  fontSize: collapsed ? 14 : 13,
                   fontWeight: active ? 600 : 500,
                   letterSpacing: '-0.01em',
                   textAlign: 'left',
@@ -162,9 +163,12 @@ export function Sidebar({ collapsed, onToggle, activeView, onNavigate, onLogout 
                   flexShrink: 0,
                 }}
               >
-                <span className="sidebar-nav-icon-bubble">
+                <span
+                  className="sidebar-nav-icon-bubble"
+                  style={collapsed ? undefined : { width: 36, height: 36 }}
+                >
                   <span className="sidebar-nav-icon" style={{ display: 'grid', placeItems: 'center' }}>
-                    <Icon size={18} fill="none" stroke="currentColor" strokeWidth={1.7} />
+                    <Icon size={collapsed ? 18 : 16} fill="none" stroke="currentColor" strokeWidth={1.7} />
                   </span>
                 </span>
                 {!collapsed && <span className="sidebar-nav-label">{item.label}</span>}
@@ -177,41 +181,46 @@ export function Sidebar({ collapsed, onToggle, activeView, onNavigate, onLogout 
 
       <div
         style={{
-          borderTop: `1px solid ${theme.divider}`,
-          paddingTop: spacing[3],
-          marginTop: spacing[3],
+          borderTop: collapsed ? 'none' : `1px solid ${theme.divider}`,
+          paddingTop: collapsed ? 0 : spacing[2],
+          marginTop: collapsed ? 16 : spacing[2],
           display: 'flex',
           flexDirection: 'column',
-          gap: 4,
+          gap: collapsed ? 16 : 4,
           alignItems: collapsed ? 'center' : 'stretch',
+          flexShrink: 0,
         }}
       >
         <button
           type="button"
           onClick={onLogout}
-          className="sidebar-nav-item sidebar-logout-item"
+          className={`sidebar-nav-item sidebar-logout-item${collapsed ? '' : ' is-expanded'}`}
           aria-label="Log out"
           style={{
             position: 'relative',
             display: 'flex',
             alignItems: 'center',
             justifyContent: collapsed ? 'center' : 'flex-start',
-            gap: 12,
+            gap: collapsed ? 12 : 10,
             width: collapsed ? 'auto' : '100%',
-            padding: collapsed ? 0 : '6px 10px',
+            minHeight: collapsed ? undefined : 38,
+            padding: collapsed ? 0 : '3px 8px',
             border: 'none',
             borderRadius: sidebarTokens.itemRadius,
             background: 'transparent',
             color: theme['text-secondary'],
-            fontSize: 14,
+            fontSize: collapsed ? 14 : 13,
             fontWeight: 500,
             letterSpacing: '-0.01em',
             textAlign: 'left',
             cursor: 'pointer',
           }}
         >
-          <span className="sidebar-nav-icon-bubble">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+          <span
+            className="sidebar-nav-icon-bubble"
+            style={collapsed ? undefined : { width: 36, height: 36 }}
+          >
+            <svg width={collapsed ? 18 : 16} height={collapsed ? 18 : 16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
               <path d="M16 17l5-5-5-5" />
               <path d="M21 12H9" />
