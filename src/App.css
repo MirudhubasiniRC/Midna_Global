@@ -253,6 +253,12 @@
   color: var(--brand-mid, #7c93ff);
 }
 
+/* Profile page detail sections — vertical list of label/value rows, last row has no divider */
+.detail-list > *:last-child {
+  border-bottom: none !important;
+  padding-bottom: 0 !important;
+}
+
 .performer-row {
   display: flex;
   align-items: center;

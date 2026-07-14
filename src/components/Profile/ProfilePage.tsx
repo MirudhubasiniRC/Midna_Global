@@ -59,19 +59,36 @@ type DetailFieldProps = {
 
 function DetailField({ label, value }: DetailFieldProps) {
   return (
-    <div>
-      <div
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: spacing[5],
+        padding: `${spacing[4]} 0`,
+        borderBottom: `1px solid ${theme.divider}`,
+      }}
+    >
+      <span
         style={{
-          fontSize: 11,
-          fontWeight: 600,
-          color: theme['text-muted'],
-          letterSpacing: '0.04em',
-          textTransform: 'uppercase',
+          fontSize: 13,
+          fontWeight: 500,
+          color: theme['text-secondary'],
+          flexShrink: 0,
         }}
       >
         {label}
-      </div>
-      <div style={{ fontSize: 14, fontWeight: 600, color: theme['text-primary'], marginTop: 4 }}>{value}</div>
+      </span>
+      <span
+        style={{
+          fontSize: 14,
+          fontWeight: 600,
+          color: theme['text-primary'],
+          textAlign: 'right',
+        }}
+      >
+        {value}
+      </span>
     </div>
   );
 }
@@ -83,18 +100,11 @@ type DetailSectionProps = {
 
 function DetailSection({ title, children }: DetailSectionProps) {
   return (
-    <div className="dash-card" style={{ marginBottom: spacing[5] }}>
+    <div className="dash-card">
       <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, letterSpacing: '-0.01em', color: theme['text-primary'] }}>
         {title}
       </h2>
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-          gap: spacing[4],
-          marginTop: spacing[4],
-        }}
-      >
+      <div className="detail-list" style={{ display: 'flex', flexDirection: 'column', marginTop: spacing[3] }}>
         {children}
       </div>
     </div>
@@ -257,49 +267,59 @@ export function ProfilePage({ onBack }: ProfilePageProps) {
         </div>
       </div>
 
-      <DetailSection title="Personal Details">
-        <DetailField label="Name" value="Arun Prakash" />
-        <DetailField label="Mobile 1" value="+91 98765 43210" />
-        <DetailField label="Mobile 2" value="+91 90000 11223" />
-        <DetailField label="Date of Birth" value="14 Feb 1990" />
-        <DetailField label="Country" value="India" />
-        <DetailField label="State" value="Tamil Nadu" />
-        <DetailField label="Pincode" value="600028" />
-        <DetailField label="Address" value="No. 12, Anna Nagar, Chennai" />
-      </DetailSection>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))',
+          gap: spacing[5],
+          marginBottom: spacing[5],
+          alignItems: 'stretch',
+        }}
+      >
+        <DetailSection title="Personal Details">
+          <DetailField label="Name" value="Arun Prakash" />
+          <DetailField label="Mobile 1" value="+91 98765 43210" />
+          <DetailField label="Mobile 2" value="+91 90000 11223" />
+          <DetailField label="Date of Birth" value="14 Feb 1990" />
+          <DetailField label="Country" value="India" />
+          <DetailField label="State" value="Tamil Nadu" />
+          <DetailField label="Pincode" value="600028" />
+          <DetailField label="Address" value="No. 12, Anna Nagar, Chennai" />
+        </DetailSection>
 
-      <DetailSection title="Membership & Billing">
-        <DetailField label="Midna ID (MID)" value="M10048" />
-        <DetailField label="Date of Joining" value="03 Jan 2022" />
-        <DetailField label="Subscription" value={<Pill label={currentTier} color={tier.color} bg={tier.bg} emoji={tier.emoji} />} />
-        <DetailField label="Expiry Date" value="02 Jan 2027" />
-        <DetailField label="Billing" value={`${tier.billing} commission`} />
-        <DetailField label="Opening Balance" value="₹8,200" />
-      </DetailSection>
+        <DetailSection title="Membership & Billing">
+          <DetailField label="Midna ID (MID)" value="M10048" />
+          <DetailField label="Date of Joining" value="03 Jan 2022" />
+          <DetailField label="Subscription" value={<Pill label={currentTier} color={tier.color} bg={tier.bg} emoji={tier.emoji} />} />
+          <DetailField label="Expiry Date" value="02 Jan 2027" />
+          <DetailField label="Billing" value={`${tier.billing} commission`} />
+          <DetailField label="Opening Balance" value="₹8,200" />
+        </DetailSection>
 
-      <DetailSection title="Professional Details">
-        <DetailField label="UID" value="MDN-UID-08812" />
-        <DetailField label="Services" value="Genetic Counseling, Sample Collection, Report Review" />
-        <DetailField
-          label="Availability"
-          value={<Pill label="Full Time" color={metricColors.blue.text} bg={metricColors.blue.bg} />}
-        />
-        <DetailField label="Certified" value={<Pill label="Yes" color={theme.success} bg={theme['success-bg']} />} />
-        <DetailField label="Certification Date" value="18 Mar 2022" />
-      </DetailSection>
+        <DetailSection title="Professional Details">
+          <DetailField label="UID" value="MDN-UID-08812" />
+          <DetailField label="Services" value="Genetic Counseling, Sample Collection, Report Review" />
+          <DetailField
+            label="Availability"
+            value={<Pill label="Full Time" color={metricColors.blue.text} bg={metricColors.blue.bg} />}
+          />
+          <DetailField label="Certified" value={<Pill label="Yes" color={theme.success} bg={theme['success-bg']} />} />
+          <DetailField label="Certification Date" value="18 Mar 2022" />
+        </DetailSection>
 
-      <DetailSection title="Visibility & Admin">
-        <DetailField label="MRP Visibility" value={<Pill label="Show" color={theme.success} bg={theme['success-bg']} />} />
-        <DetailField
-          label="Branding"
-          value={<Pill label="CBA" color={metricColors.purple.text} bg={metricColors.purple.bg} />}
-        />
-        <DetailField label="MIS Training" value={<Pill label="Completed" color={theme.success} bg={theme['success-bg']} />} />
-        <DetailField label="Mentored By" value="Rathinaswamy A · 9597770205" />
-        <DetailField label="Admin By" value="Priya Shah" />
-        <DetailField label="Status" value={<Pill label="Active" color={theme.success} bg={theme['success-bg']} />} />
-        <DetailField label="Remarks" value={<span style={{ fontWeight: 400, color: theme['text-muted'], fontStyle: 'italic' }}>No remarks</span>} />
-      </DetailSection>
+        <DetailSection title="Visibility & Admin">
+          <DetailField label="MRP Visibility" value={<Pill label="Show" color={theme.success} bg={theme['success-bg']} />} />
+          <DetailField
+            label="Branding"
+            value={<Pill label="CBA" color={metricColors.purple.text} bg={metricColors.purple.bg} />}
+          />
+          <DetailField label="MIS Training" value={<Pill label="Completed" color={theme.success} bg={theme['success-bg']} />} />
+          <DetailField label="Mentored By" value="Rathinaswamy A · 9597770205" />
+          <DetailField label="Admin By" value="Priya Shah" />
+          <DetailField label="Status" value={<Pill label="Active" color={theme.success} bg={theme['success-bg']} />} />
+          <DetailField label="Remarks" value={<span style={{ fontWeight: 400, color: theme['text-muted'], fontStyle: 'italic' }}>No remarks</span>} />
+        </DetailSection>
+      </div>
 
       {/* Certifications card */}
       <div className="dash-card">
