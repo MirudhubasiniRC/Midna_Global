@@ -1,15 +1,46 @@
 .app-frame {
+  position: relative;
+  isolation: isolate;
   min-height: 100vh;
   min-height: 100dvh;
   padding: var(--layout-framePadding, 0px);
-  background: var(--color-bg-frame, #ffffff);
-  color: var(--color-text-primary, #1d2939);
+  background: var(--color-bg-frame, #f4f7fa);
+  color: var(--color-text-primary, #212529);
   font-family: var(--font-sans-family, 'Inter Variable', 'Inter', system-ui, sans-serif);
   box-sizing: border-box;
+  overflow: hidden;
 }
 
-/* White page holds three separate enclosed grey panels */
+/* Soft lilac/blue ambient bubbles — reference atmosphere behind the shell */
+.app-frame::before,
+.app-frame::after {
+  content: '';
+  position: fixed;
+  pointer-events: none;
+  z-index: 0;
+  border-radius: 50%;
+  filter: blur(2px);
+}
+
+.app-frame::before {
+  width: min(62vw, 680px);
+  height: min(62vw, 680px);
+  top: -12%;
+  right: -8%;
+  background: var(--bubble-primary, radial-gradient(circle, rgba(142, 154, 254, 0.22) 0%, rgba(142, 154, 254, 0) 70%));
+}
+
+.app-frame::after {
+  width: min(48vw, 520px);
+  height: min(48vw, 520px);
+  bottom: -18%;
+  left: -6%;
+  background: var(--bubble-secondary, radial-gradient(circle, rgba(190, 75, 219, 0.1) 0%, rgba(190, 75, 219, 0) 70%));
+}
+
 .app-shell {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: stretch;
   gap: var(--layout-shellGap, 0px);
@@ -22,52 +53,40 @@
   overflow: hidden;
 }
 
+/* Content area bleeds into the cool-grey canvas — cards provide elevation */
 .panel {
-  background: var(--color-bg-canvas, #f8f9fc);
-  border: var(--layout-panelBorder, 1px solid #e6e9f6);
-  border-radius: var(--layout-panelRadius, 24px);
-  /*
-   * The border color is intentionally close to the page background (same
-   * continuous-surface look), so it never reads on its own. Two shadow
-   * layers do the actual work: a 1px all-around ring for a crisp, equally
-   * visible edge on every side (top included — a directional drop shadow
-   * alone is always weakest at the top), plus a soft diffused shadow for depth.
-   */
-  box-shadow: 0 0 0 1px rgba(22, 26, 46, 0.09), 0 1px 2px rgba(22, 26, 46, 0.04), 0 16px 40px rgba(22, 26, 46, 0.08);
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
   box-sizing: border-box;
 }
 
-/*
- * Sidebar is a white panel with a thin right border, flush against the
- * page (background/border set inline in Sidebar.tsx). It's collapsible
- * (width toggles in Sidebar.tsx); the active nav item gets a raised
- * white pill of its own, with a shadow, to stand out even on the white fill.
- */
 .sidebar {
   border: none;
+  background: transparent;
 }
 
 .sidebar-nav-item {
   background: transparent;
   overflow: visible;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition: background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
 }
 
-/* Custom tooltip (collapsed rail only) — reveals on hover via CSS, no native title-attribute delay */
 .sidebar-tooltip {
   position: absolute;
   left: calc(100% + 12px);
   top: 50%;
   transform: translateY(-50%) translateX(-4px);
-  background: #14161f;
+  background: #212529;
   color: #ffffff;
   font-size: 12px;
   font-weight: 600;
   letter-spacing: -0.01em;
   white-space: nowrap;
   padding: 6px 10px;
-  border-radius: 8px;
-  box-shadow: 0 8px 20px rgba(10, 12, 28, 0.3);
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(80, 90, 140, 0.22);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.1s ease, transform 0.1s ease;
@@ -80,8 +99,13 @@
 }
 
 .sidebar-nav-item:hover:not(.is-active) {
-  background: var(--color-bg-hover, #f1f3fc);
-  color: var(--color-text-primary, #161a2e);
+  background: rgba(255, 255, 255, 0.65);
+  color: var(--color-text-primary, #212529);
+}
+
+.sidebar-nav-item:hover:not(.is-active) .sidebar-nav-icon-bubble {
+  background: #ffffff;
+  box-shadow: var(--shadow-float, 0 6px 18px rgba(80, 90, 140, 0.08));
 }
 
 .app-main {
@@ -90,8 +114,6 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  /* Frame-colored inset on top/right/bottom so the content panel's rounded edge
-     reads as a floating card on every side, not just wherever leftover space happens to be */
   padding: var(--layout-shellGapTop, 32px) var(--layout-shellGap, 20px) var(--layout-shellGap, 20px) 0;
   background: transparent;
   overflow: auto;
@@ -107,32 +129,34 @@
 }
 
 .dash-card {
+  position: relative;
   background: var(--color-bg-surface, #fff);
-  border-radius: var(--radius-lg, 14px);
+  border-radius: var(--radius-lg, 24px);
   box-shadow: var(--shadow-card);
   padding: var(--space-6, 24px);
+  border: none;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
 
 .btn-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
-  border: 1px solid var(--color-border, #e6e9f6);
+  border: none;
   background: var(--color-bg-surface, #fff);
-  color: var(--color-text-secondary, #667085);
-  box-shadow: var(--shadow-card, 0 10px 28px rgba(22, 26, 46, 0.06));
-  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+  color: var(--color-text-secondary, #868e96);
+  box-shadow: var(--shadow-float, 0 4px 14px rgba(80, 90, 140, 0.14));
+  transition: color 0.15s ease, background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .btn-icon:hover {
-  border-color: var(--color-primary, #4f6af0);
-  color: var(--color-primary, #4f6af0);
-  background: var(--color-primary-soft, #eaeeff);
+  color: var(--color-primary, #6d7af2);
+  background: #ffffff;
   transform: translateY(-1px);
-  box-shadow: var(--shadow-cardHover, 0 16px 36px rgba(22, 26, 46, 0.1));
+  box-shadow: 0 6px 18px rgba(80, 90, 140, 0.2);
 }
 
 .btn-icon:active {
@@ -144,13 +168,13 @@
 }
 
 .sidebar-logout-item:hover {
-  background: var(--color-error-bg, #fee2e2);
-  color: var(--color-error, #dc2626);
+  background: var(--color-error-bg, #fff5f5);
+  color: var(--color-error, #fa5252);
 }
 
 .notice-scroll {
   scrollbar-width: thin;
-  scrollbar-color: var(--color-border, #e6e9f6) transparent;
+  scrollbar-color: var(--color-border, #e9ecef) transparent;
 }
 
 .notice-scroll::-webkit-scrollbar {
@@ -162,28 +186,27 @@
 }
 
 .notice-scroll::-webkit-scrollbar-thumb {
-  background: var(--color-border, #e6e9f6);
+  background: var(--color-border, #e9ecef);
   border-radius: 999px;
 }
 
 .notice-scroll::-webkit-scrollbar-thumb:hover {
-  background: var(--color-text-muted, #98a2b3);
+  background: var(--color-text-muted, #adb5bd);
 }
 
-/* Attention-drawing pulse ring on the Notice board card + blinking alert glyph in its title */
 .notice-board-pulse {
-  animation: notice-pulse-ring 1.3s ease-out infinite;
+  animation: notice-pulse-ring 1.6s ease-out infinite;
 }
 
 @keyframes notice-pulse-ring {
   0% {
-    box-shadow: var(--shadow-card), 0 0 0 0 rgba(79, 106, 240, 0.5);
+    box-shadow: var(--shadow-card), 0 0 0 0 rgba(109, 122, 242, 0.35);
   }
   70% {
-    box-shadow: var(--shadow-card), 0 0 0 10px rgba(79, 106, 240, 0);
+    box-shadow: var(--shadow-card), 0 0 0 12px rgba(109, 122, 242, 0);
   }
   100% {
-    box-shadow: var(--shadow-card), 0 0 0 0 rgba(79, 106, 240, 0);
+    box-shadow: var(--shadow-card), 0 0 0 0 rgba(109, 122, 242, 0);
   }
 }
 
@@ -198,8 +221,8 @@
     transform: scale(1);
   }
   50% {
-    opacity: 0.15;
-    transform: scale(1.12);
+    opacity: 0.2;
+    transform: scale(1.08);
   }
 }
 
@@ -210,7 +233,6 @@
   }
 }
 
-/* "Live" status dot — a solid dot with an expanding, fading ring, like a YouTube live-analytics indicator */
 .status-dot-ping::after {
   content: '';
   position: absolute;
@@ -239,12 +261,13 @@
 }
 
 .notice-ack-btn {
-  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.1s ease;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
 }
 
 .notice-ack-btn[aria-pressed='false']:hover {
-  border-color: var(--color-primary, #4f6af0);
-  color: var(--color-primary, #4f6af0);
+  border-color: transparent;
+  color: var(--color-primary, #6d7af2);
+  box-shadow: var(--shadow-float);
 }
 
 .notice-ack-btn:active {
@@ -252,37 +275,46 @@
 }
 
 /*
- * No background fill — selection reads via a left accent bar plus a
- * colored icon, using a lighter brand tint (not the full-saturation base)
- * so it's a quiet indicator, not a loud block.
+ * Soft-UI active nav: circular periwinkle bubble + glow behind the icon,
+ * matching the reference slim rail (Home in blue circle).
  */
 .sidebar-nav-item.is-active {
   background: transparent;
+  color: var(--color-text-primary, #212529);
 }
 
 .sidebar-nav-item.is-active::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 4px;
-  height: 60%;
-  border-radius: 0 999px 999px 0;
-  background: var(--brand-mid, #7c93ff);
-  box-shadow: 0 0 8px rgba(124, 147, 255, 0.6);
+  display: none;
+}
+
+.sidebar-nav-item.is-active .sidebar-nav-icon-bubble {
+  background: var(--btn-primary-gradient, linear-gradient(135deg, #8e9afe 0%, #6d7af2 100%));
+  color: #ffffff;
+  box-shadow: var(--shadow-soft, 0 8px 20px rgba(109, 122, 242, 0.28));
 }
 
 .sidebar-nav-item.is-active .sidebar-nav-label {
-  color: var(--color-text-primary, #161a2e);
-  font-weight: 700;
+  color: var(--color-text-primary, #212529);
+  font-weight: 600;
 }
 
 .sidebar-nav-item.is-active .sidebar-nav-icon {
-  color: var(--brand-mid, #7c93ff);
+  color: #ffffff;
 }
 
-/* Profile page detail sections — vertical list of label/value rows, last row has no divider */
+.sidebar-nav-icon-bubble {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  background: #ffffff;
+  color: var(--color-text-secondary, #868e96);
+  box-shadow: var(--shadow-float, 0 4px 14px rgba(80, 90, 140, 0.14));
+  transition: background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+}
+
 .detail-list > *:last-child {
   border-bottom: none !important;
   padding-bottom: 0 !important;
@@ -292,13 +324,13 @@
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 10px 10px;
-  border-radius: var(--radius-md, 12px);
+  padding: 10px 12px;
+  border-radius: var(--radius-md, 16px);
   transition: background 0.15s ease;
 }
 
 .performer-row:hover {
-  background: var(--color-bg-muted, #f2f4f7);
+  background: var(--color-bg-muted, #f1f3f5);
 }
 
 .kpi-grid {
@@ -307,8 +339,46 @@
   gap: 20px;
 }
 
-/* Profile page detail cards — explicit column counts so all 4 hold one row on
-   large screens instead of an auto-fit min-width dropping the 4th to its own row */
+.kpi-card {
+  position: relative;
+  overflow: hidden;
+  background: var(--color-bg-surface, #fff);
+  border-radius: var(--radius-lg, 24px);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-5, 20px);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4, 16px);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  top: -40px;
+  right: -36px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(142, 154, 254, 0.12) 0%, rgba(142, 154, 254, 0) 70%);
+  pointer-events: none;
+}
+
+.kpi-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-cardHover);
+}
+
+.kpi-icon-bubble {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+}
+
 .profile-detail-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -337,20 +407,15 @@
     grid-template-columns: 1fr;
   }
 
-  /* Stacked single-column layout — give Notice board room for all 3 cards instead of matching Top performers' height */
   .notice-board-card {
     height: 640px !important;
   }
 }
 
-/*
- * Mobile / iPhone 14 Pro Max: desktop sidebar hidden below this width.
- * Navigation is reached instead via the hamburger button next to the
- * notification bell, which opens .mobile-nav.
- */
 @media (max-width: 860px) {
   .app-frame {
     padding: 0;
+    overflow: auto;
   }
 
   .app-shell {
@@ -365,8 +430,6 @@
     display: none !important;
   }
 
-  /* Outer gap above the panel's own border — pushes the whole white card down
-     from the viewport edge, not just the text inside it */
   .app-main {
     padding: 20px 12px 12px;
     overflow: visible;
@@ -381,8 +444,6 @@
     grid-template-columns: 1fr;
   }
 
-  /* Hero card wraps to its own line on narrow screens — keep the two
-     buttons side by side in a horizontal row below the rest of the card */
   .profile-hero-actions {
     width: 100%;
   }
@@ -417,7 +478,7 @@
   border: none;
   padding: 0;
   margin: 0;
-  background: rgba(15, 23, 42, 0.45);
+  background: rgba(33, 37, 41, 0.35);
   opacity: 0;
   transition: opacity 0.22s ease;
   cursor: pointer;
@@ -438,10 +499,10 @@
   flex-direction: column;
   overflow: hidden;
   background: var(--color-bg-surface, #fff);
-  border-radius: 0 var(--radius-xl, 28px) var(--radius-xl, 28px) 0;
+  border-radius: 0 var(--radius-xl, 32px) var(--radius-xl, 32px) 0;
   transform: translateX(-105%);
   transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
-  box-shadow: 0 20px 48px rgba(16, 24, 40, 0.22);
+  box-shadow: 0 20px 48px rgba(80, 90, 140, 0.18);
 }
 
 .mobile-nav.is-open .mobile-nav-panel {
@@ -462,7 +523,6 @@
   }
 }
 
-/* Edit profile modal */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -471,7 +531,7 @@
   align-items: center;
   justify-content: center;
   padding: 24px;
-  background: rgba(15, 23, 42, 0.45);
+  background: rgba(33, 37, 41, 0.35);
   animation: modal-overlay-in 0.18s ease;
 }
 
@@ -491,8 +551,8 @@
   display: flex;
   flex-direction: column;
   background: var(--color-bg-surface, #fff);
-  border-radius: var(--radius-xl, 20px);
-  box-shadow: 0 20px 48px rgba(16, 24, 40, 0.16);
+  border-radius: var(--radius-xl, 32px);
+  box-shadow: 0 24px 56px rgba(80, 90, 140, 0.16);
   overflow: hidden;
   animation: modal-panel-in 0.2s cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -515,7 +575,7 @@
   gap: 16px;
   padding: 24px 28px;
   background: var(--color-bg-surface, #fff);
-  border-bottom: 1px solid var(--color-divider, #e6e9f6);
+  border-bottom: 1px solid var(--color-divider, #e9ecef);
   flex-shrink: 0;
 }
 
@@ -524,13 +584,13 @@
   font-size: 20px;
   font-weight: 700;
   letter-spacing: -0.02em;
-  color: var(--color-text-primary, #1d2939);
+  color: var(--color-text-primary, #212529);
 }
 
 .modal-subtitle {
   margin: 4px 0 0;
   font-size: 13px;
-  color: var(--color-text-muted, #98a2b3);
+  color: var(--color-text-muted, #adb5bd);
 }
 
 .modal-body {
@@ -543,7 +603,7 @@
   justify-content: flex-end;
   gap: 10px;
   padding: 18px 28px;
-  border-top: 1px solid var(--color-divider, #e6e9f6);
+  border-top: 1px solid var(--color-divider, #e9ecef);
   flex-shrink: 0;
 }
 
@@ -568,7 +628,7 @@
 .form-label {
   font-size: 13px;
   font-weight: 600;
-  color: var(--color-text-primary, #1d2939);
+  color: var(--color-text-primary, #212529);
 }
 
 .form-input,
@@ -577,13 +637,13 @@
   width: 100%;
   height: var(--input-height-md, 44px);
   padding: var(--input-padding, 12px 16px);
-  border-radius: var(--radius-md, 14px);
-  border: 1px solid var(--color-border, #e6e9f6);
-  background: var(--color-bg-surface, #fff);
-  color: var(--color-text-primary, #1d2939);
+  border-radius: var(--radius-pill, 9999px);
+  border: 1px solid var(--color-border, #e9ecef);
+  background: var(--color-bg-muted, #f1f3f5);
+  color: var(--color-text-primary, #212529);
   font-size: 14px;
   font-family: inherit;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
   box-sizing: border-box;
 }
 
@@ -591,8 +651,9 @@
 .form-select:focus,
 .form-textarea:focus {
   outline: none;
-  border-color: var(--color-primary, #4f6af0);
-  box-shadow: 0 0 0 3px var(--color-primary-soft, #eaeeff);
+  border-color: var(--color-primary, #6d7af2);
+  background: #ffffff;
+  box-shadow: 0 0 0 4px var(--color-primary-soft, #eef0ff);
 }
 
 .form-textarea {
@@ -602,6 +663,7 @@
   padding-bottom: 12px;
   resize: vertical;
   line-height: 1.5;
+  border-radius: var(--radius-md, 16px);
 }
 
 .form-select-wrap {
@@ -620,7 +682,7 @@
   top: 50%;
   transform: translateY(-50%);
   pointer-events: none;
-  color: var(--color-text-muted, #98a2b3);
+  color: var(--color-text-muted, #adb5bd);
 }
 
 .btn-pill-primary {
@@ -632,20 +694,20 @@
   padding: var(--btn-padding-md, 10px 16px);
   border-radius: var(--radius-pill, 9999px);
   border: none;
-  background: var(--color-btn-primary-bg, #4f6af0);
+  background: var(--btn-primary-gradient, linear-gradient(135deg, #8e9afe 0%, #6d7af2 100%));
   color: var(--color-btn-primary-text, #fff);
   font-size: 14px;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
-  box-shadow: var(--shadow-primary, 0 6px 20px rgba(79, 106, 240, 0.24));
-  transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: var(--shadow-primary, 0 10px 24px rgba(109, 122, 242, 0.35));
+  transition: filter 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .btn-pill-primary:hover {
-  background: var(--color-btn-primary-hover, #3b54de);
+  background: var(--btn-primary-gradient-hover, linear-gradient(135deg, #9aa5ff 0%, #7a86f5 100%));
   transform: translateY(-1px);
-  box-shadow: 0 10px 24px rgba(79, 106, 240, 0.3);
+  box-shadow: 0 14px 28px rgba(109, 122, 242, 0.4);
 }
 
 .btn-pill-primary:active {
@@ -660,21 +722,21 @@
   height: var(--btn-height-md, 40px);
   padding: var(--btn-padding-md, 10px 16px);
   border-radius: var(--radius-pill, 9999px);
-  border: 1px solid var(--color-btn-secondary-border, #e6e9f6);
+  border: none;
   background: var(--color-btn-secondary-bg, #fff);
-  color: var(--color-btn-secondary-text, #161a2e);
+  color: var(--color-btn-secondary-text, #212529);
   font-size: 14px;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
-  box-shadow: var(--shadow-card, 0 10px 28px rgba(22, 26, 46, 0.06));
-  transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: var(--shadow-float, 0 6px 18px rgba(80, 90, 140, 0.08));
+  transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
 }
 
 .btn-pill-secondary:hover {
-  border-color: var(--color-primary, #4f6af0);
+  color: var(--color-primary, #6d7af2);
   transform: translateY(-1px);
-  box-shadow: var(--shadow-cardHover, 0 16px 36px rgba(22, 26, 46, 0.1));
+  box-shadow: var(--shadow-cardHover, 0 16px 40px rgba(80, 90, 140, 0.12));
 }
 
 .btn-pill-secondary:active {

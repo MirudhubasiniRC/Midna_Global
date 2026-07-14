@@ -1,4 +1,4 @@
-import { colors, layoutTokens, radius, spacing } from '../../styles/theme';
+import { colors, layoutTokens, radius, shadow, spacing } from '../../styles/theme';
 
 const theme = colors.light;
 
@@ -11,7 +11,6 @@ type Performer = {
   pastel: string;
 };
 
-/** Soft pastel wells behind memoji-style faces (Donezo look) */
 const performers: Performer[] = [
   {
     rank: 1,
@@ -67,7 +66,7 @@ export function TopPerformers() {
         }}
       >
         <div>
-          <h2 style={{ margin: 0, fontSize: 22, fontWeight: 700, letterSpacing: '-0.01em', color: theme['text-primary'] }}>
+          <h2 style={{ margin: 0, fontSize: 20, fontWeight: 600, letterSpacing: '-0.01em', color: theme['text-primary'] }}>
             Top performer of 5
           </h2>
           <p style={{ margin: '4px 0 0', fontSize: 13, color: theme['text-muted'] }}>Leading scanners this period</p>
@@ -75,32 +74,34 @@ export function TopPerformers() {
         <span
           style={{
             fontSize: 11,
-            fontWeight: 700,
+            fontWeight: 600,
             color: theme.primary,
             background: theme['primary-soft'],
             borderRadius: radius.pill,
-            padding: '4px 10px',
+            padding: '6px 12px',
+            boxShadow: shadow.float,
           }}
         >
           Top 5
         </span>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 4, flex: '1 1 auto', minHeight: 0 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flex: '1 1 auto', minHeight: 0 }}>
         {performers.map((person) => (
           <div key={person.rank} className="performer-row">
             <span
               style={{
-                width: 22,
-                height: 22,
+                width: 24,
+                height: 24,
                 borderRadius: '50%',
                 display: 'grid',
                 placeItems: 'center',
                 fontSize: 11,
                 fontWeight: 700,
                 flexShrink: 0,
-                background: person.rank === 1 ? theme.primary : theme['bg-muted'],
+                background: person.rank === 1 ? 'var(--btn-primary-gradient)' : theme['bg-muted'],
                 color: person.rank === 1 ? '#fff' : theme['text-secondary'],
+                boxShadow: person.rank === 1 ? shadow.soft : 'none',
               }}
             >
               {person.rank}
@@ -115,6 +116,7 @@ export function TopPerformers() {
                 placeItems: 'center',
                 flexShrink: 0,
                 overflow: 'hidden',
+                boxShadow: shadow.float,
               }}
             >
               <img
@@ -131,28 +133,22 @@ export function TopPerformers() {
               />
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 15, fontWeight: 600, color: theme['text-primary'] }}>{person.name}</div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: theme['text-primary'] }}>{person.name}</div>
               <div style={{ fontSize: 12, color: theme['text-muted'], marginTop: 1 }}>{person.detail}</div>
             </div>
-            {person.rank === 1 ? (
-              <div
-                style={{
-                  fontSize: 13,
-                  fontWeight: 700,
-                  color: theme.primary,
-                  background: theme['primary-soft'],
-                  borderRadius: radius.pill,
-                  padding: '4px 10px',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {person.metric}
-              </div>
-            ) : (
-              <div style={{ fontSize: 14, fontWeight: 700, color: theme['text-primary'], whiteSpace: 'nowrap' }}>
-                {person.metric}
-              </div>
-            )}
+            <div
+              style={{
+                fontSize: 12,
+                fontWeight: 600,
+                color: person.rank === 1 ? theme.primary : theme['text-secondary'],
+                background: person.rank === 1 ? theme['primary-soft'] : theme['bg-muted'],
+                borderRadius: radius.pill,
+                padding: '6px 12px',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {person.metric}
+            </div>
           </div>
         ))}
       </div>

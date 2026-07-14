@@ -1,11 +1,11 @@
 /**
  * Midna Global Design System
- * Visual reference: Orbix Studio fintech dashboard (blue/indigo, soft lavender)
- * Brand primary: #4F6AF0
+ * Visual reference: soft-UI fintech dashboard (cool grey canvas, vivid blue CTAs)
+ * Brand primary: #6D7AF2 (soft periwinkle fintech)
  *
  * Three-layer backgrounds:
- *   1. bg-frame   — full outer lavender-grey page
- *   2. bg-canvas  — same lavender-grey fill behind the content panel
+ *   1. bg-frame   — full outer cool grey page
+ *   2. bg-canvas  — same cool grey fill behind the content panel
  *   3. bg-surface — white component cards inside main
  *
  * Use these tokens when building pages — colors, radius, shadow,
@@ -14,24 +14,34 @@
 
 export type ThemeMode = 'light';
 
-// ─── Brand scale (indigo/blue → #4F6AF0) ───────────────────────────────────────
+// ─── Brand scale (vivid blue → #5C7CFA) ───────────────────────────────────────
 
 /** Monochrome brand ladder for fills, charts, gradients, patterns */
 export const brandScale = {
-  /** Deep accent — hero gradients, gauge "completed", dark pattern cards */
-  dark: '#333F97',
-  /** Primary brand — buttons, active nav, solid accents */
-  base: '#4F6AF0',
+  /** Deep accent — hero gradients, dark pattern cards */
+  dark: '#5B6BF0',
+  /** Primary brand — active nav fill, solid accents */
+  base: '#6D7AF2',
   /** Hover / pressed */
-  hover: '#3B54DE',
+  hover: '#5C6AE8',
   /** Mid tint — secondary chart bars, avatars */
-  mid: '#7C93FF',
+  mid: '#8E9AFE',
   /** Light tint — soft chart bars, highlights */
-  light: '#AFC0FF',
+  light: '#B4BCFF',
   /** Soft wash — active nav bg, icon chips, completed badges */
-  soft: '#EAEEFF',
+  soft: '#EEF0FF',
   /** Muted tint — striped chart segments, muted fills */
-  muted: '#D3DBFF',
+  muted: '#E0E4FF',
+} as const;
+
+/** Secondary accents used in charts, stacked wallets, and KPI chips */
+export const accentScale = {
+  orange: '#FF922B',
+  'orange-soft': '#FFF4E6',
+  purple: '#BE4BDB',
+  'purple-soft': '#F8F0FC',
+  green: '#51CF66',
+  'green-soft': '#EBFBEE',
 } as const;
 
 // ─── Typography ───────────────────────────────────────────────────────────────
@@ -55,7 +65,7 @@ export const typography = {
      * main.tsx) — bundled with the app instead of pulled from a CDN link,
      * so it always loads regardless of network/ad-block conditions. The
      * package registers the family as "Inter Variable", not "Inter".
-     * Matches the Orbix reference's rounded geometric look.
+     * Matches the soft-UI fintech reference's rounded geometric look.
      */
     sans: {
       family: '"Inter Variable", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif',
@@ -76,38 +86,38 @@ export const typography = {
   } as const,
 
   /**
-   * Semantic text roles mapped 1:1 to the Donezo reference dashboard.
+   * Semantic text roles for dashboard hierarchy.
    * Prefer these over raw `sizes` in components so copy stays visually
-   * consistent with the template (e.g. `typography.roles.pageTitle`).
+   * consistent (e.g. `typography.roles.pageTitle`).
    */
   roles: {
-    /** Sidebar wordmark — "Donezo" */
+    /** Sidebar wordmark */
     logo: { fontSize: '20px', lineHeight: '28px', fontWeight: 700, letterSpacing: '-0.02em' },
-    /** Page heading — "Dashboard" */
-    pageTitle: { fontSize: '36px', lineHeight: '44px', fontWeight: 700, letterSpacing: '-0.02em' },
+    /** Page heading — soft-UI dashboard titles */
+    pageTitle: { fontSize: '32px', lineHeight: '40px', fontWeight: 600, letterSpacing: '-0.025em' },
     /** Page description under the heading */
     pageSubtitle: { fontSize: '14px', lineHeight: '20px', fontWeight: 400 },
-    /** Panel/card headers — "Notice board", "Top performer of 5" */
+    /** Panel/card headers — "Overview", "Transaction" */
     sectionTitle: { fontSize: '22px', lineHeight: '30px', fontWeight: 700, letterSpacing: '-0.01em' },
-    /** Nested card/row titles — notice headline, performer name */
+    /** Nested card/row titles — merchant names, contact names */
     cardTitle: { fontSize: '16px', lineHeight: '24px', fontWeight: 600, letterSpacing: '0' },
-    /** Body copy — notice text, descriptions */
+    /** Body copy — descriptions */
     description: { fontSize: '14px', lineHeight: '20px', fontWeight: 400 },
-    /** KPI card labels — "Total Projects", "Ended Projects" */
+    /** KPI card labels — "Amount Spent", "Budget Total" */
     cardLabel: { fontSize: '13px', lineHeight: '18px', fontWeight: 500 },
-    /** Big KPI numerals — "24", "10", "12" */
+    /** Big KPI numerals — "$14,765.00" */
     kpiValue: { fontSize: '32px', lineHeight: '38px', fontWeight: 700, letterSpacing: '-0.02em' },
-    /** KPI footnote — "Increased from last month" */
+    /** KPI footnote — "+32.8%" trend hints */
     kpiHint: { fontSize: '12px', lineHeight: '18px', fontWeight: 400 },
-    /** Generic helper/meta text — dates, counts, fine print */
+    /** Generic helper/meta text — dates, account numbers, fine print */
     helperText: { fontSize: '12px', lineHeight: '18px', fontWeight: 400 },
-    /** Sidebar nav group label — "MENU", "GENERAL" */
+    /** Sidebar nav group label */
     navGroupLabel: { fontSize: '11px', lineHeight: '16px', fontWeight: 600, letterSpacing: '0.06em' },
     /** Sidebar nav link */
     navItem: { fontSize: '14px', lineHeight: '20px', fontWeight: 500 },
-    /** Primary row text — names, task titles, list items */
+    /** Primary row text — names, list items */
     body: { fontSize: '14px', lineHeight: '20px', fontWeight: 500 },
-    /** Secondary row text — "Working on...", due dates */
+    /** Secondary row text — muted metadata */
     bodyMuted: { fontSize: '13px', lineHeight: '18px', fontWeight: 400 },
     /** Top bar user name */
     userName: { fontSize: '14px', lineHeight: '20px', fontWeight: 600 },
@@ -115,7 +125,7 @@ export const typography = {
     userMeta: { fontSize: '12px', lineHeight: '18px', fontWeight: 400 },
     /** Button label */
     button: { fontSize: '14px', lineHeight: '20px', fontWeight: 600 },
-    /** Large ring/gauge stat — "41%" */
+    /** Large ring/gauge stat */
     statValue: { fontSize: '30px', lineHeight: '38px', fontWeight: 700, letterSpacing: '-0.02em' },
   } as const,
 };
@@ -134,12 +144,12 @@ export const spacing = {
   12: '48px',
 } as const;
 
-/** Fintech-soft rounding — lg is the standard card radius (20px) */
+/** Soft-UI rounding — lg is the standard card radius (24px) */
 export const radius = {
-  sm: '10px',
-  md: '14px',
-  lg: '20px',
-  xl: '28px',
+  sm: '12px',
+  md: '16px',
+  lg: '24px',
+  xl: '32px',
   pill: '9999px',
 } as const;
 
@@ -154,9 +164,12 @@ export const buttonTokens = {
     md: '10px 16px',
     lg: '14px 22px',
   } as const,
-  /** Primary = solid brand pill; secondary = outlined brand pill */
+  /** Primary = soft periwinkle gradient pill; secondary = white soft-shadow pill */
   shape: 'pill' as const,
-};
+  /** Primary CTA — matches reference Send button (periwinkle → cornflower) */
+  primaryGradient: 'linear-gradient(135deg, #8E9AFE 0%, #6D7AF2 100%)',
+  primaryGradientHover: 'linear-gradient(135deg, #9AA5FF 0%, #7A86F5 100%)',
+} as const;
 
 export const inputTokens = {
   height: {
@@ -168,26 +181,43 @@ export const inputTokens = {
 };
 
 export const tableTokens = {
-  rowHeight: '48px',
+  rowHeight: '56px',
 } as const;
 
 export const shadow = {
-  /** Default white card elevation — soft, diffused, fintech-calm */
-  card: '0 10px 28px rgba(22, 26, 46, 0.06)',
+  /** Default white card elevation — soft, cool-tinted, large blur */
+  card: '0 10px 30px rgba(80, 90, 140, 0.07)',
   /** Slightly raised — hover states on cards */
-  cardHover: '0 16px 36px rgba(22, 26, 46, 0.10)',
-  /** Soft brand glow (icons, small accents) */
-  soft: '0 6px 18px rgba(79, 106, 240, 0.16)',
-  /** Primary CTA glow — used sparingly */
-  primary: '0 6px 20px rgba(79, 106, 240, 0.24)',
+  cardHover: '0 16px 40px rgba(80, 90, 140, 0.12)',
+  /** Soft brand glow (active sidebar icons, primary accents) */
+  soft: '0 8px 20px rgba(109, 122, 242, 0.28)',
+  /** Primary CTA glow — Send / Edit buttons */
+  primary: '0 10px 24px rgba(109, 122, 242, 0.35)',
+  /** Floating icon bubbles (bell, nav icons) — visible lift on cool-grey canvas */
+  float: '0 4px 14px rgba(80, 90, 140, 0.14)',
+  /**
+   * Profile / accent avatar: thick white ring + soft grey elevation
+   * (matches reference “U” bubble — ring first, then diffuse shadow).
+   */
+  avatarRing: '0 0 0 3px #ffffff, 0 6px 16px rgba(80, 90, 140, 0.18)',
+} as const;
+
+/**
+ * Decorative ambient “bubble” washes behind the shell — soft lilac/blue
+ * radial blobs matching the reference hero atmosphere.
+ */
+export const bubbleTokens = {
+  primary: 'radial-gradient(circle, rgba(142, 154, 254, 0.22) 0%, rgba(142, 154, 254, 0) 70%)',
+  secondary: 'radial-gradient(circle, rgba(190, 75, 219, 0.10) 0%, rgba(190, 75, 219, 0) 70%)',
+  tertiary: 'radial-gradient(circle, rgba(255, 146, 43, 0.08) 0%, rgba(255, 146, 43, 0) 70%)',
 } as const;
 
 // ─── Layout reference ───────────────────────────────────────────────────────
 
 /**
  * Page shell:
- * 1. Outer page — soft lavender-grey (`bg-frame`)
- * 2. Light, collapsible nav rail flush against the left edge (`sidebarTokens`)
+ * 1. Outer page — cool light grey (`bg-frame`)
+ * 2. Slim icon nav rail flush against the left edge (`sidebarTokens`)
  * 3. White component cards inside main content (`bg-surface`)
  */
 export const layoutTokens = {
@@ -195,23 +225,23 @@ export const layoutTokens = {
   framePadding: '0px',
   /** Gap between the sidebar and the content panel, and the content panel's outer right/bottom inset */
   shellGap: '20px',
-  /** Outer top inset — a bit more than shellGap so both the sidebar and content panel sit a little lower, clear of the viewport edge */
-  shellGapTop: '48px',
+  /** Outer top inset — keep chrome close to the viewport edge */
+  shellGapTop: '12px',
   /** Shared rounding for the content panel */
   panelRadius: '24px',
-  /** Soft border around each panel */
-  panelBorder: '1px solid #E6E9F6',
+  /** Soft border around each panel — invisible; cards provide elevation */
+  panelBorder: 'none',
   /** Expanded width — icons + labels */
-  sidebarWidth: '216px',
-  /** Collapsed width — icons only */
-  sidebarCollapsedWidth: '76px',
-  /** Extra breathing room above the page title, so it doesn't sit flush against the viewport edge */
-  contentPaddingTop: spacing[12],
+  sidebarWidth: '220px',
+  /** Collapsed width — icons only (matches slim icon rail in reference) */
+  sidebarCollapsedWidth: '80px',
+  /** Page title sits near the top — avoid stacked large top gaps */
+  contentPaddingTop: spacing[4],
   contentPadding: spacing[6],
   contentPaddingX: spacing[6],
-  /** Gap between dashboard cards (KPI row, panel grid) — generous, premium whitespace */
+  /** Gap between dashboard cards — generous, premium whitespace */
   gridGap: spacing[6],
-  /** Shared fixed height for the Notice board / Top performers row, so both cards line up and the taller one scrolls internally */
+  /** Shared fixed height for paired lower cards so both line up */
   homeLowerCardHeight: '480px',
 } as const;
 
@@ -225,18 +255,19 @@ export const cardTokens = {
 } as const;
 
 /**
- * Sidebar = light, collapsible nav rail. A touch whiter than the page's
- * bg-canvas (not full bg-surface white — that read as too much contrast),
- * just enough to lift it slightly off the page.
+ * Sidebar = light, slim icon nav rail. Slightly lifted off the cool-grey
+ * canvas without full white contrast.
  */
 export const sidebarTokens = {
-  background: '#F8F9FD',
-  itemRadius: radius.md,
+  background: 'transparent',
+  itemRadius: radius.pill,
+  /** Active icon bubble size (circular soft-UI rail) */
+  iconBubble: '44px',
 } as const;
 
 /**
- * Chart / gauge palette — map Donezo green bars to brandScale.
- * Use dark/base/mid/light/muted (+ stripe = muted over bg-muted).
+ * Chart / gauge palette — dual-line (blue + orange) and soft bar fills.
+ * Use dark/base/mid/light/muted for blue series; orange/purple for secondary.
  */
 export const chartTokens = {
   dark: brandScale.dark,
@@ -245,34 +276,39 @@ export const chartTokens = {
   light: brandScale.light,
   muted: brandScale.muted,
   soft: brandScale.soft,
+  /** Secondary series — Overview "Last Year" line */
+  secondary: accentScale.orange,
+  /** Tertiary series — stacked wallet / accent bars */
+  tertiary: accentScale.purple,
+  /** Inactive / empty progress capsules */
+  track: '#E9ECEF',
 } as const;
 
 /**
  * Notice/severity accents — red / orange / yellow, desaturated enough to
- * sit quietly on white surfaces rather than read as an alarm. Drives the
- * Notice Board icon chip, headline color, and left accent per item.
+ * sit quietly on white surfaces rather than read as an alarm.
  */
 export const severityTokens = {
   /** Red — urgent */
   high: {
-    icon: '#DE6B6B',
-    text: '#A93E3E',
-    bg: '#FBEEEE',
-    border: '#F0D6D6',
+    icon: '#FA5252',
+    text: '#C92A2A',
+    bg: '#FFF5F5',
+    border: '#FFC9C9',
   },
-  /** Orangy-yellow — caution */
+  /** Orange — caution */
   medium: {
-    icon: '#DDA43C',
-    text: '#8A5D14',
-    bg: '#FBF4E5',
-    border: '#EFDDB9',
+    icon: '#FF922B',
+    text: '#D9480F',
+    bg: '#FFF4E6',
+    border: '#FFD8A8',
   },
   /** Green — informational */
   low: {
-    icon: '#57A67D',
-    text: '#336B4F',
-    bg: '#EEF6F1',
-    border: '#D5E9DD',
+    icon: '#51CF66',
+    text: '#2B8A3E',
+    bg: '#EBFBEE',
+    border: '#B2F2BB',
   },
 } as const;
 
@@ -283,7 +319,7 @@ export type SeverityLevel = keyof typeof severityTokens;
  * dark → black gradient + brand mid/base radial washes + subtle stripes.
  */
 export const patternTokens = {
-  gradient: `linear-gradient(155deg, ${brandScale.dark} 0%, #1a0a14 55%, #0d0610 100%)`,
+  gradient: `linear-gradient(155deg, ${brandScale.dark} 0%, #1a1f3a 55%, #0d1117 100%)`,
   glowMid: brandScale.mid,
   glowBase: brandScale.base,
   stripe: `${brandScale.base}33`,
@@ -294,22 +330,22 @@ export const patternTokens = {
 export const colors = {
   light: {
     /**
-     * Soft lavender-grey page (Orbix Studio fintech style):
-     * bg-frame / bg-canvas → same cool lavender #EEF1FA, so the content
+     * Cool light-grey page (soft-UI fintech style):
+     * bg-frame / bg-canvas → same cool grey #F4F7FA, so the content
      *                        panel reads as one continuous surface
-     * bg-surface           → white component cards (KPIs, notice, lists, etc.)
+     * bg-surface           → white component cards (KPIs, charts, lists, etc.)
      * Structure/hierarchy comes from the white cards + soft shadow, not panel fills.
      */
-    'bg-frame': '#EEF1FA',
-    'bg-canvas': '#EEF1FA',
+    'bg-frame': '#F4F7FA',
+    'bg-canvas': '#F4F7FA',
     'bg-surface': '#FFFFFF',
-    'bg-muted': '#F1F3FC',
-    'bg-hover': '#F1F3FC',
+    'bg-muted': '#F1F3F5',
+    'bg-hover': '#F1F3F5',
 
     // Text
-    'text-primary': '#161A2E',
-    'text-secondary': '#767B99',
-    'text-muted': '#9EA3BE',
+    'text-primary': '#212529',
+    'text-secondary': '#868E96',
+    'text-muted': '#ADB5BD',
     'text-inverse': '#FFFFFF',
 
     // Brand
@@ -323,46 +359,49 @@ export const colors = {
 
     accent: brandScale.base,
     'accent-soft': brandScale.soft,
+    'accent-orange': accentScale.orange,
+    'accent-purple': accentScale.purple,
+    'accent-green': accentScale.green,
 
     // Buttons
     'btn-primary-bg': brandScale.base,
     'btn-primary-text': '#FFFFFF',
     'btn-primary-hover': brandScale.hover,
     'btn-secondary-bg': '#FFFFFF',
-    'btn-secondary-text': '#161A2E',
-    'btn-secondary-border': '#E6E9F6',
-    'btn-disabled-bg': '#E2E8F0',
-    'btn-disabled-text': '#94A3B8',
+    'btn-secondary-text': '#212529',
+    'btn-secondary-border': '#E9ECEF',
+    'btn-disabled-bg': '#E9ECEF',
+    'btn-disabled-text': '#ADB5BD',
 
     // Tables
-    'table-header-bg': '#EEF1FA',
-    'table-row-hover': '#EEF1FA',
-    'table-border': '#E6E9F6',
+    'table-header-bg': '#F8F9FA',
+    'table-row-hover': '#F8F9FA',
+    'table-border': '#E9ECEF',
 
-    // Semantic (keep — not brand green)
-    success: '#16A34A',
-    'success-bg': '#DCFCE7',
-    error: '#DC2626',
-    'error-bg': '#FEE2E2',
-    warning: '#D97706',
-    'warning-bg': '#FEF3C7',
-    info: '#0EA5E9',
-    'info-bg': '#E0F2FE',
+    // Semantic
+    success: '#51CF66',
+    'success-bg': '#EBFBEE',
+    error: '#FA5252',
+    'error-bg': '#FFF5F5',
+    warning: '#FF922B',
+    'warning-bg': '#FFF4E6',
+    info: '#339AF0',
+    'info-bg': '#E7F5FF',
 
-    // Status chips (Completed → magenta soft; others semantic)
+    // Status chips
     'status-completed-bg': brandScale.soft,
     'status-completed-text': brandScale.dark,
-    'status-progress-bg': '#FEF3C7',
-    'status-progress-text': '#92400E',
-    'status-pending-bg': '#FEE2E2',
-    'status-pending-text': '#991B1B',
+    'status-progress-bg': '#FFF4E6',
+    'status-progress-text': '#D9480F',
+    'status-pending-bg': '#FFF5F5',
+    'status-pending-text': '#C92A2A',
 
     'secure-badge-bg': brandScale.soft,
     'secure-badge-text': brandScale.dark,
     'focus-ring': brandScale.base,
 
-    border: '#E6E9F6',
-    divider: '#E6E9F6',
+    border: '#E9ECEF',
+    divider: '#E9ECEF',
   } as const,
 };
 
@@ -371,11 +410,12 @@ export const colors = {
  * badges, never as a full card fill. One hue per metric, not a rainbow.
  */
 export const metricColors = {
-  blue: { icon: '#2E90FA', text: '#175CD3', bg: '#EFF8FF' },
-  green: { icon: '#12B76A', text: '#027A48', bg: '#ECFDF3' },
-  amber: { icon: '#F79009', text: '#B54708', bg: '#FFFAEB' },
-  purple: { icon: '#9E77ED', text: '#6941C6', bg: '#F9F5FF' },
+  blue: { icon: '#6D7AF2', text: '#4C5AD4', bg: '#EEF0FF' },
+  green: { icon: '#51CF66', text: '#2B8A3E', bg: '#EBFBEE' },
+  amber: { icon: '#FF922B', text: '#D9480F', bg: '#FFF4E6' },
+  purple: { icon: '#BE4BDB', text: '#9C36B5', bg: '#F8F0FC' },
   indigo: { icon: brandScale.base, text: brandScale.dark, bg: brandScale.soft },
+  pink: { icon: '#F06595', text: '#C2255C', bg: '#FFF0F6' },
 } as const;
 
 export type MetricColor = keyof typeof metricColors;
@@ -405,6 +445,9 @@ export const getThemeCssVars = (mode: ThemeMode = 'light'): Record<string, strin
   for (const [key, value] of Object.entries(brandScale)) {
     vars[`--brand-${key}`] = value;
   }
+  for (const [key, value] of Object.entries(accentScale)) {
+    vars[`--accent-${key}`] = value;
+  }
   for (const [key, value] of Object.entries(layoutTokens)) {
     vars[`--layout-${key}`] = value;
   }
@@ -429,6 +472,11 @@ export const getThemeCssVars = (mode: ThemeMode = 'light'): Record<string, strin
   }
   for (const [key, value] of Object.entries(buttonTokens.padding)) {
     vars[`--btn-padding-${key}`] = value;
+  }
+  vars['--btn-primary-gradient'] = buttonTokens.primaryGradient;
+  vars['--btn-primary-gradient-hover'] = buttonTokens.primaryGradientHover;
+  for (const [key, value] of Object.entries(bubbleTokens)) {
+    vars[`--bubble-${key}`] = value;
   }
   for (const [key, value] of Object.entries(inputTokens.height)) {
     vars[`--input-height-${key}`] = value;

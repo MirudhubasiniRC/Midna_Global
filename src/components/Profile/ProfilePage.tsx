@@ -132,7 +132,7 @@ type DetailSectionProps = {
 function DetailSection({ title, children }: DetailSectionProps) {
   return (
     <div className="dash-card">
-      <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, letterSpacing: '-0.01em', color: theme['text-primary'] }}>
+      <h2 style={{ margin: 0, fontSize: 18, fontWeight: 600, letterSpacing: '-0.01em', color: theme['text-primary'] }}>
         {title}
       </h2>
       <div className="detail-list" style={{ display: 'flex', flexDirection: 'column', marginTop: spacing[3] }}>
@@ -219,6 +219,7 @@ export function ProfilePage({ onBack }: ProfilePageProps) {
                 padding: 0,
                 cursor: 'pointer',
                 overflow: 'hidden',
+                boxShadow: 'var(--shadow-float)',
               }}
             >
               {avatarUrl ? (
@@ -245,13 +246,13 @@ export function ProfilePage({ onBack }: ProfilePageProps) {
                 width: 38,
                 height: 38,
                 borderRadius: '50%',
-                background: theme.primary,
+                background: 'var(--btn-primary-gradient)',
                 color: '#fff',
                 border: `3px solid ${theme['bg-surface']}`,
                 display: 'grid',
                 placeItems: 'center',
                 cursor: 'pointer',
-                boxShadow: '0 4px 10px rgba(22, 26, 46, 0.18)',
+                boxShadow: 'var(--shadow-soft)',
               }}
             >
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -269,7 +270,7 @@ export function ProfilePage({ onBack }: ProfilePageProps) {
           </div>
 
           <div style={{ flex: 1, minWidth: 220 }}>
-            <h2 style={{ margin: 0, fontSize: 26, fontWeight: 700, color: theme['text-primary'], letterSpacing: '-0.02em' }}>
+            <h2 style={{ margin: 0, fontSize: 26, fontWeight: 600, color: theme['text-primary'], letterSpacing: '-0.025em' }}>
               MiDNA (H.O)
             </h2>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginTop: 12 }}>
@@ -352,7 +353,7 @@ export function ProfilePage({ onBack }: ProfilePageProps) {
 
       {/* Certifications card */}
       <div className="dash-card">
-        <h2 style={{ margin: 0, fontSize: 22, fontWeight: 700, letterSpacing: '-0.01em', color: theme['text-primary'] }}>
+        <h2 style={{ margin: 0, fontSize: 20, fontWeight: 600, letterSpacing: '-0.01em', color: theme['text-primary'] }}>
           Certifications
         </h2>
         <p style={{ margin: '6px 0 0', fontSize: 14, lineHeight: 1.55, color: theme['text-secondary'], maxWidth: 560 }}>
@@ -379,8 +380,8 @@ export function ProfilePage({ onBack }: ProfilePageProps) {
         <div
           style={{
             marginTop: spacing[5],
-            border: `1.5px dashed ${theme.border}`,
-            borderRadius: radius.md,
+            border: 'none',
+            borderRadius: radius.lg,
             padding: spacing[6],
             display: 'flex',
             flexDirection: 'column',
@@ -388,17 +389,19 @@ export function ProfilePage({ onBack }: ProfilePageProps) {
             justifyContent: 'center',
             gap: 8,
             color: theme['text-muted'],
+            background: theme['bg-muted'],
           }}
         >
           <div
             style={{
-              width: 40,
-              height: 40,
+              width: 44,
+              height: 44,
               borderRadius: '50%',
-              background: theme['bg-canvas'],
+              background: theme['bg-surface'],
               display: 'grid',
               placeItems: 'center',
-              color: theme['text-muted'],
+              color: theme.primary,
+              boxShadow: 'var(--shadow-float)',
             }}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">

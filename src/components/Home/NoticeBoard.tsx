@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { colors, layoutTokens, radius, severityTokens, spacing, type SeverityLevel } from '../../styles/theme';
+import { colors, layoutTokens, radius, severityTokens, shadow, spacing, type SeverityLevel } from '../../styles/theme';
 
 const theme = colors.light;
 
@@ -11,7 +11,6 @@ type Notice = {
   author: string;
   datetime: string;
   initials: string;
-  /** Other people who've already acknowledged this notice */
   seenCount: number;
 };
 
@@ -50,21 +49,21 @@ const notices: Notice[] = [
 
 const severityIcon: Record<SeverityLevel, React.ReactNode> = {
   high: (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
       <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z" />
       <line x1="12" y1="9" x2="12" y2="13" />
       <line x1="12" y1="17" x2="12.01" y2="17" />
     </svg>
   ),
   medium: (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
       <circle cx="12" cy="12" r="10" />
       <line x1="12" y1="8" x2="12" y2="12" />
       <line x1="12" y1="16" x2="12.01" y2="16" />
     </svg>
   ),
   low: (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
       <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
       <path d="M13.73 21a2 2 0 0 1-3.46 0" />
     </svg>
@@ -101,9 +100,9 @@ export function NoticeBoard() {
             margin: 0,
             display: 'flex',
             alignItems: 'center',
-            gap: 8,
-            fontSize: 22,
-            fontWeight: 700,
+            gap: 10,
+            fontSize: 20,
+            fontWeight: 600,
             letterSpacing: '-0.01em',
             color: theme['text-primary'],
           }}
@@ -111,17 +110,18 @@ export function NoticeBoard() {
           <span
             className="notice-board-blink"
             style={{
-              width: 30,
-              height: 30,
+              width: 34,
+              height: 34,
               borderRadius: '50%',
-              border: `2px solid ${theme.primary}`,
+              background: theme['primary-soft'],
               color: theme.primary,
               display: 'grid',
               placeItems: 'center',
               flexShrink: 0,
+              boxShadow: shadow.float,
             }}
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <line x1="12" y1="7" x2="12" y2="13" />
               <line x1="12" y1="17" x2="12.01" y2="17" />
             </svg>
@@ -152,24 +152,26 @@ export function NoticeBoard() {
             <article
               key={notice.id}
               style={{
-                borderRadius: radius.md,
-                border: `1px solid ${tone.border}`,
+                borderRadius: radius.lg,
+                border: 'none',
                 background: tone.bg,
                 padding: spacing[4],
+                boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.55)',
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
                 <span
                   style={{
-                    width: 22,
-                    height: 22,
-                    borderRadius: radius.sm,
+                    width: 32,
+                    height: 32,
+                    borderRadius: '50%',
                     display: 'grid',
                     placeItems: 'center',
                     flexShrink: 0,
                     marginTop: 1,
                     background: theme['bg-surface'],
                     color: tone.icon,
+                    boxShadow: shadow.float,
                   }}
                 >
                   {severityIcon[notice.severity]}
@@ -178,8 +180,8 @@ export function NoticeBoard() {
                   <h3
                     style={{
                       margin: 0,
-                      fontSize: 16,
-                      fontWeight: 700,
+                      fontSize: 15,
+                      fontWeight: 600,
                       color: tone.text,
                     }}
                   >
@@ -188,7 +190,7 @@ export function NoticeBoard() {
                   <p
                     style={{
                       margin: '6px 0 0',
-                      fontSize: 14,
+                      fontSize: 13,
                       lineHeight: 1.55,
                       color: theme['text-secondary'],
                     }}
@@ -196,11 +198,11 @@ export function NoticeBoard() {
                     {notice.body}
                   </p>
 
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 12 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 14, flexWrap: 'wrap' }}>
                     <div
                       style={{
-                        width: 22,
-                        height: 22,
+                        width: 24,
+                        height: 24,
                         borderRadius: '50%',
                         background: theme['bg-surface'],
                         color: theme['text-secondary'],
@@ -209,6 +211,7 @@ export function NoticeBoard() {
                         fontSize: 10,
                         fontWeight: 700,
                         flexShrink: 0,
+                        boxShadow: shadow.float,
                       }}
                     >
                       {notice.initials}
@@ -227,17 +230,18 @@ export function NoticeBoard() {
                         alignItems: 'center',
                         gap: 5,
                         flexShrink: 0,
-                        padding: '4px 10px',
+                        padding: '6px 12px',
                         borderRadius: radius.pill,
-                        border: acknowledged[notice.id] ? 'none' : `1px solid ${theme.border}`,
+                        border: 'none',
                         background: acknowledged[notice.id] ? theme.success : theme['bg-surface'],
-                        color: acknowledged[notice.id] ? '#fff' : theme['text-secondary'],
+                        color: acknowledged[notice.id] ? '#fff' : tone.icon,
                         fontSize: 11,
                         fontWeight: 600,
                         cursor: 'pointer',
+                        boxShadow: acknowledged[notice.id] ? '0 6px 14px rgba(81, 207, 102, 0.3)' : shadow.float,
                       }}
                     >
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M20 6 9 17l-5-5" />
                       </svg>
                       {acknowledged[notice.id]

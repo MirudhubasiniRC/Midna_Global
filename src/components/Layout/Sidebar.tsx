@@ -24,12 +24,9 @@ export function Sidebar({ collapsed, onToggle, activeView, onNavigate, onLogout 
         flexShrink: 0,
         display: 'flex',
         flexDirection: 'column',
-        /* Deliberately its own fixed value, not derived from the content panel's
-           contentPaddingTop — that token has changed independently for the
-           content panel before and dragged the logo down with it unintentionally. */
         padding: collapsed
-          ? `${spacing[4]} ${spacing[2]} ${spacing[5]}`
-          : `${spacing[4]} ${spacing[3]} ${spacing[5]}`,
+          ? `${spacing[3]} ${spacing[2]} ${spacing[5]}`
+          : `${spacing[3]} ${spacing[3]} ${spacing[5]}`,
         alignSelf: 'stretch',
         background: sidebarTokens.background,
         transition: 'width 0.2s ease, padding 0.2s ease',
@@ -44,7 +41,7 @@ export function Sidebar({ collapsed, onToggle, activeView, onNavigate, onLogout 
           gap: spacing[2],
           padding: collapsed ? 0 : `0 ${spacing[2]}`,
           marginBottom: spacing[6],
-          minHeight: 40,
+          minHeight: 44,
         }}
       >
         <div
@@ -77,9 +74,9 @@ export function Sidebar({ collapsed, onToggle, activeView, onNavigate, onLogout 
             className="btn-icon"
             aria-label="Collapse sidebar"
             onClick={onToggle}
-            style={{ flexShrink: 0, width: 32, height: 32 }}
+            style={{ flexShrink: 0, width: 36, height: 36 }}
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
               <rect x="3" y="3" width="18" height="18" rx="3" />
               <path d="M9 3v18" />
             </svg>
@@ -93,9 +90,9 @@ export function Sidebar({ collapsed, onToggle, activeView, onNavigate, onLogout 
           className="btn-icon"
           aria-label="Expand sidebar"
           onClick={onToggle}
-          style={{ width: 40, height: 40, margin: `0 auto ${spacing[5]}` }}
+          style={{ width: 44, height: 44, margin: `0 auto ${spacing[5]}` }}
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
             <rect x="3" y="3" width="18" height="18" rx="3" />
             <path d="M9 3v18" />
           </svg>
@@ -106,14 +103,13 @@ export function Sidebar({ collapsed, onToggle, activeView, onNavigate, onLogout 
         style={{
           display: 'flex',
           flexDirection: 'column',
-          gap: 6,
+          gap: collapsed ? 10 : 6,
           flex: 1,
           minHeight: 0,
-          /* Logo/toggle position is separately tuned via the header's own padding above —
-             don't touch that. This margin only controls the nav list's own position. */
           marginTop: collapsed ? 0 : spacing[2],
           overflowY: 'auto',
           overflowX: 'visible',
+          alignItems: collapsed ? 'center' : 'stretch',
         }}
       >
         {navItems.map((item, index) => {
@@ -137,6 +133,9 @@ export function Sidebar({ collapsed, onToggle, activeView, onNavigate, onLogout 
                   {item.section}
                 </p>
               )}
+              {isNewSection && collapsed && (
+                <div style={{ width: 22, height: 1, background: theme.divider, margin: `${spacing[2]} 0` }} />
+              )}
               <button
                 type="button"
                 onClick={() => onNavigate(item.id)}
@@ -148,26 +147,25 @@ export function Sidebar({ collapsed, onToggle, activeView, onNavigate, onLogout 
                   alignItems: 'center',
                   justifyContent: collapsed ? 'center' : 'flex-start',
                   gap: 12,
-                  width: '100%',
-                  minHeight: 42,
-                  padding: collapsed ? '10px 8px' : '10px 12px',
+                  width: collapsed ? 'auto' : '100%',
+                  minHeight: 44,
+                  padding: collapsed ? 0 : '6px 10px',
                   border: 'none',
                   borderRadius: sidebarTokens.itemRadius,
                   background: 'transparent',
-                  color: active ? theme['text-primary'] : '#565C78',
-                  fontSize: 15,
-                  fontWeight: active ? 700 : 500,
+                  color: active ? theme['text-primary'] : theme['text-secondary'],
+                  fontSize: 14,
+                  fontWeight: active ? 600 : 500,
                   letterSpacing: '-0.01em',
                   textAlign: 'left',
                   cursor: 'pointer',
                   flexShrink: 0,
                 }}
               >
-                <span
-                  className="sidebar-nav-icon"
-                  style={{ width: 20, height: 20, display: 'grid', placeItems: 'center', flexShrink: 0 }}
-                >
-                  <Icon size={19} fill="none" stroke="currentColor" strokeWidth={1.8} />
+                <span className="sidebar-nav-icon-bubble">
+                  <span className="sidebar-nav-icon" style={{ display: 'grid', placeItems: 'center' }}>
+                    <Icon size={18} fill="none" stroke="currentColor" strokeWidth={1.7} />
+                  </span>
                 </span>
                 {!collapsed && <span className="sidebar-nav-label">{item.label}</span>}
                 {collapsed && <span className="sidebar-tooltip">{item.label}</span>}
@@ -185,6 +183,7 @@ export function Sidebar({ collapsed, onToggle, activeView, onNavigate, onLogout 
           display: 'flex',
           flexDirection: 'column',
           gap: 4,
+          alignItems: collapsed ? 'center' : 'stretch',
         }}
       >
         <button
@@ -198,21 +197,21 @@ export function Sidebar({ collapsed, onToggle, activeView, onNavigate, onLogout 
             alignItems: 'center',
             justifyContent: collapsed ? 'center' : 'flex-start',
             gap: 12,
-            width: '100%',
-            padding: collapsed ? '10px 8px' : '10px 12px',
+            width: collapsed ? 'auto' : '100%',
+            padding: collapsed ? 0 : '6px 10px',
             border: 'none',
             borderRadius: sidebarTokens.itemRadius,
             background: 'transparent',
-            color: '#565C78',
-            fontSize: 15,
+            color: theme['text-secondary'],
+            fontSize: 14,
             fontWeight: 500,
             letterSpacing: '-0.01em',
             textAlign: 'left',
             cursor: 'pointer',
           }}
         >
-          <span style={{ width: 20, height: 20, display: 'grid', placeItems: 'center', flexShrink: 0 }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <span className="sidebar-nav-icon-bubble">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
               <path d="M16 17l5-5-5-5" />
               <path d="M21 12H9" />

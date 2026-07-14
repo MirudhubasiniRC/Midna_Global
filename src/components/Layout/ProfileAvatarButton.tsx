@@ -1,8 +1,10 @@
+import { shadow } from '../../styles/theme';
+
 type ProfileAvatarButtonProps = {
   onClick?: () => void;
 };
 
-/** Top-right avatar — Orbix reference keeps quick profile access next to the bell, not just in the sidebar */
+/** Top-right avatar — blue fill, white ring, soft elevation (reference “U” bubble) */
 export function ProfileAvatarButton({ onClick }: ProfileAvatarButtonProps) {
   return (
     <button
@@ -17,13 +19,14 @@ export function ProfileAvatarButton({ onClick }: ProfileAvatarButtonProps) {
         padding: 0,
         flexShrink: 0,
         cursor: 'pointer',
-        background: 'linear-gradient(135deg, #7C93FF, #4F6AF0)',
+        background: '#5C7CFA',
         color: '#fff',
         display: 'grid',
         placeItems: 'center',
-        fontWeight: 700,
+        fontWeight: 600,
         fontSize: 15,
-        boxShadow: '0 0 0 2px #ffffff, 0 4px 10px rgba(22, 26, 46, 0.14)',
+        letterSpacing: '-0.01em',
+        boxShadow: shadow.avatarRing,
       }}
     >
       U

@@ -8,8 +8,8 @@
   font-family: 'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-  color: var(--color-text-primary, #1d2939);
-  background-color: var(--color-bg-frame, #ffffff);
+  color: var(--color-text-primary, #212529);
+  background-color: var(--color-bg-frame, #f4f7fa);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -28,7 +28,7 @@ body,
 body {
   display: block;
   min-width: 320px;
-  background-color: var(--color-bg-frame, #ffffff);
+  background-color: var(--color-bg-frame, #f4f7fa);
 }
 
 a {
@@ -44,7 +44,7 @@ input {
 button:focus-visible,
 input:focus-visible,
 a:focus-visible {
-  outline: 2px solid var(--color-focus-ring, #ca317a);
+  outline: 2px solid var(--color-focus-ring, #6d7af2);
   outline-offset: 2px;
 }
 

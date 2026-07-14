@@ -32,7 +32,7 @@ export function MobileNavDrawer({ open, onClose, activeView, onNavigate, onLogou
             />
           </div>
           <button type="button" className="btn-icon" aria-label="Close menu" onClick={onClose}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round">
               <path d="M18 6 6 18M6 6l12 12" />
             </svg>
           </button>
@@ -42,7 +42,7 @@ export function MobileNavDrawer({ open, onClose, activeView, onNavigate, onLogou
           style={{
             display: 'flex',
             flexDirection: 'column',
-            gap: 4,
+            gap: 6,
             flex: '1 1 auto',
             minHeight: 0,
             overflowY: 'auto',
@@ -77,32 +77,26 @@ export function MobileNavDrawer({ open, onClose, activeView, onNavigate, onLogou
                     position: 'relative',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: 14,
+                    gap: 12,
                     width: '100%',
-                    minHeight: 44,
-                    padding: '10px 14px',
+                    minHeight: 48,
+                    padding: '6px 10px',
                     border: 'none',
                     borderRadius: sidebarTokens.itemRadius,
-                    color: active ? theme['text-primary'] : '#565C78',
-                    fontSize: 15,
-                    fontWeight: active ? 700 : 500,
+                    background: 'transparent',
+                    color: active ? theme['text-primary'] : theme['text-secondary'],
+                    fontSize: 14,
+                    fontWeight: active ? 600 : 500,
                     letterSpacing: '-0.01em',
                     textAlign: 'left',
                     cursor: 'pointer',
                     flexShrink: 0,
                   }}
                 >
-                  <span
-                    className="sidebar-nav-icon"
-                    style={{
-                      width: 22,
-                      height: 22,
-                      display: 'grid',
-                      placeItems: 'center',
-                      color: 'inherit',
-                    }}
-                  >
-                    <Icon size={20} fill="none" stroke="currentColor" strokeWidth={1.7} />
+                  <span className="sidebar-nav-icon-bubble">
+                    <span className="sidebar-nav-icon" style={{ display: 'grid', placeItems: 'center' }}>
+                      <Icon size={18} fill="none" stroke="currentColor" strokeWidth={1.7} />
+                    </span>
                   </span>
                   <span className="sidebar-nav-label">{item.label}</span>
                 </button>
@@ -131,22 +125,22 @@ export function MobileNavDrawer({ open, onClose, activeView, onNavigate, onLogou
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: 14,
+              gap: 12,
               width: '100%',
-              padding: '10px 14px',
+              padding: '6px 10px',
               border: 'none',
               borderRadius: sidebarTokens.itemRadius,
               background: 'transparent',
-              color: '#565C78',
-              fontSize: 15,
+              color: theme['text-secondary'],
+              fontSize: 14,
               fontWeight: 500,
               letterSpacing: '-0.01em',
               textAlign: 'left',
               cursor: 'pointer',
             }}
           >
-            <span style={{ width: 22, height: 22, display: 'grid', placeItems: 'center', flexShrink: 0 }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <span className="sidebar-nav-icon-bubble">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
                 <path d="M16 17l5-5-5-5" />
                 <path d="M21 12H9" />
