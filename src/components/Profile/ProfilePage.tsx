@@ -23,14 +23,30 @@ const subscriptionTiers: Record<SubscriptionTier, { emoji: string; color: string
 const currentTier: SubscriptionTier = 'Diamond';
 const tier = subscriptionTiers[currentTier];
 
+/** Status — a distinct color per state so it reads at a glance, not just a label */
+type MemberStatus = 'Active' | 'On Hold' | 'Inactive';
+
+const statusTones: Record<MemberStatus, { color: string; bg: string }> = {
+  Active: { color: theme.success, bg: theme['success-bg'] },
+  'On Hold': { color: theme.warning, bg: theme['warning-bg'] },
+  Inactive: { color: theme.error, bg: theme['error-bg'] },
+};
+
+/** No backend yet — swap when member status is wired up */
+const currentStatus: MemberStatus = 'Active';
+const statusTone = statusTones[currentStatus];
+
 type PillProps = {
   label: string;
   color: string;
   bg: string;
   emoji?: string;
+  dot?: boolean;
+  /** Animated "live" ping ring on the dot, like a YouTube live-analytics indicator */
+  pulse?: boolean;
 };
 
-function Pill({ label, color, bg, emoji }: PillProps) {
+function Pill({ label, color, bg, emoji, dot, pulse }: PillProps) {
   return (
     <span
       style={{
@@ -42,10 +58,25 @@ function Pill({ label, color, bg, emoji }: PillProps) {
         color,
         background: bg,
         borderRadius: radius.pill,
-        padding: '5px 12px',
+        padding: dot ? '6px 12px 6px 10px' : '5px 12px',
         whiteSpace: 'nowrap',
       }}
     >
+      {dot && (
+        <span
+          aria-hidden="true"
+          className={pulse ? 'status-dot-ping' : undefined}
+          style={{
+            position: 'relative',
+            width: 7,
+            height: 7,
+            borderRadius: '50%',
+            background: color,
+            color,
+            flexShrink: 0,
+          }}
+        />
+      )}
       {emoji && <span aria-hidden="true">{emoji}</span>}
       {label}
     </span>
@@ -136,7 +167,7 @@ export function ProfilePage({ onBack }: ProfilePageProps) {
 
   return (
     <section>
-      <div style={{ display: 'flex', alignItems: 'center', gap: spacing[3], marginBottom: spacing[5] }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: spacing[3], marginBottom: spacing[6] }}>
         <button type="button" className="btn-icon" aria-label="Back to dashboard" onClick={onBack}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="m15 6-6 6 6 6" />
@@ -244,10 +275,11 @@ export function ProfilePage({ onBack }: ProfilePageProps) {
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginTop: 12 }}>
               <Pill label={`${currentTier} member`} color={tier.color} bg={tier.bg} emoji={tier.emoji} />
               <Pill label="Certified – Admin" color={theme.primary} bg={theme['primary-soft']} />
+              <Pill label={currentStatus} color={statusTone.color} bg={statusTone.bg} dot pulse />
             </div>
           </div>
 
-          <div style={{ display: 'flex', gap: 10 }}>
+          <div className="profile-hero-actions" style={{ display: 'flex', gap: 10 }}>
             <button
               type="button"
               className="btn-pill-primary"
@@ -268,10 +300,8 @@ export function ProfilePage({ onBack }: ProfilePageProps) {
       </div>
 
       <div
+        className="profile-detail-grid"
         style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))',
-          gap: spacing[5],
           marginBottom: spacing[5],
           alignItems: 'stretch',
         }}
@@ -316,7 +346,6 @@ export function ProfilePage({ onBack }: ProfilePageProps) {
           <DetailField label="MIS Training" value={<Pill label="Completed" color={theme.success} bg={theme['success-bg']} />} />
           <DetailField label="Mentored By" value="Rathinaswamy A · 9597770205" />
           <DetailField label="Admin By" value="Priya Shah" />
-          <DetailField label="Status" value={<Pill label="Active" color={theme.success} bg={theme['success-bg']} />} />
           <DetailField label="Remarks" value={<span style={{ fontWeight: 400, color: theme['text-muted'], fontStyle: 'italic' }}>No remarks</span>} />
         </DetailSection>
       </div>

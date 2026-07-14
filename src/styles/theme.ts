@@ -196,7 +196,7 @@ export const layoutTokens = {
   /** Gap between the sidebar and the content panel, and the content panel's outer right/bottom inset */
   shellGap: '20px',
   /** Outer top inset — a bit more than shellGap so both the sidebar and content panel sit a little lower, clear of the viewport edge */
-  shellGapTop: '32px',
+  shellGapTop: '48px',
   /** Shared rounding for the content panel */
   panelRadius: '24px',
   /** Soft border around each panel */
@@ -206,7 +206,7 @@ export const layoutTokens = {
   /** Collapsed width — icons only */
   sidebarCollapsedWidth: '76px',
   /** Extra breathing room above the page title, so it doesn't sit flush against the viewport edge */
-  contentPaddingTop: spacing[10],
+  contentPaddingTop: spacing[12],
   contentPadding: spacing[6],
   contentPaddingX: spacing[6],
   /** Gap between dashboard cards (KPI row, panel grid) — generous, premium whitespace */
