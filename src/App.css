@@ -98,14 +98,14 @@
   transform: translateY(-50%) translateX(0);
 }
 
-.sidebar-nav-item:hover:not(.is-active) {
+.sidebar-nav-item:hover:not(.is-active):not(.sidebar-logout-item) {
   background: rgba(255, 255, 255, 0.65);
   color: var(--color-text-primary, #212529);
 }
 
-.sidebar-nav-item:hover:not(.is-active) .sidebar-nav-icon-bubble {
+.sidebar-nav-item:hover:not(.is-active):not(.sidebar-logout-item) .sidebar-nav-icon-bubble {
   background: #ffffff;
-  box-shadow: var(--shadow-float, 0 6px 18px rgba(80, 90, 140, 0.08));
+  box-shadow: var(--shadow-float, 0 4px 14px rgba(80, 90, 140, 0.08));
 }
 
 .app-main {
@@ -164,12 +164,25 @@
 }
 
 .sidebar-logout-item {
+  color: var(--color-error, #fa5252) !important;
   transition: background 0.15s ease, color 0.15s ease;
+}
+
+.sidebar-logout-item .sidebar-nav-icon-bubble {
+  background: var(--color-error-bg, #fff5f5);
+  color: var(--color-error, #fa5252);
+  box-shadow: 0 4px 12px rgba(250, 82, 82, 0.16);
 }
 
 .sidebar-logout-item:hover {
   background: var(--color-error-bg, #fff5f5);
-  color: var(--color-error, #fa5252);
+  color: var(--color-error, #fa5252) !important;
+}
+
+.sidebar-logout-item:hover .sidebar-nav-icon-bubble {
+  background: var(--color-error, #fa5252);
+  color: #ffffff;
+  box-shadow: 0 8px 18px rgba(250, 82, 82, 0.28);
 }
 
 .notice-scroll {
@@ -367,6 +380,15 @@
 .kpi-card:hover {
   transform: translateY(-3px);
   box-shadow: var(--shadow-cardHover);
+}
+
+.kpi-card.is-featured::before {
+  opacity: 0;
+}
+
+.kpi-card.is-featured:hover {
+  /* Featured hover styles are applied inline (gradient + glow) */
+  transform: translateY(-3px);
 }
 
 .kpi-icon-bubble {

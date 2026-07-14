@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { colors, metricColors, spacing, typography, type MetricColor } from '../../styles/theme';
+import { colors, metricColors, radius, spacing, typography, type MetricColor } from '../../styles/theme';
 import { NotificationButton } from '../Layout/NotificationButton';
 import { ProfileAvatarButton } from '../Layout/ProfileAvatarButton';
 import type { AppView } from '../Layout/navItems';
@@ -13,7 +13,7 @@ type Kpi = {
   hint: string;
   color: MetricColor;
   icon: React.ReactNode;
-  /** When set, the card navigates here on click */
+  /** When set, the card gets colored hover + arrow and navigates here on click */
   linkTo?: AppView;
 };
 
@@ -84,6 +84,7 @@ type DashboardKpisProps = {
 
 export function DashboardKpis({ onOpenMobileMenu, onOpenProfile, onNavigate }: DashboardKpisProps) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [focusedId, setFocusedId] = useState<string | null>(null);
 
   return (
     <section>
@@ -135,13 +136,18 @@ export function DashboardKpis({ onOpenMobileMenu, onOpenProfile, onNavigate }: D
           const featured = Boolean(kpi.linkTo);
           const tone = metricColors[kpi.color];
           const hovered = hoveredId === kpi.id;
+          const focused = focusedId === kpi.id;
+          const showColor = featured && (hovered || focused);
+          const gradient = `linear-gradient(135deg, ${tone.icon} 0%, ${tone.text} 100%)`;
 
           return (
             <article
               key={kpi.id}
-              className="kpi-card"
+              className={`kpi-card${featured ? ' kpi-card--link' : ''}${showColor ? ' is-featured' : ''}`}
               onMouseEnter={() => setHoveredId(kpi.id)}
               onMouseLeave={() => setHoveredId(null)}
+              onFocus={featured ? () => setFocusedId(kpi.id) : undefined}
+              onBlur={featured ? () => setFocusedId(null) : undefined}
               onClick={featured ? () => onNavigate?.(kpi.linkTo!) : undefined}
               onKeyDown={
                 featured
@@ -158,7 +164,14 @@ export function DashboardKpis({ onOpenMobileMenu, onOpenProfile, onNavigate }: D
               style={{
                 cursor: featured ? 'pointer' : 'default',
                 outline: 'none',
-                boxShadow: hovered ? 'var(--shadow-cardHover)' : undefined,
+                background: showColor ? gradient : theme['bg-surface'],
+                boxShadow: showColor
+                  ? `0 20px 40px ${tone.icon}55`
+                  : hovered
+                    ? 'var(--shadow-cardHover)'
+                    : undefined,
+                transform: hovered || showColor ? 'translateY(-3px)' : undefined,
+                transition: 'background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease, color 0.2s ease',
               }}
             >
               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', position: 'relative', zIndex: 1 }}>
@@ -166,13 +179,29 @@ export function DashboardKpis({ onOpenMobileMenu, onOpenProfile, onNavigate }: D
                   style={{
                     fontSize: typography.roles.cardLabel.fontSize,
                     fontWeight: typography.roles.cardLabel.fontWeight,
-                    color: theme['text-secondary'],
+                    color: showColor ? 'rgba(255, 255, 255, 0.9)' : theme['text-secondary'],
+                    transition: 'color 0.2s ease',
                   }}
                 >
                   {kpi.label}
                 </span>
-                <span className="kpi-icon-bubble" style={{ background: tone.bg, color: tone.icon }}>
-                  {kpi.icon}
+                <span
+                  className="kpi-icon-bubble"
+                  style={{
+                    background: showColor ? 'rgba(255, 255, 255, 0.22)' : tone.bg,
+                    color: showColor ? '#ffffff' : tone.icon,
+                    borderRadius: radius.pill,
+                    transition: 'background 0.2s ease, color 0.2s ease',
+                  }}
+                >
+                  {showColor ? (
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M7 17 17 7" />
+                      <path d="M7 7h10v10" />
+                    </svg>
+                  ) : (
+                    kpi.icon
+                  )}
                 </span>
               </div>
 
@@ -183,7 +212,8 @@ export function DashboardKpis({ onOpenMobileMenu, onOpenProfile, onNavigate }: D
                     fontWeight: typography.roles.kpiValue.fontWeight,
                     letterSpacing: typography.roles.kpiValue.letterSpacing,
                     lineHeight: typography.roles.kpiValue.lineHeight,
-                    color: theme['text-primary'],
+                    color: showColor ? '#ffffff' : theme['text-primary'],
+                    transition: 'color 0.2s ease',
                   }}
                 >
                   {kpi.value}
@@ -192,7 +222,8 @@ export function DashboardKpis({ onOpenMobileMenu, onOpenProfile, onNavigate }: D
                   style={{
                     fontSize: typography.roles.helperText.fontSize,
                     marginTop: 6,
-                    color: theme['text-muted'],
+                    color: showColor ? 'rgba(255, 255, 255, 0.78)' : theme['text-muted'],
+                    transition: 'color 0.2s ease',
                   }}
                 >
                   {kpi.hint}
