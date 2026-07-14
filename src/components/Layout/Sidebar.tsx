@@ -24,9 +24,12 @@ export function Sidebar({ collapsed, onToggle, activeView, onNavigate, onLogout 
         flexShrink: 0,
         display: 'flex',
         flexDirection: 'column',
+        /* Deliberately its own fixed value, not derived from the content panel's
+           contentPaddingTop — that token has changed independently for the
+           content panel before and dragged the logo down with it unintentionally. */
         padding: collapsed
-          ? `calc(${layoutTokens.contentPaddingTop} - ${spacing[3]}) ${spacing[2]} ${spacing[5]}`
-          : `calc(${layoutTokens.contentPaddingTop} - ${spacing[3]}) ${spacing[3]} ${spacing[5]}`,
+          ? `${spacing[4]} ${spacing[2]} ${spacing[5]}`
+          : `${spacing[4]} ${spacing[3]} ${spacing[5]}`,
         alignSelf: 'stretch',
         background: sidebarTokens.background,
         transition: 'width 0.2s ease, padding 0.2s ease',
@@ -108,7 +111,7 @@ export function Sidebar({ collapsed, onToggle, activeView, onNavigate, onLogout 
           minHeight: 0,
           /* Logo/toggle position is separately tuned via the header's own padding above —
              don't touch that. This margin only controls the nav list's own position. */
-          marginTop: collapsed ? 0 : spacing[8],
+          marginTop: collapsed ? 0 : spacing[2],
           overflowY: 'auto',
           overflowX: 'visible',
         }}

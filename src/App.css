@@ -381,14 +381,10 @@
     grid-template-columns: 1fr;
   }
 
-  /* Hero card wraps to its own line on narrow screens — stack the two
-     buttons vertically on the right instead of a cramped side-by-side row */
+  /* Hero card wraps to its own line on narrow screens — keep the two
+     buttons side by side in a horizontal row below the rest of the card */
   .profile-hero-actions {
-    flex-direction: column;
-    align-items: stretch;
-    margin-left: auto;
-    width: auto;
-    min-width: 160px;
+    width: 100%;
   }
 
   .app-content {
