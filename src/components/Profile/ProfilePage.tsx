@@ -310,7 +310,6 @@ export function ProfilePage({ onBack }: ProfilePageProps) {
         <DetailSection title="Personal Details">
           <DetailField label="Name" value="Arun Prakash" />
           <DetailField label="Mobile 1" value="+91 98765 43210" />
-          <DetailField label="Mobile 2" value="+91 90000 11223" />
           <DetailField label="Date of Birth" value="14 Feb 1990" />
           <DetailField label="Country" value="India" />
           <DetailField label="State" value="Tamil Nadu" />

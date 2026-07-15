@@ -9,11 +9,12 @@ import { NoticeBoard } from './components/Home/NoticeBoard';
 import { TopPerformers } from './components/Home/TopPerformers';
 import { ProfilePage } from './components/Profile/ProfilePage';
 import { PlaceholderPage } from './components/Placeholder/PlaceholderPage';
+import { LedgerPage } from './components/Ledger/LedgerPage';
 
 /** Covers iPhone 14 Pro Max (430px) and similar phones / small tablets */
 const MOBILE_QUERY = '(max-width: 860px)';
 
-type PlaceholderViewId = Exclude<AppView, 'dashboard' | 'profile'>;
+type PlaceholderViewId = Exclude<AppView, 'dashboard' | 'profile' | 'ledger'>;
 
 /** Stub copy for the sections not yet built out — refine per-page as each is implemented */
 const placeholderPages: Record<PlaceholderViewId, { title: string; subtitle: string; actions?: string[] }> = {
@@ -26,11 +27,6 @@ const placeholderPages: Record<PlaceholderViewId, { title: string; subtitle: str
     title: 'My Scans (H.O)',
     subtitle: 'Preprocess, verify, and manage scan data at the Head Office.',
     actions: ['Preprocess', 'Verify', 'Data Download', 'Report Upload'],
-  },
-  ledger: {
-    title: 'My Ledger',
-    subtitle: 'Track credits and debits across auto and manual entries.',
-    actions: ['Credits · Auto', 'Credits · Manual', 'Debits · Auto', 'Debits · Manual'],
   },
   reports: {
     title: 'My Reports',
@@ -132,6 +128,11 @@ function App() {
                   <TopPerformers />
                 </div>
               </>
+            ) : view === 'ledger' ? (
+              <LedgerPage
+                onOpenMobileMenu={() => setMobileMenuOpen(true)}
+                onOpenProfile={() => setView('profile')}
+              />
             ) : (
               <PlaceholderPage
                 {...placeholderPages[view]}

@@ -40,7 +40,7 @@ export function Sidebar({ collapsed, onToggle, activeView, onNavigate, onLogout 
           justifyContent: collapsed ? 'center' : 'space-between',
           gap: spacing[2],
           padding: collapsed ? 0 : `0 ${spacing[2]}`,
-          marginBottom: collapsed ? spacing[2] : spacing[6],
+          marginBottom: collapsed ? spacing[2] : spacing[8],
           minHeight: collapsed ? 44 : 42,
           flexShrink: 0,
         }}
@@ -104,15 +104,15 @@ export function Sidebar({ collapsed, onToggle, activeView, onNavigate, onLogout 
         style={{
           display: 'flex',
           flexDirection: 'column',
-          /* Collapsed: fixed gaps. Expanded: distribute items evenly — no scroll, no dead zone. */
-          gap: collapsed ? 16 : 4,
+          /* Collapsed: breathing room. Expanded: only a light gap between items. */
+          gap: collapsed ? 16 : 6,
           flex: 1,
           minHeight: 0,
           marginTop: collapsed ? 0 : 0,
           overflowY: collapsed ? 'auto' : 'hidden',
           overflowX: 'visible',
           alignItems: collapsed ? 'center' : 'stretch',
-          justifyContent: collapsed ? 'flex-start' : 'space-between',
+          justifyContent: 'flex-start',
         }}
       >
         {navItems.map((item, index) => {
@@ -130,7 +130,7 @@ export function Sidebar({ collapsed, onToggle, activeView, onNavigate, onLogout 
                     letterSpacing: '0.06em',
                     textTransform: 'uppercase',
                     padding: `0 ${spacing[3]}`,
-                    margin: '0 0 0',
+                    margin: '20px 0 6px',
                     flexShrink: 0,
                   }}
                 >
@@ -149,8 +149,8 @@ export function Sidebar({ collapsed, onToggle, activeView, onNavigate, onLogout 
                   justifyContent: collapsed ? 'center' : 'flex-start',
                   gap: collapsed ? 12 : 10,
                   width: collapsed ? 'auto' : '100%',
-                  minHeight: collapsed ? 44 : 40,
-                  padding: collapsed ? 0 : '4px 8px',
+                  minHeight: collapsed ? 44 : 38,
+                  padding: collapsed ? 0 : '3px 8px',
                   border: 'none',
                   borderRadius: sidebarTokens.itemRadius,
                   background: 'transparent',
@@ -183,7 +183,7 @@ export function Sidebar({ collapsed, onToggle, activeView, onNavigate, onLogout 
         style={{
           borderTop: collapsed ? 'none' : `1px solid ${theme.divider}`,
           paddingTop: collapsed ? 0 : spacing[2],
-          marginTop: collapsed ? 16 : spacing[2],
+          marginTop: collapsed ? 16 : 'auto',
           display: 'flex',
           flexDirection: 'column',
           gap: collapsed ? 16 : 4,
