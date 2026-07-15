@@ -89,18 +89,11 @@ export function LedgerPage({ onOpenMobileMenu, onOpenProfile }: LedgerPageProps)
   const tableTitle = activeTab === 'receipts' ? 'Receipts' : 'Billing';
 
   return (
-    <section>
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'flex-start',
-          justifyContent: 'space-between',
-          gap: spacing[4],
-          marginBottom: spacing[6],
-        }}
-      >
+    <section className="page-section">
+      <div className="page-header">
         <div>
           <h1
+            className="page-title"
             style={{
               margin: 0,
               fontSize: typography.roles.pageTitle.fontSize,
@@ -112,12 +105,12 @@ export function LedgerPage({ onOpenMobileMenu, onOpenProfile }: LedgerPageProps)
           >
             My Ledger
           </h1>
-          <p style={{ margin: '8px 0 0', fontSize: 14, color: theme['text-secondary'] }}>
+          <p className="page-subtitle" style={{ margin: '8px 0 0', fontSize: 14, color: theme['text-secondary'] }}>
             Track receipts and billing across your network.
           </p>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div className="page-header-actions">
           <button type="button" className="btn-icon mobile-menu-btn" aria-label="Open menu" onClick={onOpenMobileMenu}>
             <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
               <path d="M4 7h16M4 12h16M4 17h16" />

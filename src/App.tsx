@@ -10,19 +10,15 @@ import { TopPerformers } from './components/Home/TopPerformers';
 import { ProfilePage } from './components/Profile/ProfilePage';
 import { PlaceholderPage } from './components/Placeholder/PlaceholderPage';
 import { LedgerPage } from './components/Ledger/LedgerPage';
+import { ScansMlaPage } from './components/Scans/ScansMlaPage';
 
 /** Covers iPhone 14 Pro Max (430px) and similar phones / small tablets */
 const MOBILE_QUERY = '(max-width: 860px)';
 
-type PlaceholderViewId = Exclude<AppView, 'dashboard' | 'profile' | 'ledger'>;
+type PlaceholderViewId = Exclude<AppView, 'dashboard' | 'profile' | 'ledger' | 'scans-mla'>;
 
 /** Stub copy for the sections not yet built out — refine per-page as each is implemented */
 const placeholderPages: Record<PlaceholderViewId, { title: string; subtitle: string; actions?: string[] }> = {
-  'scans-mla': {
-    title: 'My Scans (MLA)',
-    subtitle: 'Upload scans and manage client data for MLA-side operations.',
-    actions: ['Scan Upload', 'Add Client Data', 'Export', 'Delete'],
-  },
   'scans-ho': {
     title: 'My Scans (H.O)',
     subtitle: 'Preprocess, verify, and manage scan data at the Head Office.',
@@ -115,7 +111,10 @@ function App() {
         <div className="app-main">
           <main className="app-content panel">
             {view === 'profile' ? (
-              <ProfilePage onBack={() => setView('dashboard')} />
+              <ProfilePage
+                onBack={() => setView('dashboard')}
+                onOpenMobileMenu={() => setMobileMenuOpen(true)}
+              />
             ) : view === 'dashboard' ? (
               <>
                 <DashboardKpis
@@ -130,6 +129,11 @@ function App() {
               </>
             ) : view === 'ledger' ? (
               <LedgerPage
+                onOpenMobileMenu={() => setMobileMenuOpen(true)}
+                onOpenProfile={() => setView('profile')}
+              />
+            ) : view === 'scans-mla' ? (
+              <ScansMlaPage
                 onOpenMobileMenu={() => setMobileMenuOpen(true)}
                 onOpenProfile={() => setView('profile')}
               />

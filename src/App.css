@@ -560,6 +560,14 @@
   .mobile-menu-btn {
     display: inline-flex !important;
   }
+
+  .page-header {
+    gap: 12px;
+  }
+
+  .page-title {
+    font-size: 28px !important;
+  }
 }
 
 .mobile-menu-btn {
@@ -891,6 +899,51 @@
   border: none;
 }
 
+/* Shared page shell — ledger / profile / scans */
+.page-section {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.page-title-block {
+  min-width: 0;
+  flex: 1;
+}
+
+.page-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.page-title {
+  word-break: break-word;
+}
+
+.page-subtitle {
+  max-width: 42rem;
+}
+
+.profile-hero-row {
+  width: 100%;
+}
+
+.scans-clients-empty,
+.scans-upload-footer {
+  width: 100%;
+}
+
 @media (max-width: 640px) {
   .ledger-topup-banner {
     flex-direction: column;
@@ -899,6 +952,84 @@
 
   .ledger-topup-banner .btn-pill-primary {
     width: 100%;
+  }
+
+  .page-header {
+    margin-bottom: 18px;
+  }
+
+  .page-title {
+    font-size: 24px !important;
+    line-height: 1.2 !important;
+  }
+
+  .page-subtitle {
+    font-size: 13px !important;
+  }
+
+  .dash-card {
+    padding: 16px !important;
+    border-radius: 20px;
+  }
+
+  .profile-hero-card {
+    padding: 18px 16px !important;
+  }
+
+  .profile-hero-row {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 16px !important;
+  }
+
+  .profile-hero-actions {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .profile-hero-actions .btn-pill-primary,
+  .profile-hero-actions .btn-pill-secondary {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .scans-dropzone {
+    padding: 28px 16px !important;
+  }
+
+  .scans-clients-empty {
+    flex-direction: column;
+    align-items: stretch !important;
+  }
+
+  .scans-clients-empty .btn-pill-primary {
+    width: 100%;
+  }
+
+  .scans-upload-footer {
+    flex-direction: column;
+    align-items: stretch !important;
+  }
+
+  .scans-upload-footer .btn-pill-primary {
+    width: 100%;
+  }
+
+  .modal-overlay {
+    padding: 12px;
+    align-items: flex-end;
+  }
+
+  .modal-panel {
+    max-height: min(92vh, 760px);
+    border-radius: 24px 24px 16px 16px;
+  }
+
+  .modal-header,
+  .modal-body,
+  .modal-footer {
+    padding-left: 16px;
+    padding-right: 16px;
   }
 }
 

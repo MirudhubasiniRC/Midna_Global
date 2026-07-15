@@ -7,6 +7,7 @@ const theme = colors.light;
 
 type ProfilePageProps = {
   onBack: () => void;
+  onOpenMobileMenu?: () => void;
 };
 
 /** Subscription tiers — billing % pulled from the plan reference table */
@@ -211,7 +212,7 @@ function LitePopup({ open, title, children, onClose }: LitePopupProps) {
   );
 }
 
-export function ProfilePage({ onBack }: ProfilePageProps) {
+export function ProfilePage({ onBack, onOpenMobileMenu }: ProfilePageProps) {
   const [editOpen, setEditOpen] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [pendingImage, setPendingImage] = useState<string | null>(null);
@@ -300,35 +301,46 @@ export function ProfilePage({ onBack }: ProfilePageProps) {
   };
 
   return (
-    <section>
-      <div style={{ display: 'flex', alignItems: 'center', gap: spacing[3], marginBottom: spacing[6] }}>
-        <button type="button" className="btn-icon" aria-label="Back to dashboard" onClick={onBack}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="m15 6-6 6 6 6" />
-          </svg>
-        </button>
-        <div>
-          <h1
-            style={{
-              margin: 0,
-              fontSize: typography.roles.pageTitle.fontSize,
-              lineHeight: typography.roles.pageTitle.lineHeight,
-              fontWeight: typography.roles.pageTitle.fontWeight,
-              letterSpacing: typography.roles.pageTitle.letterSpacing,
-              color: theme['text-primary'],
-            }}
-          >
-            My Profile
-          </h1>
-          <p style={{ margin: '6px 0 0', fontSize: 14, color: theme['text-secondary'] }}>
-            Manage your certification, mentorship, and billing details.
-          </p>
+    <section className="page-section">
+      <div className="page-header">
+        <div style={{ display: 'flex', alignItems: 'center', gap: spacing[3], minWidth: 0, flex: 1 }}>
+          <button type="button" className="btn-icon" aria-label="Back to dashboard" onClick={onBack}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="m15 6-6 6 6 6" />
+            </svg>
+          </button>
+          <div className="page-title-block" style={{ minWidth: 0 }}>
+            <h1
+              className="page-title"
+              style={{
+                margin: 0,
+                fontSize: typography.roles.pageTitle.fontSize,
+                lineHeight: typography.roles.pageTitle.lineHeight,
+                fontWeight: typography.roles.pageTitle.fontWeight,
+                letterSpacing: typography.roles.pageTitle.letterSpacing,
+                color: theme['text-primary'],
+              }}
+            >
+              My Profile
+            </h1>
+            <p className="page-subtitle" style={{ margin: '6px 0 0', fontSize: 14, color: theme['text-secondary'] }}>
+              Manage your certification, mentorship, and billing details.
+            </p>
+          </div>
+        </div>
+        <div className="page-header-actions">
+          <button type="button" className="btn-icon mobile-menu-btn" aria-label="Open menu" onClick={onOpenMobileMenu}>
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+              <path d="M4 7h16M4 12h16M4 17h16" />
+            </svg>
+          </button>
         </div>
       </div>
 
       {/* Hero card */}
-      <div className="dash-card" style={{ marginBottom: spacing[5], padding: spacing[8] }}>
+      <div className="dash-card profile-hero-card" style={{ marginBottom: spacing[5], padding: spacing[8] }}>
         <div
+          className="profile-hero-row"
           style={{
             display: 'flex',
             alignItems: 'center',

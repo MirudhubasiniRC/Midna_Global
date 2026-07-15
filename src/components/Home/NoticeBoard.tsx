@@ -110,8 +110,8 @@ export function NoticeBoard() {
           <span
             className="notice-board-blink"
             style={{
-              width: 34,
-              height: 34,
+              width: 44,
+              height: 44,
               borderRadius: '50%',
               background: theme['primary-soft'],
               color: theme.primary,
@@ -119,12 +119,13 @@ export function NoticeBoard() {
               placeItems: 'center',
               flexShrink: 0,
               boxShadow: shadow.float,
+              fontSize: 26,
+              fontWeight: 800,
+              lineHeight: 1,
+              letterSpacing: 0,
             }}
           >
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="12" y1="7" x2="12" y2="13" />
-              <line x1="12" y1="17" x2="12.01" y2="17" />
-            </svg>
+            !
           </span>
           Notice board
         </h2>
