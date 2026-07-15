@@ -1,4 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { colors, radius, shadow, spacing } from '../../styles/theme';
+
+const theme = colors.light;
 
 type EditProfileModalProps = {
   open: boolean;
@@ -56,6 +59,9 @@ const textFields: { key: FieldKey; label: string; type?: string }[] = [
 
 export function EditProfileModal({ open, onClose }: EditProfileModalProps) {
   const [form, setForm] = useState<FormState>(initialForm);
+  const [certPreview, setCertPreview] = useState<string | null>(null);
+  const [certName, setCertName] = useState<string | null>(null);
+  const certInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -70,12 +76,40 @@ export function EditProfileModal({ open, onClose }: EditProfileModalProps) {
     };
   }, [open, onClose]);
 
+  useEffect(() => {
+    if (open) return;
+    setCertPreview((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return null;
+    });
+    setCertName(null);
+  }, [open]);
+
   if (!open) return null;
 
   const update = (key: keyof FormState) => (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     setForm((f) => ({ ...f, [key]: e.target.value }));
+  };
+
+  const handleCertChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setCertPreview((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return URL.createObjectURL(file);
+    });
+    setCertName(file.name);
+    e.target.value = '';
+  };
+
+  const clearCert = () => {
+    setCertPreview((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return null;
+    });
+    setCertName(null);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -95,7 +129,7 @@ export function EditProfileModal({ open, onClose }: EditProfileModalProps) {
         <div className="modal-header">
           <div>
             <h2 className="modal-title">Edit your profile</h2>
-            <p className="modal-subtitle">Update your contact details, photo, and certificate.</p>
+            <p className="modal-subtitle">Update your contact details and add certifications.</p>
           </div>
           <button type="button" className="btn-icon" aria-label="Close" onClick={onClose}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -153,6 +187,90 @@ export function EditProfileModal({ open, onClose }: EditProfileModalProps) {
                 onChange={update('nurturingServices')}
               />
             </label>
+
+            <div className="form-field" style={{ marginTop: 18 }}>
+              <span className="form-label">Certification</span>
+              <input
+                ref={certInputRef}
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+                onChange={handleCertChange}
+                style={{ display: 'none' }}
+              />
+
+              {certPreview ? (
+                <div
+                  style={{
+                    borderRadius: radius.lg,
+                    overflow: 'hidden',
+                    background: theme['bg-muted'],
+                    boxShadow: shadow.float,
+                  }}
+                >
+                  <img
+                    src={certPreview}
+                    alt="Certification preview"
+                    style={{ width: '100%', maxHeight: 180, objectFit: 'cover', display: 'block' }}
+                  />
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: 10,
+                      padding: '12px 14px',
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontSize: 12,
+                        color: theme['text-secondary'],
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {certName}
+                    </span>
+                    <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+                      <button
+                        type="button"
+                        className="btn-pill-secondary"
+                        style={{ height: 32, fontSize: 12, padding: '0 12px' }}
+                        onClick={() => certInputRef.current?.click()}
+                      >
+                        Replace
+                      </button>
+                      <button
+                        type="button"
+                        className="btn-pill-secondary"
+                        style={{ height: 32, fontSize: 12, padding: '0 12px', color: theme.error }}
+                        onClick={clearCert}
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  className="btn-pill-secondary"
+                  onClick={() => certInputRef.current?.click()}
+                  style={{ alignSelf: 'flex-start', height: 40 }}
+                >
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 16V4" />
+                    <path d="m6 10 6-6 6 6" />
+                    <path d="M4 20h16" />
+                  </svg>
+                  Add certification
+                </button>
+              )}
+              <span style={{ fontSize: 12, color: theme['text-muted'], marginTop: spacing[1] }}>
+                PNG, JPG, or WebP
+              </span>
+            </div>
           </div>
 
           <div className="modal-footer">

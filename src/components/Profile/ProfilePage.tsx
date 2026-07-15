@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { buttonTokens, colors, metricColors, radius, severityTokens, spacing, typography } from '../../styles/theme';
 import { EditProfileModal } from './EditProfileModal';
 import { AvatarCropModal } from './AvatarCropModal';
@@ -127,16 +127,85 @@ function DetailField({ label, value }: DetailFieldProps) {
 type DetailSectionProps = {
   title: string;
   children: React.ReactNode;
+  onOpen?: () => void;
 };
 
-function DetailSection({ title, children }: DetailSectionProps) {
+function DetailSection({ title, children, onOpen }: DetailSectionProps) {
   return (
-    <div className="dash-card">
-      <h2 style={{ margin: 0, fontSize: 18, fontWeight: 600, letterSpacing: '-0.01em', color: theme['text-primary'] }}>
-        {title}
-      </h2>
-      <div className="detail-list" style={{ display: 'flex', flexDirection: 'column', marginTop: spacing[3] }}>
-        {children}
+    <button
+      type="button"
+      className="dash-card profile-tile"
+      onClick={onOpen}
+      style={{
+        textAlign: 'left',
+        cursor: 'pointer',
+        border: 'none',
+        fontFamily: 'inherit',
+        width: '100%',
+        color: 'inherit',
+      }}
+    >
+      <div className="profile-tile-header">
+        <h2 className="profile-tile-title">{title}</h2>
+        <span
+          aria-hidden="true"
+          style={{
+            width: 28,
+            height: 28,
+            borderRadius: '50%',
+            background: theme['primary-soft'],
+            color: theme.primary,
+            display: 'grid',
+            placeItems: 'center',
+            flexShrink: 0,
+          }}
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M7 17 17 7" />
+            <path d="M7 7h10v10" />
+          </svg>
+        </span>
+      </div>
+      <div className="detail-list profile-tile-body">{children}</div>
+    </button>
+  );
+}
+
+type LitePopupProps = {
+  open: boolean;
+  title: string;
+  children: React.ReactNode;
+  onClose: () => void;
+};
+
+function LitePopup({ open, title, children, onClose }: LitePopupProps) {
+  if (!open) return null;
+
+  return (
+    <div className="modal-overlay profile-lite-overlay" role="presentation" onClick={onClose}>
+      <div
+        className="profile-lite-popup"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="profile-lite-title"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, marginBottom: spacing[4] }}>
+          <div>
+            <h2 id="profile-lite-title" style={{ margin: 0, fontSize: 18, fontWeight: 600, color: theme['text-primary'], letterSpacing: '-0.01em' }}>
+              {title}
+            </h2>
+            <p style={{ margin: '4px 0 0', fontSize: 13, color: theme['text-muted'] }}>Quick view</p>
+          </div>
+          <button type="button" className="btn-icon" aria-label="Close" onClick={onClose} style={{ width: 36, height: 36 }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+              <path d="M18 6 6 18M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <div className="detail-list" style={{ display: 'flex', flexDirection: 'column' }}>
+          {children}
+        </div>
       </div>
     </div>
   );
@@ -146,7 +215,21 @@ export function ProfilePage({ onBack }: ProfilePageProps) {
   const [editOpen, setEditOpen] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [pendingImage, setPendingImage] = useState<string | null>(null);
+  const [liteSection, setLiteSection] = useState<string | null>(null);
   const avatarInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!liteSection) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setLiteSection(null);
+    };
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', onKey);
+    return () => {
+      document.body.style.overflow = '';
+      window.removeEventListener('keydown', onKey);
+    };
+  }, [liteSection]);
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -163,6 +246,57 @@ export function ProfilePage({ onBack }: ProfilePageProps) {
   const handleCropSave = (dataUrl: string) => {
     setAvatarUrl(dataUrl);
     closeCropModal();
+  };
+
+  const personalFields = (
+    <>
+      <DetailField label="Name" value="Arun Prakash" />
+      <DetailField label="Mobile 1" value="+91 98765 43210" />
+      <DetailField label="Date of Birth" value="14 Feb 1990" />
+      <DetailField label="Country" value="India" />
+      <DetailField label="State" value="Tamil Nadu" />
+      <DetailField label="Pincode" value="600028" />
+      <DetailField label="Address" value="No. 12, Anna Nagar, Chennai" />
+    </>
+  );
+
+  const membershipFields = (
+    <>
+      <DetailField label="MID" value="M10048" />
+      <DetailField label="Date of Joining" value="03 Jan 2022" />
+      <DetailField label="Subscription" value={<Pill label={currentTier} color={tier.color} bg={tier.bg} emoji={tier.emoji} />} />
+      <DetailField label="Expiry Date" value="02 Jan 2027" />
+      <DetailField label="Billing" value={tier.billing} />
+      <DetailField label="Opening Balance" value="₹8,200" />
+    </>
+  );
+
+  const professionalFields = (
+    <>
+      <DetailField label="UID" value="MDN-UID-08812" />
+      <DetailField label="Services" value="Genetic Counseling, Sample Collection, Report Review" />
+      <DetailField label="Availability" value={<Pill label="Full Time" color={metricColors.blue.text} bg={metricColors.blue.bg} />} />
+      <DetailField label="Certified" value={<Pill label="Yes" color={theme.success} bg={theme['success-bg']} />} />
+      <DetailField label="Certification Date" value="18 Mar 2022" />
+    </>
+  );
+
+  const visibilityFields = (
+    <>
+      <DetailField label="MRP Visibility" value={<Pill label="Show" color={theme.success} bg={theme['success-bg']} />} />
+      <DetailField label="Branding" value={<Pill label="CBA" color={metricColors.purple.text} bg={metricColors.purple.bg} />} />
+      <DetailField label="MIS Training" value={<Pill label="Completed" color={theme.success} bg={theme['success-bg']} />} />
+      <DetailField label="Mentored By" value="Rathinaswamy A · 9597770205" />
+      <DetailField label="Admin By" value="Priya Shah" />
+      <DetailField label="Remarks" value={<span style={{ fontWeight: 400, color: theme['text-muted'], fontStyle: 'italic' }}>No remarks</span>} />
+    </>
+  );
+
+  const liteContent: Record<string, React.ReactNode> = {
+    'Personal Details': personalFields,
+    'Membership & Billing': membershipFields,
+    'Professional Details': professionalFields,
+    'Visibility & Admin': visibilityFields,
   };
 
   return (
@@ -270,13 +404,42 @@ export function ProfilePage({ onBack }: ProfilePageProps) {
           </div>
 
           <div style={{ flex: 1, minWidth: 220 }}>
-            <h2 style={{ margin: 0, fontSize: 26, fontWeight: 600, color: theme['text-primary'], letterSpacing: '-0.025em' }}>
+            <h2
+              style={{
+                margin: 0,
+                fontSize: 26,
+                fontWeight: 600,
+                color: theme['text-primary'],
+                letterSpacing: '-0.025em',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 8,
+              }}
+            >
               MiDNA (H.O)
+              <span
+                title="Certified – Admin"
+                aria-label="Verified · Certified Admin"
+                style={{
+                  width: 22,
+                  height: 22,
+                  borderRadius: '50%',
+                  background: '#3897F0',
+                  color: '#fff',
+                  display: 'inline-grid',
+                  placeItems: 'center',
+                  flexShrink: 0,
+                  boxShadow: '0 2px 8px rgba(56, 151, 240, 0.35)',
+                }}
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M20 6 9 17l-5-5" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </span>
             </h2>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginTop: 12 }}>
-              <Pill label={`${currentTier} member`} color={tier.color} bg={tier.bg} emoji={tier.emoji} />
-              <Pill label="Certified – Admin" color={theme.primary} bg={theme['primary-soft']} />
               <Pill label={currentStatus} color={statusTone.color} bg={statusTone.bg} dot pulse />
+              <Pill label={currentTier} color={tier.color} bg={tier.bg} emoji={tier.emoji} />
             </div>
           </div>
 
@@ -307,81 +470,38 @@ export function ProfilePage({ onBack }: ProfilePageProps) {
           alignItems: 'stretch',
         }}
       >
-        <DetailSection title="Personal Details">
-          <DetailField label="Name" value="Arun Prakash" />
-          <DetailField label="Mobile 1" value="+91 98765 43210" />
-          <DetailField label="Date of Birth" value="14 Feb 1990" />
-          <DetailField label="Country" value="India" />
-          <DetailField label="State" value="Tamil Nadu" />
-          <DetailField label="Pincode" value="600028" />
-          <DetailField label="Address" value="No. 12, Anna Nagar, Chennai" />
+        <DetailSection title="Personal Details" onOpen={() => setLiteSection('Personal Details')}>
+          {personalFields}
         </DetailSection>
 
-        <DetailSection title="Membership & Billing">
-          <DetailField label="Midna ID (MID)" value="M10048" />
-          <DetailField label="Date of Joining" value="03 Jan 2022" />
-          <DetailField label="Subscription" value={<Pill label={currentTier} color={tier.color} bg={tier.bg} emoji={tier.emoji} />} />
-          <DetailField label="Expiry Date" value="02 Jan 2027" />
-          <DetailField label="Billing" value={`${tier.billing} commission`} />
-          <DetailField label="Opening Balance" value="₹8,200" />
+        <DetailSection title="Membership & Billing" onOpen={() => setLiteSection('Membership & Billing')}>
+          {membershipFields}
         </DetailSection>
 
-        <DetailSection title="Professional Details">
-          <DetailField label="UID" value="MDN-UID-08812" />
-          <DetailField label="Services" value="Genetic Counseling, Sample Collection, Report Review" />
-          <DetailField
-            label="Availability"
-            value={<Pill label="Full Time" color={metricColors.blue.text} bg={metricColors.blue.bg} />}
-          />
-          <DetailField label="Certified" value={<Pill label="Yes" color={theme.success} bg={theme['success-bg']} />} />
-          <DetailField label="Certification Date" value="18 Mar 2022" />
+        <DetailSection title="Professional Details" onOpen={() => setLiteSection('Professional Details')}>
+          {professionalFields}
         </DetailSection>
 
-        <DetailSection title="Visibility & Admin">
-          <DetailField label="MRP Visibility" value={<Pill label="Show" color={theme.success} bg={theme['success-bg']} />} />
-          <DetailField
-            label="Branding"
-            value={<Pill label="CBA" color={metricColors.purple.text} bg={metricColors.purple.bg} />}
-          />
-          <DetailField label="MIS Training" value={<Pill label="Completed" color={theme.success} bg={theme['success-bg']} />} />
-          <DetailField label="Mentored By" value="Rathinaswamy A · 9597770205" />
-          <DetailField label="Admin By" value="Priya Shah" />
-          <DetailField label="Remarks" value={<span style={{ fontWeight: 400, color: theme['text-muted'], fontStyle: 'italic' }}>No remarks</span>} />
+        <DetailSection title="Visibility & Admin" onOpen={() => setLiteSection('Visibility & Admin')}>
+          {visibilityFields}
         </DetailSection>
       </div>
 
-      {/* Certifications card */}
+      {/* Certifications — display only; upload lives in Edit profile */}
       <div className="dash-card">
         <h2 style={{ margin: 0, fontSize: 20, fontWeight: 600, letterSpacing: '-0.01em', color: theme['text-primary'] }}>
           Certifications
         </h2>
         <p style={{ margin: '6px 0 0', fontSize: 14, lineHeight: 1.55, color: theme['text-secondary'], maxWidth: 560 }}>
-          Upload images of your certifications. Previews appear below; connect a backend when you are ready to save
-          them.
+          Your uploaded certificates appear here.
         </p>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: spacing[4], flexWrap: 'wrap' }}>
-          <button
-            type="button"
-            className="btn-pill-secondary"
-            style={{ height: buttonTokens.height.sm, padding: buttonTokens.padding.sm, fontSize: 13 }}
-          >
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 16V4" />
-              <path d="m6 10 6-6 6 6" />
-              <path d="M4 20h16" />
-            </svg>
-            Add certification
-          </button>
-          <span style={{ fontSize: 12, color: theme['text-muted'] }}>PNG, JPG, or WebP</span>
-        </div>
 
         <div
           style={{
             marginTop: spacing[5],
             border: 'none',
             borderRadius: radius.lg,
-            padding: spacing[6],
+            padding: spacing[8],
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -389,12 +509,13 @@ export function ProfilePage({ onBack }: ProfilePageProps) {
             gap: 8,
             color: theme['text-muted'],
             background: theme['bg-muted'],
+            minHeight: 160,
           }}
         >
           <div
             style={{
-              width: 44,
-              height: 44,
+              width: 48,
+              height: 48,
               borderRadius: '50%',
               background: theme['bg-surface'],
               display: 'grid',
@@ -403,7 +524,7 @@ export function ProfilePage({ onBack }: ProfilePageProps) {
               boxShadow: 'var(--shadow-float)',
             }}
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
               <rect x="3" y="3" width="18" height="18" rx="3" />
               <circle cx="9" cy="9" r="2" />
               <path d="m21 15-5-5L5 21" />
@@ -414,6 +535,14 @@ export function ProfilePage({ onBack }: ProfilePageProps) {
       </div>
 
       <EditProfileModal open={editOpen} onClose={() => setEditOpen(false)} />
+
+      <LitePopup
+        open={Boolean(liteSection)}
+        title={liteSection ?? ''}
+        onClose={() => setLiteSection(null)}
+      >
+        {liteSection ? liteContent[liteSection] : null}
+      </LitePopup>
 
       {pendingImage && (
         <AvatarCropModal imageSrc={pendingImage} onCancel={closeCropModal} onSave={handleCropSave} />
