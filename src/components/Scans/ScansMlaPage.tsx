@@ -4,6 +4,7 @@ import { NotificationButton } from '../Layout/NotificationButton';
 import { ProfileAvatarButton } from '../Layout/ProfileAvatarButton';
 import { DeclarationModal } from './DeclarationModal';
 import { EditScanModal } from './EditScanModal';
+import { extractClientFromZip } from './extractClientFromZip';
 import { ScanImagesModal } from './ScanImagesModal';
 import {
   defaultScanDetails,
@@ -115,12 +116,16 @@ export function ScansMlaPage({ onOpenMobileMenu, onOpenProfile }: ScansMlaPagePr
   const [declared, setDeclared] = useState(false);
   const [records, setRecords] = useState<ScanRecord[]>(seedRecords);
   const [error, setError] = useState<string | null>(null);
+  const [extractNotice, setExtractNotice] = useState<string | null>(null);
+  const [extractOk, setExtractOk] = useState(false);
+  const [extracting, setExtracting] = useState(false);
   const [declarationOpen, setDeclarationOpen] = useState(false);
   const [editingRecord, setEditingRecord] = useState<ScanRecord | null>(null);
   const [viewingImages, setViewingImages] = useState<ScanRecord | null>(null);
   const [exportNotice, setExportNotice] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const tableRef = useRef<HTMLDivElement>(null);
+  const extractRequestId = useRef(0);
 
   const clientComplete =
     clientForm.name.trim().length > 0 &&
@@ -128,7 +133,7 @@ export function ScansMlaPage({ onOpenMobileMenu, onOpenProfile }: ScansMlaPagePr
     clientForm.phone.trim().length > 0 &&
     clientForm.gender.trim().length > 0;
 
-  const canSubmit = Boolean(file) && declared && clientComplete;
+  const canSubmit = Boolean(file) && declared && clientComplete && !extracting;
 
   const updateClient = (key: keyof UploadClientForm) => (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -136,8 +141,10 @@ export function ScansMlaPage({ onOpenMobileMenu, onOpenProfile }: ScansMlaPagePr
     setClientForm((f) => ({ ...f, [key]: e.target.value }));
   };
 
-  const pickFile = (next: File | null) => {
+  const pickFile = async (next: File | null) => {
     setError(null);
+    setExtractNotice(null);
+    setExtractOk(false);
     if (!next) {
       setFile(null);
       return;
@@ -148,21 +155,60 @@ export function ScansMlaPage({ onOpenMobileMenu, onOpenProfile }: ScansMlaPagePr
       next.type === 'application/x-zip-compressed';
     if (!isZip) {
       setFile(null);
+      setClientForm(emptyClientForm);
       setError('Only .zip files are allowed.');
       return;
     }
+
     setFile(next);
+    setClientForm(emptyClientForm);
+    setExtracting(true);
+    const requestId = ++extractRequestId.current;
+
+    try {
+      const { data, sourceFile, foundAny } = await extractClientFromZip(next);
+      if (requestId !== extractRequestId.current) return;
+
+      setClientForm({
+        name: data.name,
+        age: data.age,
+        phone: data.phone,
+        gender: data.gender,
+      });
+
+      if (foundAny) {
+        setExtractOk(true);
+        setExtractNotice(
+          sourceFile
+            ? `Client data filled from ${sourceFile}. Review and edit if needed.`
+            : 'Client data filled from the zip package. Review and edit if needed.'
+        );
+      } else {
+        setExtractOk(false);
+        setExtractNotice('No client document found in the zip. Enter details manually.');
+      }
+    } catch {
+      if (requestId !== extractRequestId.current) return;
+      setClientForm(emptyClientForm);
+      setError('Could not read client data from this zip. Enter details manually.');
+    } finally {
+      if (requestId === extractRequestId.current) setExtracting(false);
+    }
   };
 
   const clearFile = () => {
+    extractRequestId.current += 1;
     setFile(null);
     setError(null);
+    setExtractNotice(null);
+    setExtractOk(false);
+    setExtracting(false);
+    setClientForm(emptyClientForm);
     if (inputRef.current) inputRef.current.value = '';
   };
 
   const resetForm = () => {
     clearFile();
-    setClientForm(emptyClientForm);
     setDeclared(false);
   };
 
@@ -255,7 +301,7 @@ export function ScansMlaPage({ onOpenMobileMenu, onOpenProfile }: ScansMlaPagePr
             My Scans (MLA)
           </h1>
           <p className="page-subtitle" style={{ margin: '8px 0 0', fontSize: 14, color: theme['text-secondary'] }}>
-            Upload a scan, add client details, then submit. Export each row to Head Office when ready.
+            Upload a scan zip — client details are filled from the package document. Export to Head Office when ready.
           </p>
         </div>
 
@@ -299,7 +345,9 @@ export function ScansMlaPage({ onOpenMobileMenu, onOpenProfile }: ScansMlaPagePr
         <div className="scans-card-head">
           <div>
             <h2 className="scans-card-title">Upload scans</h2>
-            <p className="scans-card-sub">Add the zip package and client details, then submit to the list below.</p>
+            <p className="scans-card-sub">
+              Choose a zip package — name, age, phone, and gender are extracted automatically.
+            </p>
           </div>
           <span className="scans-card-meta">.zip only</span>
         </div>
@@ -325,8 +373,16 @@ export function ScansMlaPage({ onOpenMobileMenu, onOpenProfile }: ScansMlaPagePr
                   <path d="M4 20h16" />
                 </svg>
               </span>
-              <span className="scans-dropzone-label">{file ? file.name : 'Choose zip file'}</span>
-              <span className="scans-dropzone-meta">{file ? formatBytes(file.size) : 'Click to browse · .zip only'}</span>
+              <span className="scans-dropzone-label">
+                {extracting ? 'Reading zip…' : file ? file.name : 'Choose zip file'}
+              </span>
+              <span className="scans-dropzone-meta">
+                {extracting
+                  ? 'Extracting client data from package document'
+                  : file
+                    ? formatBytes(file.size)
+                    : 'Click to browse · .zip only'}
+              </span>
               {file && (
                 <span
                   role="button"
@@ -355,7 +411,9 @@ export function ScansMlaPage({ onOpenMobileMenu, onOpenProfile }: ScansMlaPagePr
               <span className="scans-step-num">2</span>
               <div>
                 <h3 className="scans-step-title">Client data</h3>
-                <p className="scans-step-hint">Details for this scan submission</p>
+                <p className="scans-step-hint">
+                  {extracting ? 'Extracting from zip…' : 'Auto-filled from zip · edit if needed'}
+                </p>
               </div>
             </div>
             <div className="scans-client-fields">
@@ -448,6 +506,9 @@ export function ScansMlaPage({ onOpenMobileMenu, onOpenProfile }: ScansMlaPagePr
           </button>
         </div>
 
+        {extractNotice && !error && (
+          <p className={extractOk ? 'scans-upload-notice' : 'scans-upload-error'}>{extractNotice}</p>
+        )}
         {error && <p className="scans-upload-error">{error}</p>}
       </div>
 
