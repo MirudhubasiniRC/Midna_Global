@@ -11,6 +11,8 @@ export type ZipExtractResult = {
   data: ExtractedClientData;
   sourceFile: string | null;
   foundAny: boolean;
+  /** Non-directory entries found in the zip (for diagnostics). */
+  fileCount: number;
 };
 
 const emptyClient: ExtractedClientData = {
@@ -20,252 +22,224 @@ const emptyClient: ExtractedClientData = {
   gender: '',
 };
 
-const DOC_EXTENSIONS = ['.txt', '.csv', '.json', '.xml', '.docx', '.doc'];
-const PREFERRED_NAME_HINTS = ['client', 'patient', 'info', 'data', 'details', 'meta', 'profile', 'subject'];
-
-const FIELD_ALIASES: Record<keyof ExtractedClientData, string[]> = {
-  name: ['name', 'fullname', 'clientname', 'patientname', 'childname'],
-  age: ['age', 'years', 'clientage'],
-  phone: ['phone', 'phno', 'ph', 'mobile', 'mobileno', 'contact', 'phonenumber', 'contactno'],
-  gender: ['gender', 'sex'],
-};
-
-function normalizeKey(raw: string): string {
-  return raw.toLowerCase().replace(/[^a-z0-9]/g, '');
+function hasAnyField(data: ExtractedClientData): boolean {
+  return Boolean(data.name || data.age || data.phone || data.gender);
 }
 
 function normalizeGender(raw: string): string {
   const value = raw.trim().toLowerCase();
   if (!value) return '';
-  if (value.startsWith('m') || value === 'boy') return 'Male';
-  if (value.startsWith('f') || value === 'girl') return 'Female';
-  if (value.startsWith('o')) return 'Other';
+  if (value === 'm' || value.startsWith('male') || value === 'boy') return 'Male';
+  if (value === 'f' || value.startsWith('female') || value === 'girl') return 'Female';
+  if (value === 'o' || value.startsWith('other')) return 'Other';
   return raw.trim();
 }
 
-function setField(target: ExtractedClientData, key: string, value: string) {
-  const normalized = normalizeKey(key);
-  const cleaned = value.trim();
-  if (!cleaned) return;
-
-  (Object.keys(FIELD_ALIASES) as Array<keyof ExtractedClientData>).forEach((field) => {
-    if (FIELD_ALIASES[field].includes(normalized) && !target[field]) {
-      target[field] = field === 'gender' ? normalizeGender(cleaned) : cleaned;
-    }
-  });
+function normalizeZipPath(path: string): string {
+  return path.replace(/\\/g, '/');
 }
 
-function hasAnyField(data: ExtractedClientData): boolean {
-  return Boolean(data.name || data.age || data.phone || data.gender);
+function baseName(path: string): string {
+  const normalized = normalizeZipPath(path);
+  return normalized.split('/').pop() ?? normalized;
 }
 
-function parseKeyValueText(text: string): ExtractedClientData {
-  const result = { ...emptyClient };
-  const lines = text.split(/\r?\n/);
+/** Age in whole years from an ISO / date string. */
+export function ageFromDob(dobRaw: string, now = new Date()): string {
+  const dob = new Date(dobRaw);
+  if (Number.isNaN(dob.getTime())) return '';
 
-  for (const line of lines) {
-    const trimmed = line.trim();
-    if (!trimmed) continue;
-
-    const match = trimmed.match(/^([^:=\t|]+)[:=\t|]\s*(.+)$/);
-    if (match) {
-      setField(result, match[1], match[2]);
-      continue;
-    }
-
-    // CSV-ish: Name,Age,Phone,Gender on one row is handled separately
+  let age = now.getFullYear() - dob.getFullYear();
+  const monthDiff = now.getMonth() - dob.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < dob.getDate())) {
+    age -= 1;
   }
 
-  return result;
+  return age >= 0 && age <= 120 ? String(age) : '';
 }
 
-function parseCsv(text: string): ExtractedClientData {
+/** Decode scanner text that may be UTF-8 or UTF-16. */
+export function decodeZipText(bytes: Uint8Array): string {
+  if (bytes.length >= 2 && bytes[0] === 0xff && bytes[1] === 0xfe) {
+    return new TextDecoder('utf-16le').decode(bytes);
+  }
+  if (bytes.length >= 2 && bytes[0] === 0xfe && bytes[1] === 0xff) {
+    return new TextDecoder('utf-16be').decode(bytes);
+  }
+
+  // UTF-16 LE without BOM (null bytes on odd indexes)
+  if (
+    bytes.length >= 8 &&
+    bytes[1] === 0 &&
+    bytes[3] === 0 &&
+    bytes[5] === 0 &&
+    bytes[0] !== 0
+  ) {
+    return new TextDecoder('utf-16le').decode(bytes);
+  }
+
+  const utf8 = new TextDecoder('utf-8').decode(bytes);
+  // Mis-decoded UTF-16 often leaves NULs — strip as last resort
+  if (utf8.includes('\0')) {
+    return utf8.replace(/\0/g, '');
+  }
+  return utf8;
+}
+
+/**
+ * Midna scanner Data.xml body (often plain text, not real XML tags):
+ *   {id} {name…} {Gender} {ISO-DOB} {category} {phone} {base64Photo…}
+ *
+ * Example:
+ *   3001202301 Anmol Vij Male 1987-05-10T20:07:43+05:30 business 9842227643 /9j/…
+ */
+export function parseMidnaDataXml(text: string): ExtractedClientData {
   const result = { ...emptyClient };
-  const rows = text
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter(Boolean)
-    .map((line) => line.split(',').map((cell) => cell.trim().replace(/^"|"$/g, '')));
 
-  if (rows.length === 0) return result;
+  let plain = text.replace(/^\uFEFF/, '').replace(/\0/g, '');
+  plain = plain.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  if (!plain) return result;
 
-  if (rows.length >= 2) {
-    const headers = rows[0];
-    const values = rows[1];
-    headers.forEach((header, index) => {
-      setField(result, header, values[index] ?? '');
-    });
+  // Drop trailing base64 photo payload (JPEG markers or long base64)
+  const photoCut = plain.search(/\s\/9j\//i);
+  if (photoCut >= 0) {
+    plain = plain.slice(0, photoCut).trim();
+  }
+
+  // Primary regex
+  const match = plain.match(
+    /^(\d+)\s+(.+?)\s+(Male|Female|Other|M|F)\s+(\d{4}-\d{2}-\d{2}(?:T[^\s]*)?)\s+(\S+)\s+(\d{8,15})\b/i
+  );
+
+  if (match) {
+    result.name = match[2].trim();
+    result.gender = normalizeGender(match[3]);
+    result.age = ageFromDob(match[4]);
+    result.phone = match[6];
     return result;
   }
 
-  // Single row with labels embedded: Name:X,Age:Y
-  return parseKeyValueText(rows[0].join('\n'));
-}
+  // Token fallback — resilient to odd spacing / multi-word names like "L B SAHANA"
+  const tokens = plain.split(' ').filter(Boolean);
+  if (tokens.length < 4) return result;
 
-function parseJson(text: string): ExtractedClientData {
-  const result = { ...emptyClient };
-  try {
-    const parsed: unknown = JSON.parse(text);
-    const objects: Record<string, unknown>[] = [];
-
-    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
-      objects.push(parsed as Record<string, unknown>);
-    } else if (Array.isArray(parsed) && parsed[0] && typeof parsed[0] === 'object') {
-      objects.push(parsed[0] as Record<string, unknown>);
-    }
-
-    for (const obj of objects) {
-      Object.entries(obj).forEach(([key, value]) => {
-        if (value == null) return;
-        setField(result, key, String(value));
-      });
-    }
-  } catch {
-    // ignore invalid json
-  }
-  return result;
-}
-
-function parseXml(text: string): ExtractedClientData {
-  const result = { ...emptyClient };
-  const tagRegex = /<([A-Za-z0-9:_-]+)[^>]*>([^<]+)<\/\1>/g;
-  let match: RegExpExecArray | null;
-  while ((match = tagRegex.exec(text)) !== null) {
-    setField(result, match[1], match[2]);
-  }
-
-  if (!hasAnyField(result)) {
-    return parseKeyValueText(text.replace(/<[^>]+>/g, '\n'));
-  }
-  return result;
-}
-
-async function parseDocx(bytes: ArrayBuffer): Promise<ExtractedClientData> {
-  const nested = await JSZip.loadAsync(bytes);
-  const documentXml = nested.file('word/document.xml');
-  if (!documentXml) return { ...emptyClient };
-  const xml = await documentXml.async('string');
-  const text = xml
-    .replace(/<w:tab\/>/g, '\t')
-    .replace(/<\/w:p>/g, '\n')
-    .replace(/<[^>]+>/g, '')
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'");
-  return parseKeyValueText(text);
-}
-
-function scoreDocPath(path: string): number {
-  const lower = path.toLowerCase();
-  const base = lower.split('/').pop() ?? lower;
-  let score = 0;
-
-  for (const ext of DOC_EXTENSIONS) {
-    if (base.endsWith(ext)) {
-      score += 10;
+  const genderIdx = tokens.findIndex((t) => /^(male|female|other|m|f)$/i.test(t));
+  const dobIdx = tokens.findIndex((t) => /^\d{4}-\d{2}-\d{2}/.test(t));
+  let phoneIdx = -1;
+  for (let i = tokens.length - 1; i >= 0; i -= 1) {
+    if (/^\d{8,15}$/.test(tokens[i])) {
+      phoneIdx = i;
       break;
     }
   }
 
-  for (const hint of PREFERRED_NAME_HINTS) {
-    if (base.includes(hint)) score += 5;
+  if (/^\d+$/.test(tokens[0]) && genderIdx > 1) {
+    result.name = tokens.slice(1, genderIdx).join(' ').trim();
+    result.gender = normalizeGender(tokens[genderIdx]);
+  } else if (genderIdx > 0) {
+    result.name = tokens.slice(0, genderIdx).join(' ').trim();
+    result.gender = normalizeGender(tokens[genderIdx]);
   }
 
-  // Prefer shallow files
-  score -= path.split('/').length;
-  return score;
-}
-
-function parseFromFileName(fileName: string): ExtractedClientData {
-  const result = { ...emptyClient };
-  const base = fileName.replace(/\.zip$/i, '').replace(/[_-]+/g, ' ').trim();
-  if (!base) return result;
-
-  // Pattern: Name Age Gender Phone  OR  Name_Age_Gender_Phone
-  const parts = base.split(/\s+/).filter(Boolean);
-  if (parts.length >= 2) {
-    const ageIdx = parts.findIndex((p) => /^\d{1,3}$/.test(p));
-    const phoneIdx = parts.findIndex((p) => /^\d{8,15}$/.test(p));
-    const genderIdx = parts.findIndex((p) => /^(male|female|other|m|f|o)$/i.test(p));
-
-    if (ageIdx >= 0) result.age = parts[ageIdx];
-    if (phoneIdx >= 0) result.phone = parts[phoneIdx];
-    if (genderIdx >= 0) result.gender = normalizeGender(parts[genderIdx]);
-
-    const nameParts = parts.filter((_, i) => i !== ageIdx && i !== phoneIdx && i !== genderIdx);
-    if (nameParts.length > 0) result.name = nameParts.join(' ');
-  }
+  if (dobIdx >= 0) result.age = ageFromDob(tokens[dobIdx]);
+  if (phoneIdx >= 0) result.phone = tokens[phoneIdx];
 
   return result;
 }
 
-async function parseDocContent(path: string, bytes: ArrayBuffer): Promise<ExtractedClientData> {
-  const lower = path.toLowerCase();
-  const text = new TextDecoder().decode(bytes);
+function isDataXmlPath(path: string): boolean {
+  return baseName(path).toLowerCase() === 'data.xml';
+}
 
-  if (lower.endsWith('.json')) return parseJson(text);
-  if (lower.endsWith('.xml')) return parseXml(text);
-  if (lower.endsWith('.csv')) return parseCsv(text);
-  if (lower.endsWith('.docx')) return parseDocx(bytes);
-  if (lower.endsWith('.doc')) {
-    // Legacy .doc is binary; best-effort extract readable strings
-    const readable = text.replace(/[^\x09\x0A\x0D\x20-\x7E]/g, '\n');
-    return parseKeyValueText(readable);
-  }
+function findDataXmlPaths(paths: string[]): string[] {
+  const normalized = paths.map(normalizeZipPath);
+  const exact = normalized.filter(isDataXmlPath);
+  if (exact.length > 0) return exact;
 
-  return parseKeyValueText(text);
+  return normalized.filter((p) => {
+    const base = baseName(p).toLowerCase();
+    return base.endsWith('.xml') && base.includes('data');
+  });
+}
+
+function isIgnoredPath(path: string): boolean {
+  const n = normalizeZipPath(path).toLowerCase();
+  return n.startsWith('__macosx/') || n.includes('/.ds_store') || n.endsWith('/.ds_store');
 }
 
 /**
- * Reads client fields from a scan ZIP package.
- * Looks for a client/patient info document (.txt/.json/.xml/.csv/.docx),
- * then falls back to the ZIP file name.
+ * Reads client fields from a Midna scan ZIP.
+ * Primary source: Data.xml (ID, name, gender, DOB, category, phone, photo).
  */
 export async function extractClientFromZip(file: File): Promise<ZipExtractResult> {
-  const zip = await JSZip.loadAsync(file);
-  const candidates = Object.keys(zip.files)
-    .filter((path) => !zip.files[path].dir)
-    .filter((path) => !path.startsWith('__MACOSX/'))
-    .map((path) => ({ path, score: scoreDocPath(path) }))
-    .filter((entry) => entry.score >= 9)
-    .sort((a, b) => b.score - a.score);
-
-  for (const candidate of candidates) {
-    const entry = zip.file(candidate.path);
-    if (!entry) continue;
-    const bytes = await entry.async('arraybuffer');
-    const data = await parseDocContent(candidate.path, bytes);
-    if (hasAnyField(data)) {
-      return {
-        data,
-        sourceFile: candidate.path.split('/').pop() ?? candidate.path,
-        foundAny: true,
-      };
-    }
-  }
-
-  // Any remaining text-like file as a weaker fallback
-  for (const path of Object.keys(zip.files)) {
+  const zip = await JSZip.loadAsync(await file.arrayBuffer());
+  const paths = Object.keys(zip.files).filter((path) => {
     const entry = zip.files[path];
-    if (entry.dir || path.startsWith('__MACOSX/')) continue;
-    if (!/\.(txt|csv|json|xml)$/i.test(path)) continue;
-    const bytes = await entry.async('arraybuffer');
-    const data = await parseDocContent(path, bytes);
-    if (hasAnyField(data)) {
+    return !entry.dir && !isIgnoredPath(path);
+  });
+
+  const tryParseEntry = async (path: string): Promise<ExtractedClientData | null> => {
+    const entry = zip.file(path) ?? zip.file(normalizeZipPath(path));
+    if (!entry) {
+      // Path key may use backslashes — look up original key
+      const originalKey = Object.keys(zip.files).find(
+        (k) => normalizeZipPath(k) === normalizeZipPath(path)
+      );
+      if (!originalKey) return null;
+      const original = zip.file(originalKey);
+      if (!original) return null;
+      const bytes = await original.async('uint8array');
+      return parseMidnaDataXml(decodeZipText(bytes));
+    }
+    const bytes = await entry.async('uint8array');
+    return parseMidnaDataXml(decodeZipText(bytes));
+  };
+
+  for (const dataXmlPath of findDataXmlPaths(paths)) {
+    const data = await tryParseEntry(dataXmlPath);
+    if (data && hasAnyField(data)) {
       return {
         data,
-        sourceFile: path.split('/').pop() ?? path,
+        sourceFile: baseName(dataXmlPath),
         foundAny: true,
+        fileCount: paths.length,
       };
     }
   }
 
-  const fromName = parseFromFileName(file.name);
+  // Fallback: any .xml that matches the Midna line format
+  for (const path of paths) {
+    if (!baseName(path).toLowerCase().endsWith('.xml')) continue;
+    const data = await tryParseEntry(path);
+    if (data && hasAnyField(data)) {
+      return {
+        data,
+        sourceFile: baseName(path),
+        foundAny: true,
+        fileCount: paths.length,
+      };
+    }
+  }
+
+  // Last resort: small text-like files (some packages use .txt)
+  for (const path of paths) {
+    const base = baseName(path).toLowerCase();
+    if (!/\.(txt|csv)$/.test(base)) continue;
+    const data = await tryParseEntry(path);
+    if (data && hasAnyField(data)) {
+      return {
+        data,
+        sourceFile: baseName(path),
+        foundAny: true,
+        fileCount: paths.length,
+      };
+    }
+  }
+
   return {
-    data: fromName,
-    sourceFile: hasAnyField(fromName) ? file.name : null,
-    foundAny: hasAnyField(fromName),
+    data: { ...emptyClient },
+    sourceFile: null,
+    foundAny: false,
+    fileCount: paths.length,
   };
 }

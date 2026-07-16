@@ -166,7 +166,7 @@ export function ScansMlaPage({ onOpenMobileMenu, onOpenProfile }: ScansMlaPagePr
     const requestId = ++extractRequestId.current;
 
     try {
-      const { data, sourceFile, foundAny } = await extractClientFromZip(next);
+      const { data, sourceFile, foundAny, fileCount } = await extractClientFromZip(next);
       if (requestId !== extractRequestId.current) return;
 
       setClientForm({
@@ -185,7 +185,11 @@ export function ScansMlaPage({ onOpenMobileMenu, onOpenProfile }: ScansMlaPagePr
         );
       } else {
         setExtractOk(false);
-        setExtractNotice('No client document found in the zip. Enter details manually.');
+        setExtractNotice(
+          fileCount > 0
+            ? `Found ${fileCount} file(s) in the zip, but could not parse Data.xml. Enter details manually.`
+            : 'No files found in the zip. Enter details manually.'
+        );
       }
     } catch {
       if (requestId !== extractRequestId.current) return;
