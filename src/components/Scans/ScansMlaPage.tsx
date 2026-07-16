@@ -1,39 +1,77 @@
 import { useRef, useState } from 'react';
-import { colors, radius, shadow, spacing, typography } from '../../styles/theme';
+import { colors, radius, spacing, typography } from '../../styles/theme';
 import { NotificationButton } from '../Layout/NotificationButton';
 import { ProfileAvatarButton } from '../Layout/ProfileAvatarButton';
-import { AddClientDataModal, type ClientData } from './AddClientDataModal';
 import { DeclarationModal } from './DeclarationModal';
+import { EditScanModal } from './EditScanModal';
+import { ScanImagesModal } from './ScanImagesModal';
+import {
+  defaultScanDetails,
+  nextScanId,
+  type ScanDetails,
+  type ScanRecord,
+  type ScanRecordStatus,
+} from './scanTypes';
 
 const theme = colors.light;
 
-type UploadRecord = {
-  id: string;
+const genderOptions = ['Male', 'Female', 'Other'] as const;
+
+type UploadClientForm = {
   name: string;
-  size: string;
-  uploadedAt: string;
-  status: 'Uploaded' | 'Processing' | 'Failed';
+  age: string;
+  phone: string;
+  gender: string;
 };
 
-type ClientRecord = ClientData & {
-  id: string;
-  addedAt: string;
+const emptyClientForm: UploadClientForm = {
+  name: '',
+  age: '',
+  phone: '',
+  gender: '',
 };
 
-const seedRecords: UploadRecord[] = [
+const seedRecords: ScanRecord[] = [
   {
     id: 'u1',
-    name: 'nest-south-batch-14.zip',
+    scanId: 'S42487',
+    fileName: 'nest-south-batch-14.zip',
     size: '12.4 MB',
     uploadedAt: '14 Jul 2026 · 10:22 AM',
-    status: 'Uploaded',
+    status: 'Saved',
+    details: {
+      clientType: 'Individual',
+      referredBy: 'SELF',
+      ledgerName: '9597770205',
+      name: 'RUDRA VIJ',
+      age: '12',
+      phone: '9876543210',
+      gender: 'Male',
+      mrp: '₹2,000',
+    },
+    detailsSaved: true,
+    exported: false,
   },
   {
     id: 'u2',
-    name: 'mla-scans-jul-week2.zip',
+    scanId: 'S42486',
+    fileName: 'mla-scans-jul-week2.zip',
     size: '8.1 MB',
     uploadedAt: '12 Jul 2026 · 04:05 PM',
-    status: 'Processing',
+    exportedAt: '12 Jul 2026 · 05:10 PM',
+    status: 'Exported',
+    details: {
+      clientType: 'Individual',
+      referredBy: 'SELF',
+      ledgerName: '9597770205',
+      name: 'Riya Saravanan',
+      age: '10',
+      phone: '9123456780',
+      gender: 'Female',
+      mrp: '₹1,500',
+    },
+    detailsSaved: true,
+    exported: true,
   },
 ];
 
@@ -55,10 +93,15 @@ function formatStamp(date = new Date()) {
     .replace(',', ' ·');
 }
 
-function statusStyles(status: UploadRecord['status']) {
-  if (status === 'Uploaded') return { color: theme.success, background: theme['success-bg'] };
+function statusStyles(status: ScanRecordStatus) {
+  if (status === 'Exported') return { color: theme.success, background: theme['success-bg'] };
+  if (status === 'Saved') return { color: theme.primary, background: theme['primary-soft'] };
   if (status === 'Processing') return { color: theme.warning, background: theme['warning-bg'] };
-  return { color: theme.error, background: theme['error-bg'] };
+  return { color: theme['text-secondary'], background: theme['bg-muted'] };
+}
+
+function canExport(record: ScanRecord) {
+  return record.detailsSaved && !record.exported;
 }
 
 type ScansMlaPageProps = {
@@ -68,15 +111,30 @@ type ScansMlaPageProps = {
 
 export function ScansMlaPage({ onOpenMobileMenu, onOpenProfile }: ScansMlaPageProps) {
   const [file, setFile] = useState<File | null>(null);
+  const [clientForm, setClientForm] = useState<UploadClientForm>(emptyClientForm);
   const [declared, setDeclared] = useState(false);
-  const [records, setRecords] = useState<UploadRecord[]>(seedRecords);
-  const [clients, setClients] = useState<ClientRecord[]>([]);
+  const [records, setRecords] = useState<ScanRecord[]>(seedRecords);
   const [error, setError] = useState<string | null>(null);
   const [declarationOpen, setDeclarationOpen] = useState(false);
-  const [clientModalOpen, setClientModalOpen] = useState(false);
+  const [editingRecord, setEditingRecord] = useState<ScanRecord | null>(null);
+  const [viewingImages, setViewingImages] = useState<ScanRecord | null>(null);
+  const [exportNotice, setExportNotice] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const tableRef = useRef<HTMLDivElement>(null);
 
-  const canSubmit = Boolean(file) && declared;
+  const clientComplete =
+    clientForm.name.trim().length > 0 &&
+    clientForm.age.trim().length > 0 &&
+    clientForm.phone.trim().length > 0 &&
+    clientForm.gender.trim().length > 0;
+
+  const canSubmit = Boolean(file) && declared && clientComplete;
+
+  const updateClient = (key: keyof UploadClientForm) => (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    setClientForm((f) => ({ ...f, [key]: e.target.value }));
+  };
 
   const pickFile = (next: File | null) => {
     setError(null);
@@ -102,31 +160,81 @@ export function ScansMlaPage({ onOpenMobileMenu, onOpenProfile }: ScansMlaPagePr
     if (inputRef.current) inputRef.current.value = '';
   };
 
-  const handleSubmit = () => {
-    if (!file || !declared) return;
-    setRecords((prev) => [
-      {
-        id: `u-${Date.now()}`,
-        name: file.name,
-        size: formatBytes(file.size),
-        uploadedAt: formatStamp(),
-        status: 'Uploaded',
-      },
-      ...prev,
-    ]);
+  const resetForm = () => {
     clearFile();
+    setClientForm(emptyClientForm);
     setDeclared(false);
   };
 
-  const handleClientSubmit = (data: ClientData) => {
-    setClients((prev) => [
+  const handleSubmit = () => {
+    if (!canSubmit || !file) return;
+    const fileUrl = URL.createObjectURL(file);
+    setRecords((prev) => [
       {
-        id: `c-${Date.now()}`,
-        ...data,
-        addedAt: formatStamp(),
+        id: `u-${Date.now()}`,
+        scanId: nextScanId(),
+        fileName: file.name,
+        fileUrl,
+        size: formatBytes(file.size),
+        uploadedAt: formatStamp(),
+        status: 'Saved',
+        details: {
+          ...defaultScanDetails(),
+          name: clientForm.name.trim(),
+          age: clientForm.age.trim(),
+          phone: clientForm.phone.trim(),
+          gender: clientForm.gender,
+        },
+        detailsSaved: true,
+        exported: false,
       },
       ...prev,
     ]);
+    resetForm();
+    tableRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  const handleSaveDetails = (details: ScanDetails) => {
+    if (!editingRecord) return;
+    setRecords((prev) =>
+      prev.map((row) =>
+        row.id === editingRecord.id
+          ? {
+              ...row,
+              details,
+              detailsSaved: true,
+              status: row.exported ? row.status : 'Saved',
+            }
+          : row
+      )
+    );
+    setEditingRecord(null);
+  };
+
+  const handleExport = (record: ScanRecord) => {
+    if (!canExport(record)) return;
+    const stamp = formatStamp();
+    setRecords((prev) =>
+      prev.map((row) =>
+        row.id === record.id
+          ? {
+              ...row,
+              exported: true,
+              exportedAt: stamp,
+              status: 'Exported',
+            }
+          : row
+      )
+    );
+    setExportNotice(`Scan ${record.scanId} exported to scans DB. Head Office has been notified.`);
+    window.setTimeout(() => setExportNotice(null), 5000);
+  };
+
+  const handleDelete = (id: string) => {
+    const row = records.find((r) => r.id === id);
+    if (row?.fileUrl) URL.revokeObjectURL(row.fileUrl);
+    setRecords((prev) => prev.filter((r) => r.id !== id));
+    if (editingRecord?.id === id) setEditingRecord(null);
   };
 
   return (
@@ -147,7 +255,7 @@ export function ScansMlaPage({ onOpenMobileMenu, onOpenProfile }: ScansMlaPagePr
             My Scans (MLA)
           </h1>
           <p className="page-subtitle" style={{ margin: '8px 0 0', fontSize: 14, color: theme['text-secondary'] }}>
-            Upload scan packages and keep client records up to date.
+            Upload a scan, add client details, then submit. Export each row to Head Office when ready.
           </p>
         </div>
 
@@ -162,143 +270,24 @@ export function ScansMlaPage({ onOpenMobileMenu, onOpenProfile }: ScansMlaPagePr
         </div>
       </div>
 
-      <div className="dash-card" style={{ marginBottom: spacing[5], width: '100%' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: spacing[4], gap: 12 }}>
-          <h2 style={{ margin: 0, fontSize: 18, fontWeight: 650, letterSpacing: '-0.01em', color: theme['text-primary'] }}>
-            Clients
-          </h2>
-          <span style={{ fontSize: 12, color: theme['text-muted'] }}>{clients.length}</span>
-        </div>
-
-        {clients.length === 0 ? (
-          <div
-            className="scans-clients-empty"
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: 16,
-              flexWrap: 'wrap',
-              padding: '16px 18px',
-              borderRadius: radius.md,
-              background: theme['bg-muted'],
-            }}
-          >
-            <div style={{ minWidth: 0 }}>
-              <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: theme['text-primary'] }}>No clients yet</p>
-              <p style={{ margin: '4px 0 0', fontSize: 13, color: theme['text-muted'] }}>
-                Capture name, age, phone, and gender for each client.
-              </p>
-            </div>
-            <button
-              type="button"
-              className="btn-pill-primary"
-              onClick={() => setClientModalOpen(true)}
-              style={{ height: 36, padding: '0 16px', fontSize: 13, flexShrink: 0 }}
-            >
-              Add Client
-            </button>
-          </div>
-        ) : (
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              gap: 12,
-              overflowX: 'auto',
-              paddingBottom: 4,
-            }}
-          >
-            {clients.map((client) => (
-              <div
-                key={client.id}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 12,
-                  padding: '14px 16px',
-                  borderRadius: radius.md,
-                  background: theme['bg-muted'],
-                  minWidth: 260,
-                  flex: '1 1 260px',
-                }}
-              >
-                <div
-                  style={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: '50%',
-                    background: theme['primary-soft'],
-                    color: theme.primary,
-                    display: 'grid',
-                    placeItems: 'center',
-                    flexShrink: 0,
-                    fontWeight: 700,
-                    fontSize: 13,
-                    boxShadow: shadow.float,
-                  }}
-                >
-                  {client.name.slice(0, 1).toUpperCase()}
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div
-                    style={{
-                      fontSize: 14,
-                      fontWeight: 600,
-                      color: theme['text-primary'],
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    {client.name}
-                  </div>
-                  <div style={{ fontSize: 12, color: theme['text-muted'], marginTop: 2 }}>
-                    {client.age} yrs · {client.gender} · {client.phone}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      <div className="dash-card" style={{ marginBottom: spacing[5] }}>
+      {exportNotice && (
         <div
+          className="scans-export-notice"
           style={{
-            display: 'flex',
-            alignItems: 'flex-start',
-            justifyContent: 'space-between',
-            gap: 12,
-            marginBottom: spacing[5],
+            marginBottom: spacing[4],
+            padding: '12px 16px',
+            borderRadius: radius.md,
+            background: theme['success-bg'],
+            color: theme.success,
+            fontSize: 14,
+            fontWeight: 600,
           }}
         >
-          <div>
-            <h2 style={{ margin: 0, fontSize: 18, fontWeight: 650, letterSpacing: '-0.01em', color: theme['text-primary'] }}>
-              Upload scans
-            </h2>
-            <p style={{ margin: '4px 0 0', fontSize: 13, color: theme['text-secondary'] }}>
-              Click the area below to choose a zip package.
-            </p>
-          </div>
-          <span
-            style={{
-              fontSize: 11,
-              fontWeight: 700,
-              letterSpacing: '0.04em',
-              textTransform: 'uppercase',
-              color: theme.primary,
-              background: theme['primary-soft'],
-              borderRadius: radius.pill,
-              padding: '6px 12px',
-              flexShrink: 0,
-            }}
-          >
-            Zip only
-          </span>
+          {exportNotice}
         </div>
+      )}
 
+      <div className="dash-card scans-upload-card" style={{ marginBottom: spacing[4] }}>
         <input
           ref={inputRef}
           type="file"
@@ -307,240 +296,255 @@ export function ScansMlaPage({ onOpenMobileMenu, onOpenProfile }: ScansMlaPagePr
           onChange={(e) => pickFile(e.target.files?.[0] ?? null)}
         />
 
-        <button
-          type="button"
-          className="scans-dropzone"
-          onClick={() => inputRef.current?.click()}
-          style={{
-            width: '100%',
-            border: `1.5px dashed ${file ? theme.primary : theme.border}`,
-            borderRadius: radius.lg,
-            padding: '36px 24px',
-            background: file ? theme['primary-soft'] : theme['bg-muted'],
-            cursor: 'pointer',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: 8,
-            fontFamily: 'inherit',
-            transition: 'background 0.15s ease, border-color 0.15s ease',
-          }}
-        >
-          <span
-            style={{
-              width: 56,
-              height: 56,
-              borderRadius: '50%',
-              background: theme['bg-surface'],
-              color: theme.primary,
-              display: 'grid',
-              placeItems: 'center',
-              boxShadow: shadow.float,
-              marginBottom: 4,
-            }}
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 16V4" />
-              <path d="m6 10 6-6 6 6" />
-              <path d="M4 20h16" />
-            </svg>
-          </span>
-          <span style={{ fontSize: 15, fontWeight: 650, color: theme['text-primary'] }}>
-            {file ? file.name : 'Click to upload zip file'}
-          </span>
-          <span style={{ fontSize: 13, color: theme['text-muted'] }}>
-            {file ? formatBytes(file.size) : 'Fingerprint scan packages · .zip only'}
-          </span>
-          {file && (
-            <span
-              role="button"
-              tabIndex={0}
-              onClick={(e) => {
-                e.stopPropagation();
-                clearFile();
-              }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  clearFile();
-                }
-              }}
-              style={{
-                marginTop: 6,
-                fontSize: 12,
-                fontWeight: 600,
-                color: theme.error,
-                textDecoration: 'underline',
-              }}
-            >
-              Remove file
-            </span>
-          )}
-        </button>
-
-        {error && (
-          <p style={{ margin: `${spacing[3]} 0 0`, fontSize: 13, color: theme.error, fontWeight: 500 }}>{error}</p>
-        )}
-
-        <div
-          className="scans-upload-footer"
-          style={{
-            marginTop: spacing[5],
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: spacing[4],
-            flexWrap: 'wrap',
-            paddingTop: spacing[4],
-            borderTop: `1px solid ${theme.divider}`,
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, minWidth: 0, flex: 1 }}>
-            <input
-              id="scan-declaration"
-              type="checkbox"
-              checked={declared}
-              onChange={(e) => setDeclared(e.target.checked)}
-              style={{
-                width: 18,
-                height: 18,
-                marginTop: 2,
-                accentColor: theme.primary,
-                flexShrink: 0,
-                cursor: 'pointer',
-              }}
-            />
-            <label htmlFor="scan-declaration" style={{ fontSize: 14, color: theme['text-secondary'], lineHeight: 1.45, cursor: 'pointer' }}>
-              I agree to the{' '}
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setDeclarationOpen(true);
-                }}
-                style={{
-                  border: 'none',
-                  background: 'none',
-                  padding: 0,
-                  margin: 0,
-                  font: 'inherit',
-                  fontWeight: 650,
-                  color: theme.primary,
-                  textDecoration: 'underline',
-                  cursor: 'pointer',
-                }}
-              >
-                Declaration
-              </button>
-            </label>
+        <div className="scans-card-head">
+          <div>
+            <h2 className="scans-card-title">Upload scans</h2>
+            <p className="scans-card-sub">Add the zip package and client details, then submit to the list below.</p>
           </div>
-
-          <button
-            type="button"
-            className="btn-pill-primary"
-            disabled={!canSubmit}
-            onClick={handleSubmit}
-            style={{
-              opacity: canSubmit ? 1 : 0.4,
-              cursor: canSubmit ? 'pointer' : 'not-allowed',
-              height: 42,
-              padding: '0 22px',
-              flexShrink: 0,
-            }}
-          >
-            Submit upload
-          </button>
-        </div>
-      </div>
-
-      <div className="dash-card" style={{ width: '100%' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: spacing[4], gap: 12 }}>
-          <h2 style={{ margin: 0, fontSize: 18, fontWeight: 650, letterSpacing: '-0.01em', color: theme['text-primary'] }}>
-            Uploaded documents
-          </h2>
-          <span style={{ fontSize: 12, color: theme['text-muted'] }}>{records.length}</span>
+          <span className="scans-card-meta">.zip only</span>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {records.map((row) => {
-            const chip = statusStyles(row.status);
-            return (
-              <div
-                key={row.id}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 12,
-                  padding: '12px 14px',
-                  borderRadius: radius.md,
-                  background: theme['bg-muted'],
-                }}
-              >
-                <div
-                  style={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: '50%',
-                    background: theme['primary-soft'],
-                    color: theme.primary,
-                    display: 'grid',
-                    placeItems: 'center',
-                    flexShrink: 0,
-                    boxShadow: shadow.float,
+        <div className="scans-upload-grid">
+          <section className="scans-upload-panel">
+            <div className="scans-step-head">
+              <span className="scans-step-num">1</span>
+              <div>
+                <h3 className="scans-step-title">Scan package</h3>
+                <p className="scans-step-hint">Fingerprint scan zip file</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              className={`scans-dropzone${file ? ' has-file' : ''}`}
+              onClick={() => inputRef.current?.click()}
+            >
+              <span className="scans-dropzone-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 16V4" />
+                  <path d="m6 10 6-6 6 6" />
+                  <path d="M4 20h16" />
+                </svg>
+              </span>
+              <span className="scans-dropzone-label">{file ? file.name : 'Choose zip file'}</span>
+              <span className="scans-dropzone-meta">{file ? formatBytes(file.size) : 'Click to browse · .zip only'}</span>
+              {file && (
+                <span
+                  role="button"
+                  tabIndex={0}
+                  className="scans-file-clear"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    clearFile();
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      clearFile();
+                    }
                   }}
                 >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z" />
-                    <path d="M14 2v6h6" />
+                  Remove file
+                </span>
+              )}
+            </button>
+          </section>
+
+          <section className="scans-upload-panel">
+            <div className="scans-step-head">
+              <span className="scans-step-num">2</span>
+              <div>
+                <h3 className="scans-step-title">Client data</h3>
+                <p className="scans-step-hint">Details for this scan submission</p>
+              </div>
+            </div>
+            <div className="scans-client-fields">
+              <label className="form-field">
+                <span className="form-label">Name</span>
+                <input
+                  className="form-input"
+                  type="text"
+                  placeholder="Client full name"
+                  value={clientForm.name}
+                  onChange={updateClient('name')}
+                />
+              </label>
+              <label className="form-field">
+                <span className="form-label">Age</span>
+                <input
+                  className="form-input"
+                  type="number"
+                  min={1}
+                  max={120}
+                  placeholder="e.g. 12"
+                  value={clientForm.age}
+                  onChange={updateClient('age')}
+                />
+              </label>
+              <label className="form-field">
+                <span className="form-label">Phno</span>
+                <input
+                  className="form-input"
+                  type="tel"
+                  placeholder="Phone number"
+                  value={clientForm.phone}
+                  onChange={updateClient('phone')}
+                />
+              </label>
+              <label className="form-field">
+                <span className="form-label">Gender</span>
+                <div className="form-select-wrap">
+                  <select className="form-input form-select" value={clientForm.gender} onChange={updateClient('gender')}>
+                    <option value="" disabled>
+                      Select gender
+                    </option>
+                    {genderOptions.map((g) => (
+                      <option key={g} value={g}>
+                        {g}
+                      </option>
+                    ))}
+                  </select>
+                  <svg className="form-select-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="m6 9 6 6 6-6" />
                   </svg>
                 </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div
-                    style={{
-                      fontSize: 14,
-                      fontWeight: 600,
-                      color: theme['text-primary'],
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    {row.name}
-                  </div>
-                  <div style={{ fontSize: 12, color: theme['text-muted'], marginTop: 2 }}>
-                    {row.size} · {row.uploadedAt}
-                  </div>
-                </div>
-                <span
-                  style={{
-                    fontSize: 11,
-                    fontWeight: 700,
-                    borderRadius: radius.pill,
-                    padding: '5px 10px',
-                    whiteSpace: 'nowrap',
-                    ...chip,
+              </label>
+            </div>
+          </section>
+        </div>
+
+        <div className="scans-upload-footer">
+          <div className="scans-step-head scans-step-head-inline">
+            <span className="scans-step-num">3</span>
+            <label className="scans-declaration-inline" htmlFor="scan-declaration">
+              <input
+                id="scan-declaration"
+                type="checkbox"
+                checked={declared}
+                onChange={(e) => setDeclared(e.target.checked)}
+              />
+              <span>
+                I agree to the{' '}
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setDeclarationOpen(true);
                   }}
                 >
-                  {row.status}
-                </span>
-              </div>
-            );
-          })}
+                  Declaration
+                </button>
+              </span>
+            </label>
+          </div>
+          <button
+            type="button"
+            className="btn-pill-primary scans-submit-btn"
+            disabled={!canSubmit}
+            onClick={handleSubmit}
+          >
+            Submit scan
+          </button>
+        </div>
+
+        {error && <p className="scans-upload-error">{error}</p>}
+      </div>
+
+      <div ref={tableRef} className="dash-card scans-table-card" style={{ width: '100%' }}>
+        <div className="scans-card-head">
+          <div>
+            <h2 className="scans-card-title">Uploaded scans</h2>
+            <p className="scans-card-sub">Export sends to scans DB and notifies HO · Edit to update billing details</p>
+          </div>
+          <span className="scans-card-meta">{records.length}</span>
+        </div>
+
+        <div className="scans-table-wrap">
+          <table className="scans-table">
+            <thead>
+              <tr>
+                <th>Sno</th>
+                <th>Scan Id</th>
+                <th>Name</th>
+                <th>Gender</th>
+                <th>File</th>
+                <th>Status</th>
+                <th>Export</th>
+                <th>Edit</th>
+                <th>Delete</th>
+              </tr>
+            </thead>
+            <tbody>
+              {records.map((row, index) => {
+                const chip = statusStyles(row.status);
+                const exportReady = canExport(row);
+                return (
+                  <tr key={row.id}>
+                    <td data-label="Sno">{index + 1}</td>
+                    <td data-label="Scan Id">
+                      <button type="button" className="scans-table-link" onClick={() => setEditingRecord(row)}>
+                        {row.scanId}
+                      </button>
+                    </td>
+                    <td data-label="Name">{row.details.name || '—'}</td>
+                    <td data-label="Gender">{row.details.gender || '—'}</td>
+                    <td data-label="File">
+                      <button
+                        type="button"
+                        className="scans-table-file-link"
+                        title="View scan images"
+                        onClick={() => setViewingImages(row)}
+                      >
+                        {row.fileName}
+                      </button>
+                      <span className="scans-table-meta">{row.size}</span>
+                    </td>
+                    <td data-label="Status">
+                      <span className="scans-status-chip" style={chip}>
+                        {row.status}
+                      </span>
+                    </td>
+                    <td data-label="Export">
+                      <button
+                        type="button"
+                        className="scans-action-btn scans-action-export"
+                        disabled={!exportReady}
+                        title={exportReady ? 'Send to scans DB and notify HO' : 'Complete scan details before exporting'}
+                        onClick={() => handleExport(row)}
+                      >
+                        Export
+                      </button>
+                    </td>
+                    <td data-label="Edit">
+                      <button type="button" className="scans-action-btn" onClick={() => setEditingRecord(row)}>
+                        Edit
+                      </button>
+                    </td>
+                    <td data-label="Delete">
+                      <button type="button" className="scans-action-btn scans-action-danger" onClick={() => handleDelete(row.id)}>
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
       </div>
 
-      <DeclarationModal
-        open={declarationOpen}
-        onClose={() => setDeclarationOpen(false)}
-        onAccept={() => setDeclared(true)}
-      />
-      <AddClientDataModal
-        open={clientModalOpen}
-        onClose={() => setClientModalOpen(false)}
-        onSubmit={handleClientSubmit}
-      />
+      <DeclarationModal open={declarationOpen} onClose={() => setDeclarationOpen(false)} onAccept={() => setDeclared(true)} />
+      {editingRecord && (
+        <EditScanModal
+          open={Boolean(editingRecord)}
+          scanId={editingRecord.scanId}
+          initial={editingRecord.details}
+          onClose={() => setEditingRecord(null)}
+          onSave={handleSaveDetails}
+        />
+      )}
+      <ScanImagesModal open={Boolean(viewingImages)} record={viewingImages} onClose={() => setViewingImages(null)} />
     </section>
   );
 }
