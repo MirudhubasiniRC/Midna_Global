@@ -5,6 +5,7 @@ import {
   LuWallet,
   LuFileText,
   LuUsers,
+  LuUserPlus,
   LuClipboardList,
   LuMessageSquare,
   LuActivity,
@@ -23,6 +24,7 @@ export const navItems = [
   { id: 'mis-communications', label: 'Communications', Icon: LuMessageSquare, section: 'MIS' },
   { id: 'mis-network', label: 'Network Performance', Icon: LuActivity, section: 'MIS' },
   { id: 'mis-scans', label: 'Scans', Icon: LuSearch, section: 'MIS' },
+  { id: 'admin-members', label: 'Member Accounts', Icon: LuUserPlus, section: 'Admin' },
 ] as const;
 
 export type AppView = (typeof navItems)[number]['id'] | 'profile';

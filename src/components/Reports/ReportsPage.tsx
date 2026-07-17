@@ -2,8 +2,6 @@ import { useMemo, useState } from 'react';
 import { colors, radius, spacing, typography } from '../../styles/theme';
 import { NotificationButton } from '../Layout/NotificationButton';
 import { ProfileAvatarButton } from '../Layout/ProfileAvatarButton';
-import { EditScanModal } from '../Scans/EditScanModal';
-import type { ScanDetails } from '../Scans/scanTypes';
 import { CabModal } from './CabModal';
 import { DeleteScanModal } from './DeleteScanModal';
 import { downloadReportPdf } from './downloadReportPdf';
@@ -58,7 +56,6 @@ export function ReportsPage({ onOpenMobileMenu, onOpenProfile }: ReportsPageProp
   const [layout, setLayout] = useState<'cards' | 'table'>('table');
   const [query, setQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('All');
-  const [editingRecord, setEditingRecord] = useState<ReportRecord | null>(null);
   const [upgradingRecord, setUpgradingRecord] = useState<ReportRecord | null>(null);
   const [cabRecord, setCabRecord] = useState<ReportRecord | null>(null);
   const [deletingRecord, setDeletingRecord] = useState<ReportRecord | null>(null);
@@ -95,15 +92,6 @@ export function ReportsPage({ onOpenMobileMenu, onOpenProfile }: ReportsPageProp
   const handleDownload = (record: ReportRecord) => {
     downloadReportPdf(record);
     showNotice(`Report for scan ${record.scanId} downloaded.`);
-  };
-
-  const handleSaveDetails = (details: ScanDetails) => {
-    if (!editingRecord) return;
-    setRecords((prev) =>
-      prev.map((row) => (row.id === editingRecord.id ? { ...row, details } : row))
-    );
-    setEditingRecord(null);
-    showNotice(`Data updated for scan ${editingRecord.scanId}.`);
   };
 
   const handleUpgrade = (record: ReportRecord) => {
@@ -144,9 +132,7 @@ export function ReportsPage({ onOpenMobileMenu, onOpenProfile }: ReportsPageProp
             {initials(row.details.name)}
           </span>
           <div className="reports-card-idblock">
-            <button type="button" className="reports-card-name" onClick={() => setEditingRecord(row)}>
-              {row.details.name || 'Unnamed client'}
-            </button>
+            <span className="reports-card-name">{row.details.name || 'Unnamed client'}</span>
             <span className="reports-card-meta">
               {row.scanId}
               {row.details.gender ? ` · ${row.details.gender}` : ''}
@@ -195,14 +181,16 @@ export function ReportsPage({ onOpenMobileMenu, onOpenProfile }: ReportsPageProp
           <div className="reports-card-tools">
             <button
               type="button"
-              className="reports-tool-btn reports-tool-edit"
-              title="Edit client data"
-              onClick={() => setEditingRecord(row)}
+              className="reports-tool-btn reports-tool-ai"
+              disabled
+              title="AI-generated reports are coming soon"
             >
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+                <path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1" />
+                <circle cx="12" cy="12" r="4" />
               </svg>
-              <span className="reports-tool-label">Edit</span>
+              <span className="reports-tool-label">AI Report</span>
+              <span className="reports-soon-badge">Soon</span>
             </button>
             <button
               type="button"
@@ -271,7 +259,7 @@ export function ReportsPage({ onOpenMobileMenu, onOpenProfile }: ReportsPageProp
             <th>Report</th>
             <th>Status</th>
             <th>Download</th>
-            <th>Edit Data</th>
+            <th>AI Report</th>
             <th>Upgrade</th>
             <th>CAB</th>
             <th>Delete Scan</th>
@@ -286,9 +274,7 @@ export function ReportsPage({ onOpenMobileMenu, onOpenProfile }: ReportsPageProp
               <tr key={row.id}>
                 <td data-label="Sno">{index + 1}</td>
                 <td data-label="Scan Id">
-                  <button type="button" className="scans-table-link" onClick={() => setEditingRecord(row)}>
-                    {row.scanId}
-                  </button>
+                  <span className="scans-table-file-static">{row.scanId}</span>
                 </td>
                 <td data-label="Name">{row.details.name || '—'}</td>
                 <td data-label="Gender">{row.details.gender || '—'}</td>
@@ -314,9 +300,14 @@ export function ReportsPage({ onOpenMobileMenu, onOpenProfile }: ReportsPageProp
                     Download
                   </button>
                 </td>
-                <td data-label="Edit Data">
-                  <button type="button" className="scans-action-btn" onClick={() => setEditingRecord(row)}>
-                    Edit Data
+                <td data-label="AI Report">
+                  <button
+                    type="button"
+                    className="scans-action-btn reports-action-ai"
+                    disabled
+                    title="AI-generated reports are coming soon"
+                  >
+                    AI Report · Soon
                   </button>
                 </td>
                 <td data-label="Upgrade">
@@ -382,7 +373,7 @@ export function ReportsPage({ onOpenMobileMenu, onOpenProfile }: ReportsPageProp
             My Reports
           </h1>
           <p className="page-subtitle" style={{ margin: '8px 0 0', fontSize: 14, color: theme['text-secondary'] }}>
-            All your scans and their reports — download, edit data, upgrade, listen to CAB, or delete a scan.
+            All your scans and their reports — download, upgrade, listen to CAB, or delete a scan. AI reports are coming soon.
           </p>
         </div>
 
@@ -546,15 +537,6 @@ export function ReportsPage({ onOpenMobileMenu, onOpenProfile }: ReportsPageProp
         )}
       </div>
 
-      {editingRecord && (
-        <EditScanModal
-          open={Boolean(editingRecord)}
-          scanId={editingRecord.scanId}
-          initial={editingRecord.details}
-          onClose={() => setEditingRecord(null)}
-          onSave={handleSaveDetails}
-        />
-      )}
       <UpgradeReportModal
         open={Boolean(upgradingRecord)}
         record={upgradingRecord}

@@ -12,11 +12,16 @@ import { PlaceholderPage } from './components/Placeholder/PlaceholderPage';
 import { LedgerPage } from './components/Ledger/LedgerPage';
 import { ScansMlaPage } from './components/Scans/ScansMlaPage';
 import { ReportsPage } from './components/Reports/ReportsPage';
+import { AuthPage } from './components/Auth/AuthPage';
+import { AdminMembersPage } from './components/Admin/AdminMembersPage';
 
 /** Covers iPhone 14 Pro Max (430px) and similar phones / small tablets */
 const MOBILE_QUERY = '(max-width: 860px)';
 
-type PlaceholderViewId = Exclude<AppView, 'dashboard' | 'profile' | 'ledger' | 'scans-mla' | 'reports'>;
+type PlaceholderViewId = Exclude<
+  AppView,
+  'dashboard' | 'profile' | 'ledger' | 'scans-mla' | 'reports' | 'admin-members'
+>;
 
 /** Stub copy for the sections not yet built out — refine per-page as each is implemented */
 const placeholderPages: Record<PlaceholderViewId, { title: string; subtitle: string; actions?: string[] }> = {
@@ -51,6 +56,7 @@ const placeholderPages: Record<PlaceholderViewId, { title: string; subtitle: str
 };
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [view, setView] = useState<AppView>('dashboard');
@@ -90,7 +96,15 @@ function App() {
     };
   }, [mobileMenuOpen]);
 
-  const handleLogout = () => setView('dashboard');
+  const handleLogout = () => {
+    setView('dashboard');
+    setMobileMenuOpen(false);
+    setIsAuthenticated(false);
+  };
+
+  if (!isAuthenticated) {
+    return <AuthPage onAuthenticated={() => setIsAuthenticated(true)} />;
+  }
 
   return (
     <div className={`app-frame ${isMobile ? 'is-mobile' : ''}`}>
@@ -135,6 +149,11 @@ function App() {
               />
             ) : view === 'reports' ? (
               <ReportsPage
+                onOpenMobileMenu={() => setMobileMenuOpen(true)}
+                onOpenProfile={() => setView('profile')}
+              />
+            ) : view === 'admin-members' ? (
+              <AdminMembersPage
                 onOpenMobileMenu={() => setMobileMenuOpen(true)}
                 onOpenProfile={() => setView('profile')}
               />
