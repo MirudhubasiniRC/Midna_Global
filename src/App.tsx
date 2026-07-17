@@ -11,11 +11,12 @@ import { ProfilePage } from './components/Profile/ProfilePage';
 import { PlaceholderPage } from './components/Placeholder/PlaceholderPage';
 import { LedgerPage } from './components/Ledger/LedgerPage';
 import { ScansMlaPage } from './components/Scans/ScansMlaPage';
+import { ReportsPage } from './components/Reports/ReportsPage';
 
 /** Covers iPhone 14 Pro Max (430px) and similar phones / small tablets */
 const MOBILE_QUERY = '(max-width: 860px)';
 
-type PlaceholderViewId = Exclude<AppView, 'dashboard' | 'profile' | 'ledger' | 'scans-mla'>;
+type PlaceholderViewId = Exclude<AppView, 'dashboard' | 'profile' | 'ledger' | 'scans-mla' | 'reports'>;
 
 /** Stub copy for the sections not yet built out — refine per-page as each is implemented */
 const placeholderPages: Record<PlaceholderViewId, { title: string; subtitle: string; actions?: string[] }> = {
@@ -23,11 +24,6 @@ const placeholderPages: Record<PlaceholderViewId, { title: string; subtitle: str
     title: 'My Scans (H.O)',
     subtitle: 'Preprocess, verify, and manage scan data at the Head Office.',
     actions: ['Preprocess', 'Verify', 'Data Download', 'Report Upload'],
-  },
-  reports: {
-    title: 'My Reports',
-    subtitle: 'Download, edit, and manage report data and CAB entries.',
-    actions: ['Download', 'Edit Data', 'Upgrade', 'CAB', 'Delete Scan'],
   },
   trainees: {
     title: 'My Trainees',
@@ -134,6 +130,11 @@ function App() {
               />
             ) : view === 'scans-mla' ? (
               <ScansMlaPage
+                onOpenMobileMenu={() => setMobileMenuOpen(true)}
+                onOpenProfile={() => setView('profile')}
+              />
+            ) : view === 'reports' ? (
+              <ReportsPage
                 onOpenMobileMenu={() => setMobileMenuOpen(true)}
                 onOpenProfile={() => setView('profile')}
               />
