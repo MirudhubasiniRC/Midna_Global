@@ -109,7 +109,7 @@ export function Sidebar({ collapsed, onToggle, activeView, onNavigate, onLogout 
           flex: 1,
           minHeight: 0,
           marginTop: collapsed ? 0 : 0,
-          overflowY: collapsed ? 'auto' : 'hidden',
+          overflowY: 'auto',
           overflowX: 'visible',
           alignItems: collapsed ? 'center' : 'stretch',
           justifyContent: 'flex-start',
@@ -130,7 +130,7 @@ export function Sidebar({ collapsed, onToggle, activeView, onNavigate, onLogout 
                     letterSpacing: '0.06em',
                     textTransform: 'uppercase',
                     padding: `0 ${spacing[3]}`,
-                    margin: '20px 0 6px',
+                    margin: '12px 0 4px',
                     flexShrink: 0,
                   }}
                 >
