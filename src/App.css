@@ -409,6 +409,80 @@
   align-items: stretch;
 }
 
+.trainees-layout {
+  display: grid;
+  grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
+  gap: 20px;
+  align-items: stretch;
+  flex: 1;
+  min-height: 0;
+}
+
+.app-main--fill {
+  overflow: hidden;
+}
+
+.app-content--fill {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  padding-bottom: 20px;
+}
+
+.trainees-page {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.trainees-page .page-header {
+  flex-shrink: 0;
+  margin-bottom: 20px;
+}
+
+.trainees-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.trainees-panel-header {
+  flex-shrink: 0;
+}
+
+.trainees-panel-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.trainees-table-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.trainees-table-toolbar {
+  flex-shrink: 0;
+}
+
+.trainees-table-body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+.trainees-table-footer {
+  flex-shrink: 0;
+}
+
 .profile-tile {
   display: flex !important;
   flex-direction: column;
@@ -555,6 +629,23 @@
 
   .profile-detail-grid {
     grid-template-columns: 1fr;
+  }
+
+  .trainees-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .app-main--fill {
+    overflow: auto;
+  }
+
+  .app-content--fill {
+    overflow: visible;
+    min-height: min(100%, auto);
+  }
+
+  .trainees-panel {
+    max-height: 320px;
   }
 
   .profile-hero-actions {

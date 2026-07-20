@@ -1,5 +1,6 @@
 import { env } from '../config/env';
 import { ApiError } from './errors';
+import { getToken } from './token';
 import type { RequestOptions } from './types';
 
 function buildUrl(path: string): string {
@@ -38,12 +39,15 @@ export async function apiClient<T>(path: string, options: RequestOptions = {}): 
   const onAbort = () => controller.abort();
   signal?.addEventListener('abort', onAbort);
 
+  const token = getToken();
+
   try {
     const response = await fetch(buildUrl(path), {
       method,
       headers: {
         Accept: 'application/json',
         ...(body !== undefined ? { 'Content-Type': 'application/json' } : {}),
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...headers,
       },
       body: body !== undefined ? JSON.stringify(body) : undefined,

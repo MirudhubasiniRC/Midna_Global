@@ -1,0 +1,344 @@
+/** Mock data for My Trainees — replace with API/Postgres later. */
+
+export type TraineeStatus = 'Active' | 'Inactive' | 'Pending';
+
+export type Trainee = {
+  id: string;
+  mentorId: string;
+  name: string;
+  email: string;
+  lastActive: string;
+  status: TraineeStatus;
+  role: string;
+};
+
+export type Mentor = {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  region: string;
+};
+
+export const mentors: Mentor[] = [
+  {
+    id: 'mentor-madhu',
+    name: 'Madhu Sharma',
+    email: 'madhu@midna.com',
+    role: 'Admin · Mentor',
+    region: 'Chennai HO',
+  },
+  {
+    id: 'mentor-priya',
+    name: 'Priya Nair',
+    email: 'priya@midna.com',
+    role: 'MLA Member · Mentor',
+    region: 'Kerala',
+  },
+  {
+    id: 'mentor-arjun',
+    name: 'Arjun Dev',
+    email: 'arjun@midna.com',
+    role: 'Counsellor · Mentor',
+    region: 'Coimbatore',
+  },
+  {
+    id: 'mentor-rathina',
+    name: 'Rathinaswamy A',
+    email: 'rathina@midna.com',
+    role: 'Senior Mentor',
+    region: 'Tamil Nadu',
+  },
+  {
+    id: 'mentor-riya',
+    name: 'Riya Saravanan',
+    email: 'riya@midna.com',
+    role: 'MLA Member · Mentor',
+    region: 'Chennai',
+  },
+  {
+    id: 'mentor-suresh',
+    name: 'Suresh Kumar',
+    email: 'suresh@midna.com',
+    role: 'Counsellor · Mentor',
+    region: 'Bangalore',
+  },
+  {
+    id: 'mentor-lakshmi',
+    name: 'Lakshmi Venkat',
+    email: 'lakshmi@midna.com',
+    role: 'MLA Member · Mentor',
+    region: 'Hyderabad',
+  },
+  {
+    id: 'mentor-gopal',
+    name: 'Gopal Menon',
+    email: 'gopal@midna.com',
+    role: 'Senior Mentor',
+    region: 'Kerala',
+  },
+  {
+    id: 'mentor-neha',
+    name: 'Neha Gupta',
+    email: 'neha@midna.com',
+    role: 'Counsellor · Mentor',
+    region: 'Mumbai',
+  },
+  {
+    id: 'mentor-karthik',
+    name: 'Karthik Reddy',
+    email: 'karthik@midna.com',
+    role: 'MLA Member · Mentor',
+    region: 'Andhra Pradesh',
+  },
+];
+
+export const trainees: Trainee[] = [
+  {
+    id: 't1',
+    mentorId: 'mentor-madhu',
+    name: 'Robert Fox',
+    email: 'robert.fox@midna.com',
+    lastActive: '22 Apr 2026',
+    status: 'Active',
+    role: 'Trainee',
+  },
+  {
+    id: 't2',
+    mentorId: 'mentor-madhu',
+    name: 'Esther Howard',
+    email: 'esther.h@midna.com',
+    lastActive: '22 Apr 2026',
+    status: 'Active',
+    role: 'Trainee',
+  },
+  {
+    id: 't3',
+    mentorId: 'mentor-madhu',
+    name: 'Rubia Richards',
+    email: 'rubia.r@midna.com',
+    lastActive: '20 Apr 2026',
+    status: 'Inactive',
+    role: 'Trainee',
+  },
+  {
+    id: 't4',
+    mentorId: 'mentor-madhu',
+    name: 'Jane Cooper',
+    email: 'jane.c@midna.com',
+    lastActive: '18 Apr 2026',
+    status: 'Pending',
+    role: 'Trainee',
+  },
+  {
+    id: 't5',
+    mentorId: 'mentor-madhu',
+    name: 'Devon Lane',
+    email: 'devon.l@midna.com',
+    lastActive: '15 Apr 2026',
+    status: 'Active',
+    role: 'Junior Counsellor',
+  },
+  {
+    id: 't6',
+    mentorId: 'mentor-priya',
+    name: 'Courtney Henry',
+    email: 'courtney.h@midna.com',
+    lastActive: '21 Apr 2026',
+    status: 'Active',
+    role: 'Trainee',
+  },
+  {
+    id: 't7',
+    mentorId: 'mentor-priya',
+    name: 'Cameron Williamson',
+    email: 'cameron.w@midna.com',
+    lastActive: '19 Apr 2026',
+    status: 'Pending',
+    role: 'Trainee',
+  },
+  {
+    id: 't8',
+    mentorId: 'mentor-priya',
+    name: 'Leslie Alexander',
+    email: 'leslie.a@midna.com',
+    lastActive: '12 Apr 2026',
+    status: 'Inactive',
+    role: 'Trainee',
+  },
+  {
+    id: 't9',
+    mentorId: 'mentor-arjun',
+    name: 'Ananya Krishnan',
+    email: 'ananya.k@midna.com',
+    lastActive: '23 Apr 2026',
+    status: 'Active',
+    role: 'Trainee',
+  },
+  {
+    id: 't10',
+    mentorId: 'mentor-arjun',
+    name: 'Vikram Patel',
+    email: 'vikram.p@midna.com',
+    lastActive: '10 Apr 2026',
+    status: 'Active',
+    role: 'Trainee',
+  },
+  {
+    id: 't11',
+    mentorId: 'mentor-rathina',
+    name: 'Meera Iyer',
+    email: 'meera.i@midna.com',
+    lastActive: '22 Apr 2026',
+    status: 'Active',
+    role: 'Senior Trainee',
+  },
+  {
+    id: 't12',
+    mentorId: 'mentor-rathina',
+    name: 'Karthik Subramanian',
+    email: 'karthik.s@midna.com',
+    lastActive: '08 Apr 2026',
+    status: 'Pending',
+    role: 'Trainee',
+  },
+  {
+    id: 't13',
+    mentorId: 'mentor-rathina',
+    name: 'Divya Menon',
+    email: 'divya.m@midna.com',
+    lastActive: '05 Apr 2026',
+    status: 'Inactive',
+    role: 'Trainee',
+  },
+  {
+    id: 't14',
+    mentorId: 'mentor-riya',
+    name: 'Sneha Pillai',
+    email: 'sneha.p@midna.com',
+    lastActive: '20 Apr 2026',
+    status: 'Active',
+    role: 'Trainee',
+  },
+  {
+    id: 't15',
+    mentorId: 'mentor-riya',
+    name: 'Rahul Nair',
+    email: 'rahul.n@midna.com',
+    lastActive: '17 Apr 2026',
+    status: 'Pending',
+    role: 'Trainee',
+  },
+  {
+    id: 't16',
+    mentorId: 'mentor-suresh',
+    name: 'Aditi Rao',
+    email: 'aditi.r@midna.com',
+    lastActive: '22 Apr 2026',
+    status: 'Active',
+    role: 'Trainee',
+  },
+  {
+    id: 't17',
+    mentorId: 'mentor-suresh',
+    name: 'Manoj Bhat',
+    email: 'manoj.b@midna.com',
+    lastActive: '14 Apr 2026',
+    status: 'Active',
+    role: 'Junior Counsellor',
+  },
+  {
+    id: 't18',
+    mentorId: 'mentor-suresh',
+    name: 'Pooja Desai',
+    email: 'pooja.d@midna.com',
+    lastActive: '11 Apr 2026',
+    status: 'Inactive',
+    role: 'Trainee',
+  },
+  {
+    id: 't19',
+    mentorId: 'mentor-lakshmi',
+    name: 'Harish Varma',
+    email: 'harish.v@midna.com',
+    lastActive: '21 Apr 2026',
+    status: 'Active',
+    role: 'Trainee',
+  },
+  {
+    id: 't20',
+    mentorId: 'mentor-lakshmi',
+    name: 'Swathi Reddy',
+    email: 'swathi.r@midna.com',
+    lastActive: '19 Apr 2026',
+    status: 'Active',
+    role: 'Trainee',
+  },
+  {
+    id: 't21',
+    mentorId: 'mentor-gopal',
+    name: 'Binu Thomas',
+    email: 'binu.t@midna.com',
+    lastActive: '23 Apr 2026',
+    status: 'Active',
+    role: 'Senior Trainee',
+  },
+  {
+    id: 't22',
+    mentorId: 'mentor-gopal',
+    name: 'Deepa Nambiar',
+    email: 'deepa.n@midna.com',
+    lastActive: '16 Apr 2026',
+    status: 'Pending',
+    role: 'Trainee',
+  },
+  {
+    id: 't23',
+    mentorId: 'mentor-neha',
+    name: 'Amit Shah',
+    email: 'amit.s@midna.com',
+    lastActive: '22 Apr 2026',
+    status: 'Active',
+    role: 'Trainee',
+  },
+  {
+    id: 't24',
+    mentorId: 'mentor-neha',
+    name: 'Kavita Joshi',
+    email: 'kavita.j@midna.com',
+    lastActive: '13 Apr 2026',
+    status: 'Inactive',
+    role: 'Trainee',
+  },
+  {
+    id: 't25',
+    mentorId: 'mentor-karthik',
+    name: 'Srinivas Rao',
+    email: 'srinivas.r@midna.com',
+    lastActive: '20 Apr 2026',
+    status: 'Active',
+    role: 'Trainee',
+  },
+  {
+    id: 't26',
+    mentorId: 'mentor-karthik',
+    name: 'Lalitha Kumari',
+    email: 'lalitha.k@midna.com',
+    lastActive: '18 Apr 2026',
+    status: 'Pending',
+    role: 'Trainee',
+  },
+  {
+    id: 't27',
+    mentorId: 'mentor-karthik',
+    name: 'Venkat Prasad',
+    email: 'venkat.p@midna.com',
+    lastActive: '09 Apr 2026',
+    status: 'Active',
+    role: 'Junior Counsellor',
+  },
+];
+
+export function traineeCountFor(mentorId: string): number {
+  return trainees.filter((t) => t.mentorId === mentorId).length;
+}

@@ -1,15 +1,18 @@
 import { useState } from 'react';
+import { ApiError, login } from '../../api';
+import type { Member } from '../../api';
 import logo from '../../assets/high-resolution-color-logo.png';
 
 type AuthPageProps = {
-  onAuthenticated: () => void;
+  onAuthenticated: (member: Member) => void;
 };
 
 export function AuthPage({ onAuthenticated }: AuthPageProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const email = String(data.get('email') ?? '').trim();
@@ -21,7 +24,23 @@ export function AuthPage({ onAuthenticated }: AuthPageProps) {
     }
 
     setError('');
-    onAuthenticated();
+    setLoading(true);
+    try {
+      const result = await login({ email, password });
+      onAuthenticated(result.member);
+    } catch (err) {
+      if (err instanceof ApiError) {
+        const detail =
+          typeof err.body === 'object' && err.body !== null && 'detail' in err.body
+            ? String((err.body as { detail: unknown }).detail)
+            : err.message;
+        setError(detail || 'Sign in failed.');
+      } else {
+        setError('Unable to reach the server. Is the backend running?');
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -44,7 +63,7 @@ export function AuthPage({ onAuthenticated }: AuthPageProps) {
                   <rect x="3" y="5" width="18" height="14" rx="3" />
                   <path d="m3 7 9 6 9-6" />
                 </svg>
-                <input name="email" type="email" autoComplete="email" placeholder="name@midna.com" />
+                <input name="email" type="email" autoComplete="email" placeholder="name@midna.com" disabled={loading} />
               </div>
             </label>
 
@@ -60,6 +79,7 @@ export function AuthPage({ onAuthenticated }: AuthPageProps) {
                   type={showPassword ? 'text' : 'password'}
                   autoComplete="current-password"
                   placeholder="Enter your password"
+                  disabled={loading}
                 />
                 <button
                   type="button"
@@ -97,8 +117,8 @@ export function AuthPage({ onAuthenticated }: AuthPageProps) {
               </p>
             )}
 
-            <button type="submit" className="auth-submit">
-              Sign in
+            <button type="submit" className="auth-submit" disabled={loading}>
+              {loading ? 'Signing in…' : 'Sign in'}
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M5 12h14M13 6l6 6-6 6" />
               </svg>

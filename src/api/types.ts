@@ -17,3 +17,58 @@ export type HealthResponse = {
 export type HelloResponse = {
   message: string;
 };
+
+/** Slim identity from login /auth/me */
+export type Member = {
+  mid: number;
+  mail_id: string;
+  role: string;
+  status: string;
+  name: string;
+};
+
+/** Full profile from /profile/me */
+export type MemberProfile = {
+  mid: number;
+  mail_id: string;
+  role: string;
+  status: string;
+  name: string;
+  mobile_1: string;
+  mobile_2: string;
+  dob: string | null;
+  country: string;
+  state: string;
+  pincode: string;
+  address: string;
+  doj: string | null;
+  mas_type: string;
+  expiry_date: string | null;
+  billing: string;
+  op_bal: number | null;
+  uid: string;
+  services: string;
+  availability: string;
+  certified: boolean;
+  cr_date: string | null;
+  mrp: string;
+  branding: string;
+  mis_training: string;
+  mentored_by: string;
+  admin_by: string;
+  remarks: string;
+};
+
+export type LoginRequest = {
+  email: string;
+  password: string;
+};
+
+export type LoginResponse = {
+  token: string;
+  member: Member;
+};
+
+export type MessageResponse = {
+  message: string;
+};

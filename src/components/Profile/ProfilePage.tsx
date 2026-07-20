@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
+import { getMyProfile } from '../../api';
+import type { MemberProfile } from '../../api';
 import { buttonTokens, colors, metricColors, radius, severityTokens, spacing, typography } from '../../styles/theme';
 import { EditProfileModal } from './EditProfileModal';
 import { AvatarCropModal } from './AvatarCropModal';
@@ -20,11 +22,6 @@ const subscriptionTiers: Record<SubscriptionTier, { emoji: string; color: string
   Ultima: { emoji: '👑', color: metricColors.purple.text, bg: metricColors.purple.bg, billing: '16%' },
 };
 
-/** No backend yet — this is the member's current tier, swap when subscriptions are wired up */
-const currentTier: SubscriptionTier = 'Diamond';
-const tier = subscriptionTiers[currentTier];
-
-/** Status — a distinct color per state so it reads at a glance, not just a label */
 type MemberStatus = 'Active' | 'On Hold' | 'Inactive';
 
 const statusTones: Record<MemberStatus, { color: string; bg: string }> = {
@@ -33,9 +30,31 @@ const statusTones: Record<MemberStatus, { color: string; bg: string }> = {
   Inactive: { color: theme.error, bg: theme['error-bg'] },
 };
 
-/** No backend yet — swap when member status is wired up */
-const currentStatus: MemberStatus = 'Active';
-const statusTone = statusTones[currentStatus];
+function formatDate(value: string | null | undefined): string {
+  if (!value) return '—';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+function formatMoney(value: number | null | undefined): string {
+  if (value == null) return '—';
+  return `₹${Number(value).toLocaleString('en-IN')}`;
+}
+
+function formatMid(mid: number): string {
+  return `M${String(mid).padStart(5, '0')}`;
+}
+
+function asStatus(value: string): MemberStatus {
+  if (value === 'On Hold' || value === 'Inactive') return value;
+  return 'Active';
+}
+
+function asTier(value: string): SubscriptionTier {
+  if (value === 'Gold' || value === 'Diamond' || value === 'Platinum' || value === 'Ultima') return value;
+  return 'Gold';
+}
 
 type PillProps = {
   label: string;
@@ -43,7 +62,6 @@ type PillProps = {
   bg: string;
   emoji?: string;
   dot?: boolean;
-  /** Animated "live" ping ring on the dot, like a YouTube live-analytics indicator */
   pulse?: boolean;
 };
 
@@ -217,7 +235,31 @@ export function ProfilePage({ onBack, onOpenMobileMenu }: ProfilePageProps) {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [pendingImage, setPendingImage] = useState<string | null>(null);
   const [liteSection, setLiteSection] = useState<string | null>(null);
+  const [profile, setProfile] = useState<MemberProfile | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const avatarInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    getMyProfile()
+      .then((data) => {
+        if (!cancelled) {
+          setProfile(data);
+          setError('');
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setError('Unable to load profile.');
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     if (!liteSection) return;
@@ -249,47 +291,133 @@ export function ProfilePage({ onBack, onOpenMobileMenu }: ProfilePageProps) {
     closeCropModal();
   };
 
+  if (loading) {
+    return (
+      <section className="page-section">
+        <p style={{ color: theme['text-secondary'] }}>Loading profile…</p>
+      </section>
+    );
+  }
+
+  if (error || !profile) {
+    return (
+      <section className="page-section">
+        <button type="button" className="btn-icon" aria-label="Back to dashboard" onClick={onBack}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="m15 6-6 6 6 6" />
+          </svg>
+        </button>
+        <p style={{ marginTop: spacing[4], color: theme.error }} role="alert">
+          {error || 'Profile not found.'}
+        </p>
+      </section>
+    );
+  }
+
+  const currentTier = asTier(profile.mas_type);
+  const tier = subscriptionTiers[currentTier];
+  const currentStatus = asStatus(profile.status);
+  const statusTone = statusTones[currentStatus];
+
   const personalFields = (
     <>
-      <DetailField label="Name" value="Arun Prakash" />
-      <DetailField label="Mobile 1" value="+91 98765 43210" />
-      <DetailField label="Date of Birth" value="14 Feb 1990" />
-      <DetailField label="Country" value="India" />
-      <DetailField label="State" value="Tamil Nadu" />
-      <DetailField label="Pincode" value="600028" />
-      <DetailField label="Address" value="No. 12, Anna Nagar, Chennai" />
+      <DetailField label="Name" value={profile.name || '—'} />
+      <DetailField label="Mobile 1" value={profile.mobile_1 || '—'} />
+      {profile.mobile_2 ? <DetailField label="Mobile 2" value={profile.mobile_2} /> : null}
+      <DetailField label="Date of Birth" value={formatDate(profile.dob)} />
+      <DetailField label="Country" value={profile.country || '—'} />
+      <DetailField label="State" value={profile.state || '—'} />
+      <DetailField label="Pincode" value={profile.pincode || '—'} />
+      <DetailField label="Address" value={profile.address || '—'} />
     </>
   );
 
   const membershipFields = (
     <>
-      <DetailField label="MID" value="M10048" />
-      <DetailField label="Date of Joining" value="03 Jan 2022" />
-      <DetailField label="Subscription" value={<Pill label={currentTier} color={tier.color} bg={tier.bg} emoji={tier.emoji} />} />
-      <DetailField label="Expiry Date" value="02 Jan 2027" />
-      <DetailField label="Billing" value={tier.billing} />
-      <DetailField label="Opening Balance" value="₹8,200" />
+      <DetailField label="MID" value={formatMid(profile.mid)} />
+      <DetailField label="Date of Joining" value={formatDate(profile.doj)} />
+      <DetailField
+        label="Subscription"
+        value={<Pill label={currentTier} color={tier.color} bg={tier.bg} emoji={tier.emoji} />}
+      />
+      <DetailField label="Expiry Date" value={formatDate(profile.expiry_date)} />
+      <DetailField label="Billing" value={profile.billing || tier.billing} />
+      <DetailField label="Opening Balance" value={formatMoney(profile.op_bal)} />
     </>
   );
 
   const professionalFields = (
     <>
-      <DetailField label="UID" value="MDN-UID-08812" />
-      <DetailField label="Services" value="Genetic Counseling, Sample Collection, Report Review" />
-      <DetailField label="Availability" value={<Pill label="Full Time" color={metricColors.blue.text} bg={metricColors.blue.bg} />} />
-      <DetailField label="Certified" value={<Pill label="Yes" color={theme.success} bg={theme['success-bg']} />} />
-      <DetailField label="Certification Date" value="18 Mar 2022" />
+      <DetailField label="UID" value={profile.uid || '—'} />
+      <DetailField label="Services" value={profile.services || '—'} />
+      <DetailField
+        label="Availability"
+        value={
+          profile.availability ? (
+            <Pill label={profile.availability} color={metricColors.blue.text} bg={metricColors.blue.bg} />
+          ) : (
+            '—'
+          )
+        }
+      />
+      <DetailField
+        label="Certified"
+        value={
+          <Pill
+            label={profile.certified ? 'Yes' : 'No'}
+            color={profile.certified ? theme.success : theme['text-muted']}
+            bg={profile.certified ? theme['success-bg'] : theme['bg-muted']}
+          />
+        }
+      />
+      <DetailField label="Certification Date" value={formatDate(profile.cr_date)} />
     </>
   );
 
   const visibilityFields = (
     <>
-      <DetailField label="MRP Visibility" value={<Pill label="Show" color={theme.success} bg={theme['success-bg']} />} />
-      <DetailField label="Branding" value={<Pill label="CBA" color={metricColors.purple.text} bg={metricColors.purple.bg} />} />
-      <DetailField label="MIS Training" value={<Pill label="Completed" color={theme.success} bg={theme['success-bg']} />} />
-      <DetailField label="Mentored By" value="Rathinaswamy A · 9597770205" />
-      <DetailField label="Admin By" value="Priya Shah" />
-      <DetailField label="Remarks" value={<span style={{ fontWeight: 400, color: theme['text-muted'], fontStyle: 'italic' }}>No remarks</span>} />
+      <DetailField
+        label="MRP Visibility"
+        value={
+          <Pill
+            label={profile.mrp || 'Show'}
+            color={profile.mrp === 'Hide' ? theme['text-muted'] : theme.success}
+            bg={profile.mrp === 'Hide' ? theme['bg-muted'] : theme['success-bg']}
+          />
+        }
+      />
+      <DetailField
+        label="Branding"
+        value={
+          profile.branding ? (
+            <Pill label={profile.branding} color={metricColors.purple.text} bg={metricColors.purple.bg} />
+          ) : (
+            '—'
+          )
+        }
+      />
+      <DetailField
+        label="MIS Training"
+        value={
+          profile.mis_training ? (
+            <Pill label={profile.mis_training} color={theme.success} bg={theme['success-bg']} />
+          ) : (
+            '—'
+          )
+        }
+      />
+      <DetailField label="Mentored By" value={profile.mentored_by || '—'} />
+      <DetailField label="Admin By" value={profile.admin_by || '—'} />
+      <DetailField
+        label="Remarks"
+        value={
+          profile.remarks ? (
+            profile.remarks
+          ) : (
+            <span style={{ fontWeight: 400, color: theme['text-muted'], fontStyle: 'italic' }}>No remarks</span>
+          )
+        }
+      />
     </>
   );
 
@@ -337,7 +465,6 @@ export function ProfilePage({ onBack, onOpenMobileMenu }: ProfilePageProps) {
         </div>
       </div>
 
-      {/* Hero card */}
       <div className="dash-card profile-hero-card" style={{ marginBottom: spacing[5], padding: spacing[8] }}>
         <div
           className="profile-hero-row"
@@ -428,27 +555,32 @@ export function ProfilePage({ onBack, onOpenMobileMenu }: ProfilePageProps) {
                 gap: 8,
               }}
             >
-              MiDNA (H.O)
-              <span
-                title="Certified – Admin"
-                aria-label="Verified · Certified Admin"
-                style={{
-                  width: 22,
-                  height: 22,
-                  borderRadius: '50%',
-                  background: '#3897F0',
-                  color: '#fff',
-                  display: 'inline-grid',
-                  placeItems: 'center',
-                  flexShrink: 0,
-                  boxShadow: '0 2px 8px rgba(56, 151, 240, 0.35)',
-                }}
-              >
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <path d="M20 6 9 17l-5-5" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </span>
+              {profile.name}
+              {profile.certified && (
+                <span
+                  title="Certified"
+                  aria-label="Verified · Certified"
+                  style={{
+                    width: 22,
+                    height: 22,
+                    borderRadius: '50%',
+                    background: '#3897F0',
+                    color: '#fff',
+                    display: 'inline-grid',
+                    placeItems: 'center',
+                    flexShrink: 0,
+                    boxShadow: '0 2px 8px rgba(56, 151, 240, 0.35)',
+                  }}
+                >
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M20 6 9 17l-5-5" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </span>
+              )}
             </h2>
+            <p style={{ margin: '6px 0 0', fontSize: 14, color: theme['text-secondary'] }}>
+              {profile.mail_id} · {formatMid(profile.mid)}
+            </p>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginTop: 12 }}>
               <Pill label={currentStatus} color={statusTone.color} bg={statusTone.bg} dot pulse />
               <Pill label={currentTier} color={tier.color} bg={tier.bg} emoji={tier.emoji} />
@@ -499,7 +631,6 @@ export function ProfilePage({ onBack, onOpenMobileMenu }: ProfilePageProps) {
         </DetailSection>
       </div>
 
-      {/* Certifications — display only; upload lives in Edit profile */}
       <div className="dash-card">
         <h2 style={{ margin: 0, fontSize: 20, fontWeight: 600, letterSpacing: '-0.01em', color: theme['text-primary'] }}>
           Certifications

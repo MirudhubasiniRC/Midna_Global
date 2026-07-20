@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import './App.css';
+import { getMe, getToken, logout as apiLogout } from './api';
+import type { Member } from './api';
 import { getThemeCssVars } from './styles/theme';
 import { Sidebar } from './components/Layout/Sidebar';
 import { MobileNavDrawer } from './components/Layout/MobileNavDrawer';
@@ -14,13 +16,14 @@ import { ScansMlaPage } from './components/Scans/ScansMlaPage';
 import { ReportsPage } from './components/Reports/ReportsPage';
 import { AuthPage } from './components/Auth/AuthPage';
 import { AdminMembersPage } from './components/Admin/AdminMembersPage';
+import { TraineesPage } from './components/Trainees/TraineesPage';
 
 /** Covers iPhone 14 Pro Max (430px) and similar phones / small tablets */
 const MOBILE_QUERY = '(max-width: 860px)';
 
 type PlaceholderViewId = Exclude<
   AppView,
-  'dashboard' | 'profile' | 'ledger' | 'scans-mla' | 'reports' | 'admin-members'
+  'dashboard' | 'profile' | 'ledger' | 'scans-mla' | 'reports' | 'admin-members' | 'trainees'
 >;
 
 /** Stub copy for the sections not yet built out — refine per-page as each is implemented */
@@ -29,11 +32,6 @@ const placeholderPages: Record<PlaceholderViewId, { title: string; subtitle: str
     title: 'My Scans (H.O)',
     subtitle: 'Preprocess, verify, and manage scan data at the Head Office.',
     actions: ['Preprocess', 'Verify', 'Data Download', 'Report Upload'],
-  },
-  trainees: {
-    title: 'My Trainees',
-    subtitle: 'Add, edit, and manage trainee records.',
-    actions: ['Add', 'Edit', 'Delete'],
   },
   'mis-cab': {
     title: 'MIS · CAB',
@@ -57,6 +55,8 @@ const placeholderPages: Record<PlaceholderViewId, { title: string; subtitle: str
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [authChecking, setAuthChecking] = useState(() => Boolean(getToken()));
+  const [, setMember] = useState<Member | null>(null);
   const [collapsed, setCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [view, setView] = useState<AppView>('dashboard');
@@ -69,6 +69,34 @@ function App() {
     Object.entries(vars).forEach(([key, value]) => {
       document.documentElement.style.setProperty(key, value);
     });
+  }, []);
+
+  useEffect(() => {
+    if (!getToken()) {
+      setAuthChecking(false);
+      return;
+    }
+
+    let cancelled = false;
+    getMe()
+      .then((current) => {
+        if (cancelled) return;
+        setMember(current);
+        setIsAuthenticated(true);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        void apiLogout().catch(() => undefined);
+        setMember(null);
+        setIsAuthenticated(false);
+      })
+      .finally(() => {
+        if (!cancelled) setAuthChecking(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
@@ -97,13 +125,26 @@ function App() {
   }, [mobileMenuOpen]);
 
   const handleLogout = () => {
+    void apiLogout().catch(() => undefined);
+    setMember(null);
     setView('dashboard');
     setMobileMenuOpen(false);
     setIsAuthenticated(false);
   };
 
+  if (authChecking) {
+    return null;
+  }
+
   if (!isAuthenticated) {
-    return <AuthPage onAuthenticated={() => setIsAuthenticated(true)} />;
+    return (
+      <AuthPage
+        onAuthenticated={(current) => {
+          setMember(current);
+          setIsAuthenticated(true);
+        }}
+      />
+    );
   }
 
   return (
@@ -118,8 +159,8 @@ function App() {
             onLogout={handleLogout}
           />
         )}
-        <div className="app-main">
-          <main className="app-content panel">
+        <div className={`app-main${view === 'trainees' ? ' app-main--fill' : ''}`}>
+          <main className={`app-content panel${view === 'trainees' ? ' app-content--fill' : ''}`}>
             {view === 'profile' ? (
               <ProfilePage
                 onBack={() => setView('dashboard')}
@@ -154,6 +195,11 @@ function App() {
               />
             ) : view === 'admin-members' ? (
               <AdminMembersPage
+                onOpenMobileMenu={() => setMobileMenuOpen(true)}
+                onOpenProfile={() => setView('profile')}
+              />
+            ) : view === 'trainees' ? (
+              <TraineesPage
                 onOpenMobileMenu={() => setMobileMenuOpen(true)}
                 onOpenProfile={() => setView('profile')}
               />
