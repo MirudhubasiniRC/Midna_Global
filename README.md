@@ -1,4 +1,4 @@
-# Midna_Global
+# frontend
 
 This is a private project for Midna Global — a React + TypeScript frontend built with Vite.
 
