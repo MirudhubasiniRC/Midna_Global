@@ -17,13 +17,21 @@ import { ReportsPage } from './components/Reports/ReportsPage';
 import { AuthPage } from './components/Auth/AuthPage';
 import { AdminMembersPage } from './components/Admin/AdminMembersPage';
 import { TraineesPage } from './components/Trainees/TraineesPage';
+import { CommunicationsPage } from './components/Communications/CommunicationsPage';
 
 /** Covers iPhone 14 Pro Max (430px) and similar phones / small tablets */
 const MOBILE_QUERY = '(max-width: 860px)';
 
 type PlaceholderViewId = Exclude<
   AppView,
-  'dashboard' | 'profile' | 'ledger' | 'scans-mla' | 'reports' | 'admin-members' | 'trainees'
+  | 'dashboard'
+  | 'profile'
+  | 'ledger'
+  | 'scans-mla'
+  | 'reports'
+  | 'admin-members'
+  | 'trainees'
+  | 'mis-communications'
 >;
 
 /** Stub copy for the sections not yet built out — refine per-page as each is implemented */
@@ -37,10 +45,6 @@ const placeholderPages: Record<PlaceholderViewId, { title: string; subtitle: str
     title: 'MIS · CAB',
     subtitle: 'Manage CAB debit and delete actions.',
     actions: ['Debit', 'Delete'],
-  },
-  'mis-communications': {
-    title: 'MIS · Communications',
-    subtitle: 'Manage communications sent across the network.',
   },
   'mis-network': {
     title: 'MIS · Network Performance',
@@ -200,6 +204,11 @@ function App() {
               />
             ) : view === 'trainees' ? (
               <TraineesPage
+                onOpenMobileMenu={() => setMobileMenuOpen(true)}
+                onOpenProfile={() => setView('profile')}
+              />
+            ) : view === 'mis-communications' ? (
+              <CommunicationsPage
                 onOpenMobileMenu={() => setMobileMenuOpen(true)}
                 onOpenProfile={() => setView('profile')}
               />

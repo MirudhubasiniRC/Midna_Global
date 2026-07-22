@@ -483,6 +483,73 @@
   flex-shrink: 0;
 }
 
+.comm-compose-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.9fr);
+  gap: 20px;
+  align-items: start;
+  width: 100%;
+  min-width: 0;
+}
+
+.comm-page {
+  width: 100%;
+  min-width: 0;
+}
+
+.comm-tabs {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 4px;
+  border-radius: 999px;
+  background: var(--color-bg-muted, #f1f3f5);
+  margin-bottom: 20px;
+  max-width: 100%;
+}
+
+.comm-tab {
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--color-text-secondary, #868e96);
+}
+
+.comm-tab.is-active {
+  background: var(--color-bg-surface, #fff);
+  color: var(--color-primary, #4c6ef5);
+  box-shadow: var(--shadow-float);
+}
+
+.comm-audience-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.comm-card-scroll {
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+@media (max-width: 1200px) {
+  .comm-compose-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(240px, 0.85fr);
+    gap: 16px;
+  }
+}
+
+@media (max-width: 1100px) {
+  .comm-compose-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .profile-tile {
   display: flex !important;
   flex-direction: column;
@@ -633,6 +700,38 @@
 
   .trainees-layout {
     grid-template-columns: 1fr;
+  }
+
+  .comm-compose-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .comm-tabs {
+    display: flex;
+    width: 100%;
+    border-radius: 14px;
+  }
+
+  .comm-tab {
+    flex: 1;
+    text-align: center;
+    padding: 10px 8px;
+    font-size: 12px;
+  }
+
+  .comm-card-scroll {
+    max-height: 220px;
+  }
+
+  .comm-compose-actions {
+    width: 100%;
+  }
+
+  .comm-compose-actions .btn-pill-primary,
+  .comm-compose-actions .btn-pill-secondary {
+    flex: 1;
+    justify-content: center;
   }
 
   .app-main--fill {

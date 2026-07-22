@@ -1,51 +1,11 @@
-import { useState } from 'react';
+import { useState, useSyncExternalStore } from 'react';
 import { colors, layoutTokens, radius, severityTokens, shadow, spacing, type SeverityLevel } from '../../styles/theme';
+import {
+  getCommunicationsState,
+  subscribeCommunications,
+} from '../Communications/communicationsData';
 
 const theme = colors.light;
-
-type Notice = {
-  id: string;
-  severity: SeverityLevel;
-  headline: string;
-  body: string;
-  author: string;
-  datetime: string;
-  initials: string;
-  seenCount: number;
-};
-
-const notices: Notice[] = [
-  {
-    id: '1',
-    severity: 'low',
-    headline: 'Tomorrow is a Holiday!',
-    body: 'Let us make a promise that we would not let the hard sacrifices of our brave freedom fighters go in vain. We would work hard to make our country the best in the world. Happy Republic Day!',
-    author: 'HR Team',
-    datetime: 'Jan 14th, 2021 · 10:30 AM',
-    initials: 'HR',
-    seenCount: 18,
-  },
-  {
-    id: '2',
-    severity: 'high',
-    headline: 'System maintenance window',
-    body: 'A brief maintenance window is planned this weekend. Dashboard access may be intermittent between 2:00 AM and 4:00 AM. Please plan scans accordingly.',
-    author: 'Ops Team',
-    datetime: 'Mar 2nd, 2026 · 09:15 AM',
-    initials: 'OT',
-    seenCount: 6,
-  },
-  {
-    id: '3',
-    severity: 'medium',
-    headline: 'New billing summary live',
-    body: 'Your year-to-date and all-time billing figures are now reflected on the dashboard KPIs. Reach out to accounts if any number looks off.',
-    author: 'Accounts',
-    datetime: 'Jul 1st, 2026 · 11:00 AM',
-    initials: 'AC',
-    seenCount: 11,
-  },
-];
 
 const severityIcon: Record<SeverityLevel, React.ReactNode> = {
   high: (
@@ -71,7 +31,14 @@ const severityIcon: Record<SeverityLevel, React.ReactNode> = {
 };
 
 export function NoticeBoard() {
+  const { communications } = useSyncExternalStore(
+    subscribeCommunications,
+    getCommunicationsState,
+    getCommunicationsState
+  );
   const [acknowledged, setAcknowledged] = useState<Record<string, boolean>>({});
+
+  const notices = communications;
 
   const toggleAcknowledged = (id: string) => {
     setAcknowledged((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -147,114 +114,120 @@ export function NoticeBoard() {
           marginRight: -4,
         }}
       >
-        {notices.map((notice) => {
-          const tone = severityTokens[notice.severity];
-          return (
-            <article
-              key={notice.id}
-              style={{
-                borderRadius: radius.lg,
-                border: 'none',
-                background: tone.bg,
-                padding: spacing[4],
-                boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.55)',
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-                <span
-                  style={{
-                    width: 32,
-                    height: 32,
-                    borderRadius: '50%',
-                    display: 'grid',
-                    placeItems: 'center',
-                    flexShrink: 0,
-                    marginTop: 1,
-                    background: theme['bg-surface'],
-                    color: tone.icon,
-                    boxShadow: shadow.float,
-                  }}
-                >
-                  {severityIcon[notice.severity]}
-                </span>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <h3
+        {notices.length === 0 ? (
+          <p style={{ margin: 'auto 0', textAlign: 'center', fontSize: 13, color: theme['text-muted'] }}>
+            No notices yet. Publish one from Communications.
+          </p>
+        ) : (
+          notices.map((notice) => {
+            const tone = severityTokens[notice.severity];
+            return (
+              <article
+                key={notice.id}
+                style={{
+                  borderRadius: radius.lg,
+                  border: 'none',
+                  background: tone.bg,
+                  padding: spacing[4],
+                  boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.55)',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                  <span
                     style={{
-                      margin: 0,
-                      fontSize: 15,
-                      fontWeight: 600,
-                      color: tone.text,
+                      width: 32,
+                      height: 32,
+                      borderRadius: '50%',
+                      display: 'grid',
+                      placeItems: 'center',
+                      flexShrink: 0,
+                      marginTop: 1,
+                      background: theme['bg-surface'],
+                      color: tone.icon,
+                      boxShadow: shadow.float,
                     }}
                   >
-                    {notice.headline}
-                  </h3>
-                  <p
-                    style={{
-                      margin: '6px 0 0',
-                      fontSize: 13,
-                      lineHeight: 1.55,
-                      color: theme['text-secondary'],
-                    }}
-                  >
-                    {notice.body}
-                  </p>
-
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 14, flexWrap: 'wrap' }}>
-                    <div
+                    {severityIcon[notice.severity]}
+                  </span>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <h3
                       style={{
-                        width: 24,
-                        height: 24,
-                        borderRadius: '50%',
-                        background: theme['bg-surface'],
-                        color: theme['text-secondary'],
-                        display: 'grid',
-                        placeItems: 'center',
-                        fontSize: 10,
-                        fontWeight: 700,
-                        flexShrink: 0,
-                        boxShadow: shadow.float,
-                      }}
-                    >
-                      {notice.initials}
-                    </div>
-                    <span style={{ fontSize: 12, fontWeight: 600, color: theme['text-primary'] }}>{notice.author}</span>
-                    <span style={{ fontSize: 12, color: theme['text-muted'] }}>· {notice.datetime}</span>
-
-                    <button
-                      type="button"
-                      onClick={() => toggleAcknowledged(notice.id)}
-                      aria-pressed={!!acknowledged[notice.id]}
-                      className="notice-ack-btn"
-                      style={{
-                        marginLeft: 'auto',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: 5,
-                        flexShrink: 0,
-                        padding: '6px 12px',
-                        borderRadius: radius.pill,
-                        border: 'none',
-                        background: acknowledged[notice.id] ? theme.success : theme['bg-surface'],
-                        color: acknowledged[notice.id] ? '#fff' : tone.icon,
-                        fontSize: 11,
+                        margin: 0,
+                        fontSize: 15,
                         fontWeight: 600,
-                        cursor: 'pointer',
-                        boxShadow: acknowledged[notice.id] ? '0 6px 14px rgba(81, 207, 102, 0.3)' : shadow.float,
+                        color: tone.text,
                       }}
                     >
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M20 6 9 17l-5-5" />
-                      </svg>
-                      {acknowledged[notice.id]
-                        ? `Read · ${notice.seenCount + 1}`
-                        : `Mark as read · ${notice.seenCount}`}
-                    </button>
+                      {notice.title}
+                    </h3>
+                    <p
+                      style={{
+                        margin: '6px 0 0',
+                        fontSize: 13,
+                        lineHeight: 1.55,
+                        color: theme['text-secondary'],
+                      }}
+                    >
+                      {notice.body}
+                    </p>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 14, flexWrap: 'wrap' }}>
+                      <div
+                        style={{
+                          width: 24,
+                          height: 24,
+                          borderRadius: '50%',
+                          background: theme['bg-surface'],
+                          color: theme['text-secondary'],
+                          display: 'grid',
+                          placeItems: 'center',
+                          fontSize: 10,
+                          fontWeight: 700,
+                          flexShrink: 0,
+                          boxShadow: shadow.float,
+                        }}
+                      >
+                        {notice.authorInitials}
+                      </div>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: theme['text-primary'] }}>{notice.author}</span>
+                      <span style={{ fontSize: 12, color: theme['text-muted'] }}>· {notice.createdAt}</span>
+
+                      <button
+                        type="button"
+                        onClick={() => toggleAcknowledged(notice.id)}
+                        aria-pressed={!!acknowledged[notice.id]}
+                        className="notice-ack-btn"
+                        style={{
+                          marginLeft: 'auto',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 5,
+                          flexShrink: 0,
+                          padding: '6px 12px',
+                          borderRadius: radius.pill,
+                          border: 'none',
+                          background: acknowledged[notice.id] ? theme.success : theme['bg-surface'],
+                          color: acknowledged[notice.id] ? '#fff' : tone.icon,
+                          fontSize: 11,
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                          boxShadow: acknowledged[notice.id] ? '0 6px 14px rgba(81, 207, 102, 0.3)' : shadow.float,
+                        }}
+                      >
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M20 6 9 17l-5-5" />
+                        </svg>
+                        {acknowledged[notice.id]
+                          ? `Read · ${notice.seenCount + 1}`
+                          : `Mark as read · ${notice.seenCount}`}
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </article>
-          );
-        })}
+              </article>
+            );
+          })
+        )}
       </div>
     </section>
   );
